@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xy.fedex.catalog.dao.MetricDao" >
+  <resultMap id="BaseResultMap" type="com.xy.fedex.catalog.po.MetricPO" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="tenant_id" property="tenantId" jdbcType="BIGINT" />
+    <result column="biz_line_id" property="bizLineId" jdbcType="BIGINT" />
+    <result column="subject_id" property="subjectId" jdbcType="BIGINT" />
+    <result column="metric_name" property="metricName" jdbcType="VARCHAR" />
+    <result column="metric_desc" property="metricDesc" jdbcType="VARCHAR" />
+    <result column="unit" property="unit" jdbcType="INTEGER" />
+    <result column="metric_format" property="metricFormat" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="creator" property="creator" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, tenant_id, biz_line_id, subject_id, metric_name, metric_desc, unit, metric_format, 
+    status, create_time, update_time, creator
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from metric
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from metric
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.xy.fedex.catalog.po.MetricPO" >
+    insert into metric (id, tenant_id, biz_line_id, 
+      subject_id, metric_name, metric_desc, 
+      unit, metric_format, status, 
+      create_time, update_time, creator
+      )
+    values (#{id,jdbcType=BIGINT}, #{tenantId,jdbcType=BIGINT}, #{bizLineId,jdbcType=BIGINT}, 
+      #{subjectId,jdbcType=BIGINT}, #{metricName,jdbcType=VARCHAR}, #{metricDesc,jdbcType=VARCHAR}, 
+      #{unit,jdbcType=INTEGER}, #{metricFormat,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{creator,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.xy.fedex.catalog.po.MetricPO" >
+    insert into metric
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="tenantId != null" >
+        tenant_id,
+      </if>
+      <if test="bizLineId != null" >
+        biz_line_id,
+      </if>
+      <if test="subjectId != null" >
+        subject_id,
+      </if>
+      <if test="metricName != null" >
+        metric_name,
+      </if>
+      <if test="metricDesc != null" >
+        metric_desc,
+      </if>
+      <if test="unit != null" >
+        unit,
+      </if>
+      <if test="metricFormat != null" >
+        metric_format,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="creator != null" >
+        creator,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="tenantId != null" >
+        #{tenantId,jdbcType=BIGINT},
+      </if>
+      <if test="bizLineId != null" >
+        #{bizLineId,jdbcType=BIGINT},
+      </if>
+      <if test="subjectId != null" >
+        #{subjectId,jdbcType=BIGINT},
+      </if>
+      <if test="metricName != null" >
+        #{metricName,jdbcType=VARCHAR},
+      </if>
+      <if test="metricDesc != null" >
+        #{metricDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="unit != null" >
+        #{unit,jdbcType=INTEGER},
+      </if>
+      <if test="metricFormat != null" >
+        #{metricFormat,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="creator != null" >
+        #{creator,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.xy.fedex.catalog.po.MetricPO" >
+    update metric
+    <set >
+      <if test="tenantId != null" >
+        tenant_id = #{tenantId,jdbcType=BIGINT},
+      </if>
+      <if test="bizLineId != null" >
+        biz_line_id = #{bizLineId,jdbcType=BIGINT},
+      </if>
+      <if test="subjectId != null" >
+        subject_id = #{subjectId,jdbcType=BIGINT},
+      </if>
+      <if test="metricName != null" >
+        metric_name = #{metricName,jdbcType=VARCHAR},
+      </if>
+      <if test="metricDesc != null" >
+        metric_desc = #{metricDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="unit != null" >
+        unit = #{unit,jdbcType=INTEGER},
+      </if>
+      <if test="metricFormat != null" >
+        metric_format = #{metricFormat,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="creator != null" >
+        creator = #{creator,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.xy.fedex.catalog.po.MetricPO" >
+    update metric
+    set tenant_id = #{tenantId,jdbcType=BIGINT},
+      biz_line_id = #{bizLineId,jdbcType=BIGINT},
+      subject_id = #{subjectId,jdbcType=BIGINT},
+      metric_name = #{metricName,jdbcType=VARCHAR},
+      metric_desc = #{metricDesc,jdbcType=VARCHAR},
+      unit = #{unit,jdbcType=INTEGER},
+      metric_format = #{metricFormat,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      creator = #{creator,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

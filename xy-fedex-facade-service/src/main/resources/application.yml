@@ -1,0 +1,22 @@
+server:
+  port: 8080
+dubbo:
+  protocol:
+    name: dubbo
+    port: -1
+  registry:
+    address: zookeeper://127.0.0.1:2181
+  scan:
+    base-packages: com.xy.fedex.facade.api
+  provider:
+    timeout: 15000
+spring:
+  application:
+    name: xy-fedex-facade-service
+  cloud:
+    config:
+      discovery:
+        service-id: xy-fedex-facade-service
+        enabled: on
+
+dubbo.server.version: 1.0.0

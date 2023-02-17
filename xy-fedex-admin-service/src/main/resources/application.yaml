@@ -1,0 +1,31 @@
+server:
+  port: 8080
+dubbo:
+  protocol:
+    name: dubbo
+    port: -1
+  registry:
+    address: zookeeper://127.0.0.1:2181
+  scan:
+    base-packages: com.xy.fedex.admin.api
+  provider:
+    timeout: 15000
+spring:
+  application:
+    name: xy-fedex-admin-service
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/xy_cs_data?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&rewriteBatchedStatements=true
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  cloud:
+    config:
+      discovery:
+        service-id: xy-fedex-admin-service
+        enabled: on
+
+mybatis:
+  config-location: classpath:mybatis-config.xml
+  mapper-locations: classpath:mapper/*.xml
+
+dubbo.server.version: 1.0.0

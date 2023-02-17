@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xy.fedex.catalog.dao.ModelDao" >
+  <resultMap id="BaseResultMap" type="com.xy.fedex.catalog.po.ModelPO" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="tenant_id" property="tenantId" jdbcType="BIGINT" />
+    <result column="biz_line_id" property="bizLineId" jdbcType="BIGINT" />
+    <result column="model_name" property="modelName" jdbcType="VARCHAR" />
+    <result column="model_desc" property="modelDesc" jdbcType="VARCHAR" />
+    <result column="dsn_id" property="dsnId" jdbcType="BIGINT" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="creator" property="creator" jdbcType="VARCHAR" />
+    <result column="model_definition" property="modelDefinition" jdbcType="LONGVARCHAR" />
+    <result column="model_prop" property="modelProp" jdbcType="LONGVARCHAR" />
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    id, tenant_id, biz_line_id, model_name, model_desc, dsn_id, status, create_time, 
+    update_time, creator,model_definition, model_prop
+  </sql>
+
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from model
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from model
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.xy.fedex.catalog.po.ModelPO" >
+    insert into model (id, tenant_id, biz_line_id, 
+      model_name, model_desc, dsn_id, 
+      status, create_time, update_time, 
+      creator, model_definition, model_prop
+      )
+    values (#{id,jdbcType=BIGINT}, #{tenantId,jdbcType=BIGINT}, #{bizLineId,jdbcType=BIGINT}, 
+      #{modelName,jdbcType=VARCHAR}, #{modelDesc,jdbcType=VARCHAR}, #{dsnId,jdbcType=BIGINT}, 
+      #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{creator,jdbcType=VARCHAR}, #{modelDefinition,jdbcType=LONGVARCHAR}, #{modelProp,jdbcType=LONGVARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.xy.fedex.catalog.po.ModelPO" >
+    insert into model
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="tenantId != null" >
+        tenant_id,
+      </if>
+      <if test="bizLineId != null" >
+        biz_line_id,
+      </if>
+      <if test="modelName != null" >
+        model_name,
+      </if>
+      <if test="modelDesc != null" >
+        model_desc,
+      </if>
+      <if test="dsnId != null" >
+        dsn_id,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="creator != null" >
+        creator,
+      </if>
+      <if test="modelDefinition != null" >
+        model_definition,
+      </if>
+      <if test="modelProp != null" >
+        model_prop,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="tenantId != null" >
+        #{tenantId,jdbcType=BIGINT},
+      </if>
+      <if test="bizLineId != null" >
+        #{bizLineId,jdbcType=BIGINT},
+      </if>
+      <if test="modelName != null" >
+        #{modelName,jdbcType=VARCHAR},
+      </if>
+      <if test="modelDesc != null" >
+        #{modelDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="dsnId != null" >
+        #{dsnId,jdbcType=BIGINT},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="creator != null" >
+        #{creator,jdbcType=VARCHAR},
+      </if>
+      <if test="modelDefinition != null" >
+        #{modelDefinition,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="modelProp != null" >
+        #{modelProp,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.xy.fedex.catalog.po.ModelPO" >
+    update model
+    <set >
+      <if test="tenantId != null" >
+        tenant_id = #{tenantId,jdbcType=BIGINT},
+      </if>
+      <if test="bizLineId != null" >
+        biz_line_id = #{bizLineId,jdbcType=BIGINT},
+      </if>
+      <if test="modelName != null" >
+        model_name = #{modelName,jdbcType=VARCHAR},
+      </if>
+      <if test="modelDesc != null" >
+        model_desc = #{modelDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="dsnId != null" >
+        dsn_id = #{dsnId,jdbcType=BIGINT},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="creator != null" >
+        creator = #{creator,jdbcType=VARCHAR},
+      </if>
+      <if test="modelDefinition != null" >
+        model_definition = #{modelDefinition,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="modelProp != null" >
+        model_prop = #{modelProp,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.xy.fedex.catalog.po.ModelPO" >
+    update model
+    set tenant_id = #{tenantId,jdbcType=BIGINT},
+      biz_line_id = #{bizLineId,jdbcType=BIGINT},
+      model_name = #{modelName,jdbcType=VARCHAR},
+      model_desc = #{modelDesc,jdbcType=VARCHAR},
+      dsn_id = #{dsnId,jdbcType=BIGINT},
+      status = #{status,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      creator = #{creator,jdbcType=VARCHAR},
+      model_definition = #{modelDefinition,jdbcType=LONGVARCHAR},
+      model_prop = #{modelProp,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.xy.fedex.catalog.po.ModelPO" >
+    update model
+    set tenant_id = #{tenantId,jdbcType=BIGINT},
+      biz_line_id = #{bizLineId,jdbcType=BIGINT},
+      model_name = #{modelName,jdbcType=VARCHAR},
+      model_desc = #{modelDesc,jdbcType=VARCHAR},
+      dsn_id = #{dsnId,jdbcType=BIGINT},
+      status = #{status,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      creator = #{creator,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

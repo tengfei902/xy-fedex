@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xy.fedex.catalog.dao.MetricModelDao" >
+  <resultMap id="BaseResultMap" type="com.xy.fedex.catalog.po.MetricModelPO" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="model_id" property="modelId" jdbcType="BIGINT" />
+    <result column="metric_id" property="metricId" jdbcType="BIGINT" />
+    <result column="formula" property="formula" jdbcType="VARCHAR" />
+    <result column="condition" property="condition" jdbcType="VARCHAR" />
+    <result column="allow_dims" property="allowDims" jdbcType="VARCHAR" />
+    <result column="force_dims" property="forceDims" jdbcType="VARCHAR" />
+    <result column="advance_caculate" property="advanceCaculate" jdbcType="VARCHAR" />
+    <result column="order_by" property="orderBy" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="creator" property="creator" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, model_id, metric_id, formula, condition, allow_dims, force_dims, advance_caculate, 
+    order_by, status, create_time, update_time, creator
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from metric_model
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from metric_model
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.xy.fedex.catalog.po.MetricModelPO" >
+    insert into metric_model (id, model_id, metric_id, 
+      formula, condition, allow_dims, 
+      force_dims, advance_caculate, order_by, 
+      status, create_time, update_time, 
+      creator)
+    values (#{id,jdbcType=BIGINT}, #{modelId,jdbcType=BIGINT}, #{metricId,jdbcType=BIGINT}, 
+      #{formula,jdbcType=VARCHAR}, #{condition,jdbcType=VARCHAR}, #{allowDims,jdbcType=VARCHAR}, 
+      #{forceDims,jdbcType=VARCHAR}, #{advanceCaculate,jdbcType=VARCHAR}, #{orderBy,jdbcType=VARCHAR}, 
+      #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{creator,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.xy.fedex.catalog.po.MetricModelPO" >
+    insert into metric_model
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="modelId != null" >
+        model_id,
+      </if>
+      <if test="metricId != null" >
+        metric_id,
+      </if>
+      <if test="formula != null" >
+        formula,
+      </if>
+      <if test="condition != null" >
+        condition,
+      </if>
+      <if test="allowDims != null" >
+        allow_dims,
+      </if>
+      <if test="forceDims != null" >
+        force_dims,
+      </if>
+      <if test="advanceCaculate != null" >
+        advance_caculate,
+      </if>
+      <if test="orderBy != null" >
+        order_by,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="creator != null" >
+        creator,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="modelId != null" >
+        #{modelId,jdbcType=BIGINT},
+      </if>
+      <if test="metricId != null" >
+        #{metricId,jdbcType=BIGINT},
+      </if>
+      <if test="formula != null" >
+        #{formula,jdbcType=VARCHAR},
+      </if>
+      <if test="condition != null" >
+        #{condition,jdbcType=VARCHAR},
+      </if>
+      <if test="allowDims != null" >
+        #{allowDims,jdbcType=VARCHAR},
+      </if>
+      <if test="forceDims != null" >
+        #{forceDims,jdbcType=VARCHAR},
+      </if>
+      <if test="advanceCaculate != null" >
+        #{advanceCaculate,jdbcType=VARCHAR},
+      </if>
+      <if test="orderBy != null" >
+        #{orderBy,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="creator != null" >
+        #{creator,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.xy.fedex.catalog.po.MetricModelPO" >
+    update metric_model
+    <set >
+      <if test="modelId != null" >
+        model_id = #{modelId,jdbcType=BIGINT},
+      </if>
+      <if test="metricId != null" >
+        metric_id = #{metricId,jdbcType=BIGINT},
+      </if>
+      <if test="formula != null" >
+        formula = #{formula,jdbcType=VARCHAR},
+      </if>
+      <if test="condition != null" >
+        condition = #{condition,jdbcType=VARCHAR},
+      </if>
+      <if test="allowDims != null" >
+        allow_dims = #{allowDims,jdbcType=VARCHAR},
+      </if>
+      <if test="forceDims != null" >
+        force_dims = #{forceDims,jdbcType=VARCHAR},
+      </if>
+      <if test="advanceCaculate != null" >
+        advance_caculate = #{advanceCaculate,jdbcType=VARCHAR},
+      </if>
+      <if test="orderBy != null" >
+        order_by = #{orderBy,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="creator != null" >
+        creator = #{creator,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.xy.fedex.catalog.po.MetricModelPO" >
+    update metric_model
+    set model_id = #{modelId,jdbcType=BIGINT},
+      metric_id = #{metricId,jdbcType=BIGINT},
+      formula = #{formula,jdbcType=VARCHAR},
+      condition = #{condition,jdbcType=VARCHAR},
+      allow_dims = #{allowDims,jdbcType=VARCHAR},
+      force_dims = #{forceDims,jdbcType=VARCHAR},
+      advance_caculate = #{advanceCaculate,jdbcType=VARCHAR},
+      order_by = #{orderBy,jdbcType=VARCHAR},
+      status = #{status,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      creator = #{creator,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>
