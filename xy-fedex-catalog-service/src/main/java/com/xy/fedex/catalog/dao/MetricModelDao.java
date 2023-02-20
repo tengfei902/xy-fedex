@@ -1,9 +1,10 @@
 package com.xy.fedex.catalog.dao;
 
 import com.xy.fedex.catalog.po.MetricModelPO;
+import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
-
+@Mapper
 public interface MetricModelDao {
     int deleteByPrimaryKey(Long id);
 

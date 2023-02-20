@@ -18,7 +18,11 @@ public class CatalogFacadeImpl implements CatalogFacade {
 
     @Override
     public Response<ModelDefinition> createModel(ModelRequest modelRequest) {
+        return null;
+    }
 
+    @Override
+    public Response<ModelDefinition> createModel(String select) {
         return null;
     }
 

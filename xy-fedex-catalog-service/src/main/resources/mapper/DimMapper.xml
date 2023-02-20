@@ -4,17 +4,17 @@
   <resultMap id="BaseResultMap" type="com.xy.fedex.catalog.po.DimPO" >
     <id column="id" property="id" jdbcType="BIGINT" />
     <result column="tenant_id" property="tenantId" jdbcType="BIGINT" />
-    <result column="biz_line_id" property="bizLineId" jdbcType="BIGINT" />
+    <result column="dim_code" property="dimCode" jdbcType="VARCHAR" />
     <result column="dim_name" property="dimName" jdbcType="VARCHAR" />
     <result column="dim_type" property="dimType" jdbcType="INTEGER" />
-    <result column="dim_desc" property="dimDesc" jdbcType="VARCHAR" />
+    <result column="dim_comment" property="dimComment" jdbcType="VARCHAR" />
     <result column="status" property="status" jdbcType="INTEGER" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
     <result column="creator" property="creator" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, tenant_id, biz_line_id, dim_name, dim_type, dim_desc, status, create_time, update_time, 
+    id, tenant_id, dim_code, dim_name, dim_type, dim_comment, status, create_time, update_time,
     creator
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
@@ -28,16 +28,16 @@
     where id = #{id,jdbcType=BIGINT}
   </delete>
   <insert id="insert" parameterType="com.xy.fedex.catalog.po.DimPO" >
-    insert into dim (id, tenant_id, biz_line_id, 
-      dim_name, dim_type, dim_desc, 
+    insert into dim (id, tenant_id, dim_code,
+      dim_name, dim_type, dim_comment,
       status, create_time, update_time, 
       creator)
-    values (#{id,jdbcType=BIGINT}, #{tenantId,jdbcType=BIGINT}, #{bizLineId,jdbcType=BIGINT}, 
-      #{dimName,jdbcType=VARCHAR}, #{dimType,jdbcType=INTEGER}, #{dimDesc,jdbcType=VARCHAR}, 
+    values (#{id,jdbcType=BIGINT}, #{tenantId,jdbcType=BIGINT}, #{dimCode,jdbcType=VARCHAR},
+      #{dimName,jdbcType=VARCHAR}, #{dimType,jdbcType=INTEGER}, #{dimComment,jdbcType=VARCHAR},
       #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
       #{creator,jdbcType=VARCHAR})
   </insert>
-  <insert id="insertSelective" parameterType="com.xy.fedex.catalog.po.DimPO" >
+  <insert id="insertSelective" useGeneratedKeys="true" keyProperty="id" parameterType="com.xy.fedex.catalog.po.DimPO" >
     insert into dim
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -46,8 +46,8 @@
       <if test="tenantId != null" >
         tenant_id,
       </if>
-      <if test="bizLineId != null" >
-        biz_line_id,
+      <if test="dimCode != null" >
+        dim_code,
       </if>
       <if test="dimName != null" >
         dim_name,
@@ -55,8 +55,8 @@
       <if test="dimType != null" >
         dim_type,
       </if>
-      <if test="dimDesc != null" >
-        dim_desc,
+      <if test="dimComment != null" >
+        dim_comment,
       </if>
       <if test="status != null" >
         status,
@@ -78,8 +78,8 @@
       <if test="tenantId != null" >
         #{tenantId,jdbcType=BIGINT},
       </if>
-      <if test="bizLineId != null" >
-        #{bizLineId,jdbcType=BIGINT},
+      <if test="dimCode != null" >
+        #{dimCode,jdbcType=BIGINT},
       </if>
       <if test="dimName != null" >
         #{dimName,jdbcType=VARCHAR},
@@ -87,8 +87,8 @@
       <if test="dimType != null" >
         #{dimType,jdbcType=INTEGER},
       </if>
-      <if test="dimDesc != null" >
-        #{dimDesc,jdbcType=VARCHAR},
+      <if test="dimComment != null" >
+        #{dimComment,jdbcType=VARCHAR},
       </if>
       <if test="status != null" >
         #{status,jdbcType=INTEGER},
@@ -110,8 +110,8 @@
       <if test="tenantId != null" >
         tenant_id = #{tenantId,jdbcType=BIGINT},
       </if>
-      <if test="bizLineId != null" >
-        biz_line_id = #{bizLineId,jdbcType=BIGINT},
+      <if test="dimCode != null" >
+        dim_code = #{dimCode,jdbcType=BIGINT},
       </if>
       <if test="dimName != null" >
         dim_name = #{dimName,jdbcType=VARCHAR},
@@ -119,8 +119,8 @@
       <if test="dimType != null" >
         dim_type = #{dimType,jdbcType=INTEGER},
       </if>
-      <if test="dimDesc != null" >
-        dim_desc = #{dimDesc,jdbcType=VARCHAR},
+      <if test="dimComment != null" >
+        dim_comment = #{dimComment,jdbcType=VARCHAR},
       </if>
       <if test="status != null" >
         status = #{status,jdbcType=INTEGER},
@@ -140,10 +140,10 @@
   <update id="updateByPrimaryKey" parameterType="com.xy.fedex.catalog.po.DimPO" >
     update dim
     set tenant_id = #{tenantId,jdbcType=BIGINT},
-      biz_line_id = #{bizLineId,jdbcType=BIGINT},
+      dim_code = #{dimCode,jdbcType=BIGINT},
       dim_name = #{dimName,jdbcType=VARCHAR},
       dim_type = #{dimType,jdbcType=INTEGER},
-      dim_desc = #{dimDesc,jdbcType=VARCHAR},
+      dim_comment = #{dimComment,jdbcType=VARCHAR},
       status = #{status,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},

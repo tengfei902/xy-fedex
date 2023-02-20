@@ -12,6 +12,8 @@ public interface CatalogFacade {
 
     Response<ModelDefinition> createModel(ModelRequest modelRequest);
 
+    Response<ModelDefinition> createModel(String select);
+
     Response<Metric.MetricModel> createMetricModel(MetricModelRequest metricModelRequest);
 
     Response<Dim.DimModel> createDimModelRequest(DimModelRequest dimModelRequest);

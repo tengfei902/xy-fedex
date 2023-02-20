@@ -6,8 +6,9 @@
     <result column="tenant_id" property="tenantId" jdbcType="BIGINT" />
     <result column="biz_line_id" property="bizLineId" jdbcType="BIGINT" />
     <result column="subject_id" property="subjectId" jdbcType="BIGINT" />
+    <result column="metric_code" property="metricCode" jdbcType="VARCHAR" />
     <result column="metric_name" property="metricName" jdbcType="VARCHAR" />
-    <result column="metric_desc" property="metricDesc" jdbcType="VARCHAR" />
+    <result column="metric_comment" property="metricComment" jdbcType="VARCHAR" />
     <result column="unit" property="unit" jdbcType="INTEGER" />
     <result column="metric_format" property="metricFormat" jdbcType="INTEGER" />
     <result column="status" property="status" jdbcType="INTEGER" />
@@ -16,7 +17,7 @@
     <result column="creator" property="creator" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, tenant_id, biz_line_id, subject_id, metric_name, metric_desc, unit, metric_format, 
+    id, tenant_id, biz_line_id, subject_id, metric_code, metric_name, metric_comment, unit, metric_format,
     status, create_time, update_time, creator
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
@@ -31,17 +32,18 @@
   </delete>
   <insert id="insert" parameterType="com.xy.fedex.catalog.po.MetricPO" >
     insert into metric (id, tenant_id, biz_line_id, 
-      subject_id, metric_name, metric_desc, 
+      subject_id, metric_code,metric_name, metric_comment,
       unit, metric_format, status, 
       create_time, update_time, creator
       )
     values (#{id,jdbcType=BIGINT}, #{tenantId,jdbcType=BIGINT}, #{bizLineId,jdbcType=BIGINT}, 
-      #{subjectId,jdbcType=BIGINT}, #{metricName,jdbcType=VARCHAR}, #{metricDesc,jdbcType=VARCHAR}, 
-      #{unit,jdbcType=INTEGER}, #{metricFormat,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, 
-      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{creator,jdbcType=VARCHAR}
+      #{subjectId,jdbcType=BIGINT},#{metricCode,jdbcType=VARCHAR}, #{metricName,jdbcType=VARCHAR},
+      #{metricComment,jdbcType=VARCHAR},#{unit,jdbcType=INTEGER}, #{metricFormat,jdbcType=INTEGER},
+      #{status,jdbcType=INTEGER},#{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP},
+      #{creator,jdbcType=VARCHAR}
       )
   </insert>
-  <insert id="insertSelective" parameterType="com.xy.fedex.catalog.po.MetricPO" >
+  <insert id="insertSelective" keyProperty="id" useGeneratedKeys="true" parameterType="com.xy.fedex.catalog.po.MetricPO" >
     insert into metric
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -56,11 +58,14 @@
       <if test="subjectId != null" >
         subject_id,
       </if>
+      <if test="metricCode != null" >
+        metric_code,
+      </if>
       <if test="metricName != null" >
         metric_name,
       </if>
-      <if test="metricDesc != null" >
-        metric_desc,
+      <if test="metricComment != null" >
+        metric_comment,
       </if>
       <if test="unit != null" >
         unit,
@@ -94,11 +99,14 @@
       <if test="subjectId != null" >
         #{subjectId,jdbcType=BIGINT},
       </if>
+      <if test="metricCode != null" >
+        #{metricCode,jdbcType=VARCHAR},
+      </if>
       <if test="metricName != null" >
         #{metricName,jdbcType=VARCHAR},
       </if>
-      <if test="metricDesc != null" >
-        #{metricDesc,jdbcType=VARCHAR},
+      <if test="metricComment != null" >
+        #{metricComment,jdbcType=VARCHAR},
       </if>
       <if test="unit != null" >
         #{unit,jdbcType=INTEGER},
@@ -132,11 +140,14 @@
       <if test="subjectId != null" >
         subject_id = #{subjectId,jdbcType=BIGINT},
       </if>
-      <if test="metricName != null" >
+      <if test="metricCode != null" >
+        metric_code = #{metricCode,jdbcType=VARCHAR},
+      </if>
+        <if test="metricName != null" >
         metric_name = #{metricName,jdbcType=VARCHAR},
       </if>
-      <if test="metricDesc != null" >
-        metric_desc = #{metricDesc,jdbcType=VARCHAR},
+      <if test="metricComment != null" >
+        metric_comment = #{metricComment,jdbcType=VARCHAR},
       </if>
       <if test="unit != null" >
         unit = #{unit,jdbcType=INTEGER},
@@ -164,8 +175,9 @@
     set tenant_id = #{tenantId,jdbcType=BIGINT},
       biz_line_id = #{bizLineId,jdbcType=BIGINT},
       subject_id = #{subjectId,jdbcType=BIGINT},
+      metric_code = #{metricCode,jdbcType=VARCHAR},
       metric_name = #{metricName,jdbcType=VARCHAR},
-      metric_desc = #{metricDesc,jdbcType=VARCHAR},
+      metric_comment = #{metricComment,jdbcType=VARCHAR},
       unit = #{unit,jdbcType=INTEGER},
       metric_format = #{metricFormat,jdbcType=INTEGER},
       status = #{status,jdbcType=INTEGER},

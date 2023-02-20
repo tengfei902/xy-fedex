@@ -1,7 +1,9 @@
 package com.xy.fedex.catalog.dao;
 
 import com.xy.fedex.catalog.po.BizLinePO;
+import org.apache.ibatis.annotations.Mapper;
 
+@Mapper
 public interface BizLineDao {
     int deleteByPrimaryKey(Long id);
 
