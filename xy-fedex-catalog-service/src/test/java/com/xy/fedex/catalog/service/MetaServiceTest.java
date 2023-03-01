@@ -61,14 +61,7 @@ public class MetaServiceTest extends BaseTest {
         Long bizLineId = 0L;
         Long subjectId = 1000L;
 
-        MetricDTO tradeCntMetric = MetricDTO.builder()
-                .tenantId(tenantId)
-                .bizLineId(bizLineId)
-                .subjectId(subjectId)
-                .metricCode("trade_cnt")
-                .metricName("订单数")
-                .metricComment("订单数")
-                .build();
+        MetricDTO tradeCntMetric = MetricDTO.builder().tenantId(tenantId).bizLineId(bizLineId).subjectId(subjectId).metricCode("trade_cnt").metricName("订单数").metricComment("订单数").build();
         metaService.saveMetric(tradeCntMetric);
 
         MetricDTO feeMetric = MetricDTO.builder()
@@ -131,113 +124,44 @@ public class MetaServiceTest extends BaseTest {
     @Test
     public void testInitDim() {
         Long tenantId = 0L;
-
-        DimDTO dimDTO = DimDTO.builder()
-                .tenantId(tenantId)
-                .dimCode("dt")
-                .dimName("日期")
-                .dimComment("日期")
-                .dimType(DimType.DATE.getDimType())
-                .build();
+        DimDTO dimDTO = DimDTO.builder().tenantId(tenantId).dimCode("dt").dimName("日期").dimComment("日期").dimType(DimType.DATE.getDimType()).build();
         metaService.saveDim(dimDTO);
 
-        DimDTO hourDim = DimDTO.builder()
-                .tenantId(tenantId)
-                .dimCode("hour")
-                .dimName("小时")
-                .dimComment("小时")
-                .dimType(DimType.HOUR.getDimType())
-                .build();
+        DimDTO hourDim = DimDTO.builder().tenantId(tenantId).dimCode("hour").dimName("小时").dimComment("小时").dimType(DimType.HOUR.getDimType()).build();
         metaService.saveDim(hourDim);
 
-        DimDTO groupIdDim = DimDTO.builder()
-                .tenantId(tenantId)
-                .dimCode("group_id")
-                .dimName("组")
-                .dimComment("组")
-                .dimType(DimType.TEXT.getDimType())
-                .build();
+        DimDTO groupIdDim = DimDTO.builder().tenantId(tenantId).dimCode("group_id").dimName("组").dimComment("组").dimType(DimType.TEXT.getDimType()).build();
         metaService.saveDim(groupIdDim);
 
-        DimDTO accountStatus = DimDTO.builder()
-                .tenantId(tenantId)
-                .dimCode("account_status")
-                .dimName("账户状态")
-                .dimComment("账户状态")
-                .dimType(DimType.TEXT.getDimType())
-                .build();
+        DimDTO accountStatus = DimDTO.builder().tenantId(tenantId).dimCode("account_status").dimName("账户状态").dimComment("账户状态").dimType(DimType.TEXT.getDimType()).build();
         metaService.saveDim(accountStatus);
 
-        DimDTO tradeNoDim = DimDTO.builder()
-                .tenantId(tenantId)
-                .dimCode("out_trade_no")
-                .dimName("订单号")
-                .dimComment("订单号")
-                .dimType(DimType.TEXT.getDimType())
-                .build();
+        DimDTO tradeNoDim = DimDTO.builder().tenantId(tenantId).dimCode("out_trade_no").dimName("订单号").dimComment("订单号").dimType(DimType.TEXT.getDimType()).build();
         metaService.saveDim(tradeNoDim);
 
-        DimDTO oprType = DimDTO.builder()
-                .tenantId(tenantId)
-                .dimCode("opr_type")
-                .dimName("订单类型")
-                .dimComment("订单类型")
-                .dimType(DimType.TEXT.getDimType())
-                .build();
+        DimDTO oprType = DimDTO.builder().tenantId(tenantId).dimCode("opr_type").dimName("订单类型").dimComment("订单类型").dimType(DimType.TEXT.getDimType()).build();
         metaService.saveDim(oprType);
 
-        DimDTO providerCode = DimDTO.builder()
-                .tenantId(tenantId)
-                .dimCode("provider_code")
-                .dimName("供应商编号")
-                .dimComment("供应商编号")
-                .dimType(DimType.TEXT.getDimType())
-                .build();
+        DimDTO providerCode = DimDTO.builder().tenantId(tenantId).dimCode("provider_code").dimName("供应商编号").dimComment("供应商编号").dimType(DimType.TEXT.getDimType()).build();
         metaService.saveDim(providerCode);
 
-        DimDTO providerName = DimDTO.builder()
-                .tenantId(tenantId)
-                .dimCode("provider_name")
-                .dimName("供应商名称")
-                .dimComment("供应商名称")
-                .dimType(DimType.TEXT.getDimType())
-                .build();
+        DimDTO providerName = DimDTO.builder().tenantId(tenantId).dimCode("provider_name").dimName("供应商名称").dimComment("供应商名称").dimType(DimType.TEXT.getDimType()).build();
         metaService.saveDim(providerName);
 
-        DimDTO mchIdDim = DimDTO.builder()
-                .tenantId(tenantId)
-                .dimCode("mch_id")
-                .dimName("客户id")
-                .dimComment("客户id")
-                .dimType(DimType.TEXT.getDimType())
-                .build();
+        DimDTO mchIdDim = DimDTO.builder().tenantId(tenantId).dimCode("mch_id").dimName("客户id").dimComment("客户id").dimType(DimType.TEXT.getDimType()).build();
         metaService.saveDim(mchIdDim);
 
-        DimDTO serviceDim = DimDTO.builder()
-                .tenantId(tenantId)
-                .dimCode("service")
-                .dimName("通道类型")
-                .dimComment("通道类型")
-                .dimType(DimType.TEXT.getDimType())
-                .build();
+        DimDTO serviceDim = DimDTO.builder().tenantId(tenantId).dimCode("service").dimName("通道类型").dimComment("通道类型").dimType(DimType.TEXT.getDimType()).build();
         metaService.saveDim(serviceDim);
 
-        DimDTO tradeTypeDim = DimDTO.builder()
-                .tenantId(tenantId)
-                .dimCode("trade_type")
-                .dimName("交易类型")
-                .dimComment("交易类型")
-                .dimType(DimType.TEXT.getDimType())
-                .build();
+        DimDTO tradeTypeDim = DimDTO.builder().tenantId(tenantId).dimCode("trade_type").dimName("交易类型").dimComment("交易类型").dimType(DimType.TEXT.getDimType()).build();
         metaService.saveDim(tradeTypeDim);
 
-        DimDTO payResultDim = DimDTO.builder()
-                .tenantId(tenantId)
-                .dimCode("pay_result")
-                .dimName("交易结果")
-                .dimComment("交易结果")
-                .dimType(DimType.TEXT.getDimType())
-                .build();
+        DimDTO payResultDim = DimDTO.builder().tenantId(tenantId).dimCode("pay_result").dimName("交易结果").dimComment("交易结果").dimType(DimType.TEXT.getDimType()).build();
         metaService.saveDim(payResultDim);
+
+        DimDTO buyerIdDim = DimDTO.builder().tenantId(tenantId).dimCode("buyer_id").dimName("购买方id").dimComment("购买方id").dimType(DimType.TEXT.getDimType()).build();
+        metaService.saveDim(buyerIdDim);
+
     }
 }

@@ -7,6 +7,7 @@ import com.xy.fedex.admin.api.FedexDsnFacade;
 import com.xy.fedex.catalog.api.dto.DimModelRequest;
 import com.xy.fedex.catalog.api.dto.MetricModelRequest;
 import com.xy.fedex.catalog.api.dto.ModelRequest;
+import com.xy.fedex.catalog.common.definition.ModelDefinition;
 import com.xy.fedex.catalog.dao.DimModelDao;
 import com.xy.fedex.catalog.dao.MetricModelDao;
 import com.xy.fedex.catalog.dao.ModelDao;
@@ -20,7 +21,6 @@ import com.xy.fedex.catalog.po.ModelTableRelationPO;
 import com.xy.fedex.catalog.service.ModelService;
 import com.xy.fedex.catalog.utils.ModelUtils;
 import com.xy.fedex.dsl.utility.SQLExprUtils;
-import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,13 +41,26 @@ public class ModelServiceImpl implements ModelService {
     private DimModelDao dimModelDao;
     @Autowired
     private ModelTableRelationDao modelTableRelationDao;
-//    @Autowired
+    //    @Autowired
 //    @DubboReference
     private FedexDsnFacade fedexDsnFacade;
 
+    /**
+     * 根据选择的表获取模型初始化状态
+     * @param tableSource
+     * @return
+     */
+    @Override
+    public ModelRequest getModelRequest(String tableSource) {
+        //获取所有表
+        //获取表字段
+        //表字段与指标、维度匹配
+        return null;
+    }
+
     @Transactional
     @Override
-    public void createModel(ModelRequest modelRequest) {
+    public Long saveModel(ModelRequest modelRequest) {
         //save model
         ModelPO model = saveOrUpdateModel(modelRequest);
         //save metric model
@@ -56,10 +69,11 @@ public class ModelServiceImpl implements ModelService {
         saveOrUpdateDimModels(model.getId(), modelRequest.getDimModels());
         //save model table relation
         saveModelTableRelation(model.getId(), modelRequest);
+        return model.getId();
     }
 
     @Override
-    public void createModel(String sql) {
+    public void saveModel(String sql) {
 
     }
 
@@ -68,7 +82,7 @@ public class ModelServiceImpl implements ModelService {
         if (!Objects.isNull(modelId)) {
             return updateModel(modelRequest);
         } else {
-            return saveModel(modelRequest);
+            return createModel(modelRequest);
         }
     }
 
@@ -78,6 +92,7 @@ public class ModelServiceImpl implements ModelService {
         MySqlSelectQueryBlock mySqlSelectQueryBlock = (MySqlSelectQueryBlock) sqlSelect.getQueryBlock();
 
         SQLTableSource tableSource = mySqlSelectQueryBlock.getFrom();
+        saveModelTableRelation(modelId, tableSource);
     }
 
     private void saveModelTableRelation(Long modelId, SQLTableSource tableSource) {
@@ -107,7 +122,8 @@ public class ModelServiceImpl implements ModelService {
         if (tableSource instanceof SQLSubqueryTableSource) {
             SQLSubqueryTableSource sqlSubqueryTableSource = (SQLSubqueryTableSource) tableSource;
             SQLSelect subQuerySelect = sqlSubqueryTableSource.getSelect();
-
+            MySqlSelectQueryBlock subQuerySelectBlock = (MySqlSelectQueryBlock) subQuerySelect.getQueryBlock();
+            saveModelTableRelation(modelId, subQuerySelectBlock.getFrom());
         }
     }
 
@@ -127,7 +143,7 @@ public class ModelServiceImpl implements ModelService {
         return modelDao.selectByPrimaryKey(modelRequest.getModelId());
     }
 
-    private ModelPO saveModel(ModelRequest modelRequest) {
+    private ModelPO createModel(ModelRequest modelRequest) {
         ModelPO modelPO = new ModelPO();
         modelPO.setModelName(modelRequest.getModelName());
         modelPO.setModelDesc(modelRequest.getModelDesc());
@@ -157,18 +173,25 @@ public class ModelServiceImpl implements ModelService {
         if (CollectionUtils.isEmpty(metricModels)) {
             return;
         }
-        List<MetricModelPO> metricModelPOs = metricModels.stream().map(metricModelRequest -> {
+        List<MetricModelPO> metricModelPOS = metricModels.stream().map(metricModelRequest -> {
             MetricModelPO metricModelPO = new MetricModelPO();
             metricModelPO.setModelId(modelId);
+            metricModelPO.setMetricId(metricModelRequest.getMetricId());
             metricModelPO.setFormula(metricModelRequest.getFormula());
-            metricModelPO.setAdvanceCaculate(new Gson().toJson(Optional.ofNullable(metricModelRequest.getAdvanceCalculate()).get()));
             metricModelPO.setCondition(metricModelRequest.getCondition());
-            metricModelPO.setAllowDims(new Gson().toJson(Optional.ofNullable(metricModelRequest.getAllowDims()).get()));
-            metricModelPO.setForceDims(new Gson().toJson(Optional.ofNullable(metricModelRequest.getForceDims()).get()));
             metricModelPO.setOrderBy(metricModelRequest.getOrderBy());
+            if (!Objects.isNull(metricModelRequest.getAdvanceCalculate())) {
+                metricModelPO.setAdvanceCalculate(new Gson().toJson(metricModelRequest.getAdvanceCalculate()));
+            }
+            if (!Objects.isNull(metricModelRequest.getAllowDims())) {
+                metricModelPO.setAllowDims(new Gson().toJson(metricModelRequest.getAllowDims()));
+            }
+            if (!Objects.isNull(metricModelRequest.getForceDims())) {
+                metricModelPO.setForceDims(new Gson().toJson(metricModelRequest.getForceDims()));
+            }
             return metricModelPO;
         }).collect(Collectors.toList());
-        metricModelDao.batchInsert(metricModelPOs);
+        metricModelDao.batchInsert(metricModelPOS);
     }
 
     private void updateMetricModels(List<MetricModelRequest> metricModels) {
@@ -183,7 +206,7 @@ public class ModelServiceImpl implements ModelService {
             updateMetricModel.setAllowDims(new Gson().toJson(Optional.ofNullable(metricModelRequest.getAllowDims()).get()));
             updateMetricModel.setForceDims(new Gson().toJson(Optional.ofNullable(metricModelRequest.getForceDims()).get()));
             updateMetricModel.setOrderBy(metricModelRequest.getOrderBy());
-            updateMetricModel.setAdvanceCaculate(new Gson().toJson(Optional.ofNullable(metricModelRequest.getAdvanceCalculate()).get()));
+            updateMetricModel.setAdvanceCalculate(new Gson().toJson(Optional.ofNullable(metricModelRequest.getAdvanceCalculate()).get()));
             return updateMetricModel;
         }).collect(Collectors.toList());
 
@@ -203,6 +226,7 @@ public class ModelServiceImpl implements ModelService {
         List<DimModelRequest> updateDimModelRequests = dimModelRequests.stream().filter(dimModelRequest -> !Objects.isNull(dimModelRequest.getDimModelId())).collect(Collectors.toList());
 
         saveDimModels(modelId, newDimModelRequests);
+        updateDimModels(updateDimModelRequests);
     }
 
     private void saveDimModels(Long modelId, List<DimModelRequest> dimModelRequests) {
@@ -224,8 +248,11 @@ public class ModelServiceImpl implements ModelService {
         if (CollectionUtils.isEmpty(dimModelRequests)) {
             return;
         }
-        dimModelRequests.stream().forEach(dimModelRequest -> {
-
+        dimModelRequests.forEach(dimModelRequest -> {
+            DimModelPO dimModel = new DimModelPO();
+            dimModel.setId(dimModelRequest.getDimModelId());
+            dimModel.setFormula(dimModelRequest.getFormula());
+            dimModelDao.updateByPrimaryKeySelective(dimModel);
         });
     }
 
@@ -233,6 +260,7 @@ public class ModelServiceImpl implements ModelService {
      * ModelRequest校验
      * 1.权限校验
      * 2.参数校验
+     *
      * @param modelRequest
      */
     @Override
@@ -240,5 +268,10 @@ public class ModelServiceImpl implements ModelService {
         //权限判断
         //参数校验
         String select = ModelUtils.getModelDefinition(modelRequest);
+    }
+
+    @Override
+    public ModelDefinition getModel(Long modelId) {
+        return null;
     }
 }

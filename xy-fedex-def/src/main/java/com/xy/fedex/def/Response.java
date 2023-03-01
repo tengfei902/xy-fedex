@@ -1,8 +1,11 @@
 package com.xy.fedex.def;
 
+import lombok.Getter;
+
 import java.io.Serializable;
 import java.util.List;
 
+@Getter
 public class Response<T> implements Serializable {
     private int code;
     private String msg;

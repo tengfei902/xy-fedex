@@ -1,6 +1,6 @@
 package com.xy.fedex.admin.service.dsn.model.bo;
 
-import com.xy.infrustruction.definition.DbType;
+import com.alibaba.druid.DbType;
 import com.xy.infrustruction.definition.connection.ConnectInfo;
 import lombok.Builder;
 import lombok.Data;

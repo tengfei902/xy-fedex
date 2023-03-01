@@ -1,12 +1,17 @@
 package com.xy.fedex.catalog.service;
 
 import com.xy.fedex.catalog.api.dto.ModelRequest;
+import com.xy.fedex.catalog.common.definition.ModelDefinition;
 
 public interface ModelService {
 
-    void createModel(ModelRequest modelRequest);
+    ModelRequest getModelRequest(String tableSource);
 
-    void createModel(String sql);
+    Long saveModel(ModelRequest modelRequest);
+
+    void saveModel(String sql);
 
     void checkModelRequest(ModelRequest modelRequest);
+
+    ModelDefinition getModel(Long modelId);
 }

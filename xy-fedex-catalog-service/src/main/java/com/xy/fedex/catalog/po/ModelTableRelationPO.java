@@ -8,8 +8,6 @@ public class ModelTableRelationPO implements Serializable {
 
     private Long modelId;
 
-    private Long dsnId;
-
     private String schemaName;
 
     private String tableName;
@@ -38,14 +36,6 @@ public class ModelTableRelationPO implements Serializable {
 
     public void setModelId(Long modelId) {
         this.modelId = modelId;
-    }
-
-    public Long getDsnId() {
-        return dsnId;
-    }
-
-    public void setDsnId(Long dsnId) {
-        this.dsnId = dsnId;
     }
 
     public String getSchemaName() {

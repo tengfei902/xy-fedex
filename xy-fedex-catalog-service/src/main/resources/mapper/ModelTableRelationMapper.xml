@@ -4,7 +4,6 @@
   <resultMap id="BaseResultMap" type="com.xy.fedex.catalog.po.ModelTableRelationPO" >
     <id column="id" property="id" jdbcType="BIGINT" />
     <result column="model_id" property="modelId" jdbcType="BIGINT" />
-    <result column="dsn_id" property="dsnId" jdbcType="BIGINT" />
     <result column="schema_name" property="schemaName" jdbcType="VARCHAR" />
     <result column="table_name" property="tableName" jdbcType="VARCHAR" />
     <result column="table_alias" property="tableAlias" jdbcType="VARCHAR" />
@@ -13,7 +12,7 @@
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, model_id, dsn_id, schema_name, table_name,table_alias, status, create_time, update_time
+    id, model_id, schema_name, table_name,table_alias, status, create_time, update_time
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select 
@@ -26,10 +25,10 @@
     where id = #{id,jdbcType=BIGINT}
   </delete>
   <insert id="insert" parameterType="com.xy.fedex.catalog.po.ModelTableRelationPO" >
-    insert into model_table_relation (id, model_id, dsn_id, 
+    insert into model_table_relation (id, model_id,
       schema_name, table_name, status, 
       create_time, update_time)
-    values (#{id,jdbcType=BIGINT}, #{modelId,jdbcType=BIGINT}, #{dsnId,jdbcType=BIGINT}, 
+    values (#{id,jdbcType=BIGINT}, #{modelId,jdbcType=BIGINT},
       #{schemaName,jdbcType=VARCHAR}, #{tableName,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, 
       #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
   </insert>
@@ -41,9 +40,6 @@
       </if>
       <if test="modelId != null" >
         model_id,
-      </if>
-      <if test="dsnId != null" >
-        dsn_id,
       </if>
       <if test="schemaName != null" >
         schema_name,
@@ -71,9 +67,6 @@
       <if test="modelId != null" >
         #{modelId,jdbcType=BIGINT},
       </if>
-      <if test="dsnId != null" >
-        #{dsnId,jdbcType=BIGINT},
-      </if>
       <if test="schemaName != null" >
         #{schemaName,jdbcType=VARCHAR},
       </if>
@@ -100,9 +93,6 @@
       <if test="modelId != null" >
         model_id = #{modelId,jdbcType=BIGINT},
       </if>
-      <if test="dsnId != null" >
-        dsn_id = #{dsnId,jdbcType=BIGINT},
-      </if>
       <if test="schemaName != null" >
         schema_name = #{schemaName,jdbcType=VARCHAR},
       </if>
@@ -127,7 +117,6 @@
   <update id="updateByPrimaryKey" parameterType="com.xy.fedex.catalog.po.ModelTableRelationPO" >
     update model_table_relation
     set model_id = #{modelId,jdbcType=BIGINT},
-      dsn_id = #{dsnId,jdbcType=BIGINT},
       schema_name = #{schemaName,jdbcType=VARCHAR},
       table_name = #{tableName,jdbcType=VARCHAR},
       status = #{status,jdbcType=INTEGER},

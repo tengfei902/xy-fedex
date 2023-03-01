@@ -103,4 +103,23 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}
   </update>
+
+  <insert id="batchInsert" parameterType="java.util.List" >
+    insert into app_model_relation (
+    app_id,
+    model_id
+    )
+    values
+    <foreach collection ="list" item="relation" index= "index" separator =",">
+      (
+      #{relation.appId},
+      #{relation.modelId}
+      )
+    </foreach>
+  </insert>
+
+  <delete id="deleteByAppId" parameterType="java.lang.Long" >
+    delete from app_model_relation
+    where app_id = #{appId,jdbcType=BIGINT}
+  </delete>
 </mapper>

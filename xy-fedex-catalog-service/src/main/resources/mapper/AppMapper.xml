@@ -36,7 +36,7 @@
       #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{creator,jdbcType=VARCHAR}
       )
   </insert>
-  <insert id="insertSelective" parameterType="com.xy.fedex.catalog.po.AppPO" >
+  <insert id="insertSelective" useGeneratedKeys="true" keyProperty="id" parameterType="com.xy.fedex.catalog.po.AppPO" >
     insert into app
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >

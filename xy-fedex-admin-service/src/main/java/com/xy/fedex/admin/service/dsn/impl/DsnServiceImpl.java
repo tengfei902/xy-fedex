@@ -83,6 +83,11 @@ public class DsnServiceImpl implements DsnService {
     }
 
     @Override
+    public DsnDTO getDsn(Long dsnId) {
+        return null;
+    }
+
+    @Override
     public void deleteDsn(Long dsnId) {
     }
 }

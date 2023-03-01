@@ -6,8 +6,10 @@ import com.xy.fedex.catalog.api.dto.MetricModelRequest;
 import com.xy.fedex.catalog.api.dto.ModelRequest;
 import com.xy.fedex.catalog.dto.DimDTO;
 import com.xy.fedex.catalog.dto.MetricDTO;
+import com.xy.fedex.catalog.exception.ModelDefException;
 import com.xy.fedex.catalog.service.MetaService;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +28,7 @@ public class ModelUtils {
         if(!CollectionUtils.isEmpty(metricModels)) {
             metricModels.forEach(metricModel -> {
                 MetricDTO metric = metaService.getMetric(metricModel.getMetricId());
-                metrics.add(String.format("%s as %s",metricModel.getFormula(),metric.getMetricName()));
+                metrics.add(String.format("%s as %s",metricModel.getFormula(),metric.getMetricCode()));
             });
         }
         List<DimModelRequest> dimModels = modelRequest.getDimModels();
@@ -35,21 +37,35 @@ public class ModelUtils {
         if(!CollectionUtils.isEmpty(dimModels)) {
             dimModels.forEach(dimModelRequest -> {
                 DimDTO dim = metaService.getDim(dimModelRequest.getDimId());
-                dims.add(String.format("%s as %s",dimModelRequest.getFormula(),dim.getDimName()));
-                dimAliasList.add(dim.getDimName());
+                dims.add(String.format("%s as %s",dimModelRequest.getFormula(),dim.getDimCode()));
+                dimAliasList.add(dim.getDimCode());
             });
         }
 
         List<String> sqlParts = new ArrayList<>();
         sqlParts.add("select");
-        sqlParts.add(Joiner.on(",").join(metrics));
-        sqlParts.add(Joiner.on(",").join(dims));
+        sqlParts.add(mergeMetricAndDim(Joiner.on(",").join(metrics),Joiner.on(",").join(dims)));
         sqlParts.add("from");
         sqlParts.add(modelRequest.getTableSource());
-        sqlParts.add("where");
-        sqlParts.add(modelRequest.getCondition());
+        if(!StringUtils.isEmpty(modelRequest.getCondition())) {
+            sqlParts.add("where");
+            sqlParts.add(modelRequest.getCondition());
+        }
         sqlParts.add("group by");
         sqlParts.add(Joiner.on(",").join(dimAliasList));
         return Joiner.on(" ").join(sqlParts);
+    }
+
+    private static String mergeMetricAndDim(String metric,String dim) {
+        if(StringUtils.isEmpty(metric) && StringUtils.isEmpty(dim)) {
+            throw new ModelDefException("metric and dim empty");
+        }
+        if(StringUtils.isEmpty(metric)) {
+            return dim;
+        }
+        if(StringUtils.isEmpty(dim)) {
+            return metric;
+        }
+        return String.format("%s,%s",metric,dim);
     }
 }

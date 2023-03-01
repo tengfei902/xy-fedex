@@ -7,6 +7,7 @@
     <result column="biz_line_id" property="bizLineId" jdbcType="BIGINT" />
     <result column="subject_id" property="subjectId" jdbcType="BIGINT" />
     <result column="metric_code" property="metricCode" jdbcType="VARCHAR" />
+    <result column="formula" property="formula" jdbcType="VARCHAR" />
     <result column="metric_name" property="metricName" jdbcType="VARCHAR" />
     <result column="metric_comment" property="metricComment" jdbcType="VARCHAR" />
     <result column="unit" property="unit" jdbcType="INTEGER" />
@@ -17,7 +18,7 @@
     <result column="creator" property="creator" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, tenant_id, biz_line_id, subject_id, metric_code, metric_name, metric_comment, unit, metric_format,
+    id, tenant_id, biz_line_id, subject_id, metric_code, formula, metric_name, metric_comment, unit, metric_format,
     status, create_time, update_time, creator
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
@@ -32,12 +33,12 @@
   </delete>
   <insert id="insert" parameterType="com.xy.fedex.catalog.po.MetricPO" >
     insert into metric (id, tenant_id, biz_line_id, 
-      subject_id, metric_code,metric_name, metric_comment,
+      subject_id, metric_code,formula,metric_name, metric_comment,
       unit, metric_format, status, 
       create_time, update_time, creator
       )
     values (#{id,jdbcType=BIGINT}, #{tenantId,jdbcType=BIGINT}, #{bizLineId,jdbcType=BIGINT}, 
-      #{subjectId,jdbcType=BIGINT},#{metricCode,jdbcType=VARCHAR}, #{metricName,jdbcType=VARCHAR},
+      #{subjectId,jdbcType=BIGINT},#{metricCode,jdbcType=VARCHAR},#{formula,jdbcType=VARCHAR}, #{metricName,jdbcType=VARCHAR},
       #{metricComment,jdbcType=VARCHAR},#{unit,jdbcType=INTEGER}, #{metricFormat,jdbcType=INTEGER},
       #{status,jdbcType=INTEGER},#{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP},
       #{creator,jdbcType=VARCHAR}
@@ -60,6 +61,9 @@
       </if>
       <if test="metricCode != null" >
         metric_code,
+      </if>
+      <if test="formula != null" >
+        formula,
       </if>
       <if test="metricName != null" >
         metric_name,
@@ -102,6 +106,9 @@
       <if test="metricCode != null" >
         #{metricCode,jdbcType=VARCHAR},
       </if>
+      <if test="formula != null" >
+        #{formula,jdbcType=VARCHAR},
+      </if>
       <if test="metricName != null" >
         #{metricName,jdbcType=VARCHAR},
       </if>
@@ -143,7 +150,10 @@
       <if test="metricCode != null" >
         metric_code = #{metricCode,jdbcType=VARCHAR},
       </if>
-        <if test="metricName != null" >
+      <if test="formula != null" >
+        formula = #{formula,jdbcType=VARCHAR},
+      </if>
+      <if test="metricName != null" >
         metric_name = #{metricName,jdbcType=VARCHAR},
       </if>
       <if test="metricComment != null" >
@@ -176,6 +186,7 @@
       biz_line_id = #{bizLineId,jdbcType=BIGINT},
       subject_id = #{subjectId,jdbcType=BIGINT},
       metric_code = #{metricCode,jdbcType=VARCHAR},
+      formula = #{formula,jdbcType=VARCHAR},
       metric_name = #{metricName,jdbcType=VARCHAR},
       metric_comment = #{metricComment,jdbcType=VARCHAR},
       unit = #{unit,jdbcType=INTEGER},

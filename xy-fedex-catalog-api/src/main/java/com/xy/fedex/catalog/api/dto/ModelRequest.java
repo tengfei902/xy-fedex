@@ -22,7 +22,6 @@ public class ModelRequest implements Serializable {
     private String condition;
 
     public String getModelDefinition() {
-
         return null;
     }
 }

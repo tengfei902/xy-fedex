@@ -1,9 +1,11 @@
 package com.xy.fedex.catalog.service.impl;
 
+import com.xy.fedex.admin.api.vo.response.TableDetailVO;
 import com.xy.fedex.catalog.dao.DimDao;
 import com.xy.fedex.catalog.dao.MetricDao;
 import com.xy.fedex.catalog.dto.DimDTO;
 import com.xy.fedex.catalog.dto.MetricDTO;
+import com.xy.fedex.catalog.dto.TableAliasDTO;
 import com.xy.fedex.catalog.exception.DimNotFoundException;
 import com.xy.fedex.catalog.exception.MetricNotFoundException;
 import com.xy.fedex.catalog.exception.UpdateFailedException;
@@ -13,6 +15,7 @@ import com.xy.fedex.catalog.service.MetaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -24,18 +27,26 @@ public class MetaServiceImpl implements MetaService {
 
     @Override
     public MetricDTO getMetric(Long metricId) {
-        return null;
+        MetricPO metric = metricDao.selectByPrimaryKey(metricId);
+        if (Objects.isNull(metric)) {
+            throw new MetricNotFoundException("metric not found:" + metric);
+        }
+        return MetricDTO.builder().metricId(metric.getId()).metricCode(metric.getMetricCode()).metricName(metric.getMetricName()).subjectId(metric.getSubjectId()).metricComment(metric.getMetricComment()).bizLineId(metric.getBizLineId()).tenantId(metric.getTenantId()).metricFormat(metric.getMetricFormat()).build();
     }
 
     @Override
     public DimDTO getDim(Long dimId) {
-        return null;
+        DimPO dim = dimDao.selectByPrimaryKey(dimId);
+        if(Objects.isNull(dim)) {
+            throw new DimNotFoundException("dim not found:"+dimId);
+        }
+        return DimDTO.builder().dimId(dim.getId()).dimCode(dim.getDimCode()).dimComment(dim.getDimComment()).dimName(dim.getDimName()).dimType(dim.getDimType()).build();
     }
 
     @Override
     public Long saveMetric(MetricDTO metric) {
         MetricPO metricPO = new MetricPO();
-        if(Objects.isNull(metric.getMetricId())) {
+        if (Objects.isNull(metric.getMetricId())) {
             //save
             metricPO.setTenantId(metric.getTenantId());
             metricPO.setBizLineId(metric.getBizLineId());
@@ -50,8 +61,8 @@ public class MetaServiceImpl implements MetaService {
             return metricPO.getId();
         } else {
             metricPO = metricDao.selectByPrimaryKey(metric.getMetricId());
-            if(Objects.isNull(metricPO)) {
-                throw new MetricNotFoundException("metric not found:"+metric.getMetricId());
+            if (Objects.isNull(metricPO)) {
+                throw new MetricNotFoundException("metric not found:" + metric.getMetricId());
             }
             MetricPO updateMetric = new MetricPO();
             updateMetric.setMetricName(metric.getMetricName());
@@ -62,8 +73,8 @@ public class MetaServiceImpl implements MetaService {
             updateMetric.setUnit(metric.getUnit());
             updateMetric.setId(metric.getMetricId());
             int cnt = metricDao.updateByPrimaryKeySelective(updateMetric);
-            if(cnt <= 0) {
-                throw new UpdateFailedException("update metric failed,metric id:"+metric.getMetricId());
+            if (cnt <= 0) {
+                throw new UpdateFailedException("update metric failed,metric id:" + metric.getMetricId());
             }
             return metricPO.getId();
         }
@@ -72,7 +83,7 @@ public class MetaServiceImpl implements MetaService {
     @Override
     public Long saveDim(DimDTO dim) {
         Long dimId = dim.getDimId();
-        if(Objects.isNull(dimId)) {
+        if (Objects.isNull(dimId)) {
             DimPO dimPO = new DimPO();
             dimPO.setDimCode(dim.getDimCode());
             dimPO.setDimName(dim.getDimName());
@@ -82,8 +93,8 @@ public class MetaServiceImpl implements MetaService {
             return dimPO.getId();
         } else {
             DimPO dimPO = dimDao.selectByPrimaryKey(dimId);
-            if(Objects.isNull(dimPO)) {
-                throw new DimNotFoundException("dim not found:"+dimId);
+            if (Objects.isNull(dimPO)) {
+                throw new DimNotFoundException("dim not found:" + dimId);
             }
             DimPO updateDim = new DimPO();
             updateDim.setId(dim.getDimId());
@@ -91,6 +102,18 @@ public class MetaServiceImpl implements MetaService {
             updateDim.setDimComment(dim.getDimComment());
             dimDao.updateByPrimaryKeySelective(updateDim);
             return dimPO.getId();
+        }
+    }
+
+    @Override
+    public void matchMetricAndDim(List<TableAliasDTO> tableAliasList) {
+        for(TableAliasDTO tableAliasDTO:tableAliasList) {
+            String alias = tableAliasDTO.getAlias();
+            TableDetailVO table = tableAliasDTO.getTable();
+            for(TableDetailVO.Column column :table.getColumns()) {
+                String fieldName = column.getColumnName();
+
+            }
         }
     }
 }

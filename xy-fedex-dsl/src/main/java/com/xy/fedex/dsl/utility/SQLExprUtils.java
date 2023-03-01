@@ -7,6 +7,7 @@ import com.alibaba.druid.sql.ast.statement.SQLSelect;
 import com.alibaba.druid.sql.ast.statement.SQLSelectItem;
 import com.alibaba.druid.sql.ast.statement.SQLSelectQuery;
 import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
+import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlCreateTableStatement;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlSelectQueryBlock;
 import com.alibaba.druid.sql.parser.SQLParserUtils;
 
@@ -27,6 +28,11 @@ public class SQLExprUtils {
         SQLSelectStatement sqlSelectStatement = (SQLSelectStatement) sqlStatement;
         return sqlSelectStatement.getSelect();
         //MySqlSelectQueryBlock mySqlSelectQueryBlock = (MySqlSelectQueryBlock) sqlSelectStatement.getSelect().getQuery();
+    }
+
+    public static void parseCreateTable(String sql) {
+        SQLStatement sqlStatement = SQLUtils.parseSingleStatement(sql,DbType.mysql);
+        MySqlCreateTableStatement createTableStatement = (MySqlCreateTableStatement) sqlStatement;
     }
 
     public static List<String> getAllFields(SQLSelect select) {

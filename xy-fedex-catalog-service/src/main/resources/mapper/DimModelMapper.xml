@@ -125,4 +125,21 @@
       creator = #{creator,jdbcType=VARCHAR}
     where id = #{id,jdbcType=BIGINT}
   </update>
+
+  <insert id="batchInsert" parameterType="java.util.List" >
+    insert into dim_model (
+        model_id,
+        dim_id,
+        formula,
+        creator)
+    values
+    <foreach collection ="list" item="dimModel" index= "index" separator =",">
+      (
+      #{dimModel.modelId},
+      #{dimModel.dimId},
+      #{dimModel.formula},
+      #{dimModel.creator}
+      )
+    </foreach>
+  </insert>
 </mapper>

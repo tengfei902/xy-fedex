@@ -11,5 +11,7 @@ public interface DsnService {
 
     DsnDTO getDsn(String dsn);
 
+    DsnDTO getDsn(Long dsnId);
+
     void deleteDsn(Long dsnId);
 }

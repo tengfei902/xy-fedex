@@ -43,7 +43,7 @@
       #{creator,jdbcType=VARCHAR}, #{modelDefinition,jdbcType=LONGVARCHAR}, #{modelProp,jdbcType=LONGVARCHAR}
       )
   </insert>
-  <insert id="insertSelective" parameterType="com.xy.fedex.catalog.po.ModelPO" >
+  <insert id="insertSelective" keyProperty="id" useGeneratedKeys="true" parameterType="com.xy.fedex.catalog.po.ModelPO" >
     insert into model
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >

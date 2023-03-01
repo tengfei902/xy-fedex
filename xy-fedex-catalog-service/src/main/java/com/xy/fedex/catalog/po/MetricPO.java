@@ -17,6 +17,8 @@ public class MetricPO implements Serializable {
 
     private String metricCode;
 
+    private String formula;
+
     private String metricName;
 
     private String metricComment;
