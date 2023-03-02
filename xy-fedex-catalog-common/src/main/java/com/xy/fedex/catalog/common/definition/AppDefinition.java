@@ -1,7 +1,7 @@
 package com.xy.fedex.catalog.common.definition;
 
-import com.xy.fedex.catalog.common.definition.dim.Dim;
-import com.xy.fedex.catalog.common.definition.metric.Metric;
+import com.xy.fedex.catalog.common.definition.field.Dim;
+import com.xy.fedex.catalog.common.definition.field.Metric;
 import lombok.Data;
 
 import java.io.Serializable;

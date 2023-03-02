@@ -1,7 +1,7 @@
 package com.xy.fedex.facade.service.meta.match;
 
 import com.alibaba.druid.sql.ast.statement.SQLSelect;
-import com.xy.fedex.catalog.common.definition.metric.Metric;
+import com.xy.fedex.catalog.common.definition.field.Metric;
 import com.xy.fedex.dsl.utility.SQLExprUtils;
 import com.xy.fedex.facade.exceptions.NoModelMatchedForMetricException;
 import com.xy.fedex.facade.service.cs.CatalogService;

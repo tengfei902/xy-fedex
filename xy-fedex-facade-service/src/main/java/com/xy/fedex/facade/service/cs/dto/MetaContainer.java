@@ -2,12 +2,11 @@ package com.xy.fedex.facade.service.cs.dto;
 
 import com.alibaba.druid.sql.ast.SQLExpr;
 import com.alibaba.druid.sql.ast.statement.SQLTableSource;
-import com.xy.fedex.catalog.common.definition.dim.Dim;
-import com.xy.fedex.catalog.common.definition.metric.Metric;
+import com.xy.fedex.catalog.common.definition.field.Dim;
+import com.xy.fedex.catalog.common.definition.field.Metric;
 import lombok.Data;
 
 import java.util.List;
-import java.util.Map;
 
 public class MetaContainer {
 
