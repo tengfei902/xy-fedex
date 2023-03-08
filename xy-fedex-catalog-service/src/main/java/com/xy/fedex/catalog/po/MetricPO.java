@@ -9,8 +9,6 @@ import java.util.Date;
 public class MetricPO implements Serializable {
     private Long id;
 
-    private Long tenantId;
-
     private Long bizLineId;
 
     private Long subjectId;
@@ -18,6 +16,8 @@ public class MetricPO implements Serializable {
     private String metricCode;
 
     private String formula;
+
+    private Integer metricType;
 
     private String metricName;
 

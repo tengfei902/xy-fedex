@@ -1,4 +1,4 @@
-package com.xy.fedex.catalog.service.impl;
+package com.xy.fedex.catalog.service.meta.impl;
 
 import com.alibaba.druid.sql.ast.SQLExpr;
 import com.alibaba.druid.sql.ast.statement.SQLExprTableSource;
@@ -10,28 +10,23 @@ import com.xy.fedex.admin.api.FedexTableFacade;
 import com.xy.fedex.admin.api.vo.request.TableRequest;
 import com.xy.fedex.admin.api.vo.response.TableDetailVO;
 import com.xy.fedex.catalog.common.definition.column.TableField;
-import com.xy.fedex.catalog.common.definition.field.MetaField;
 import com.xy.fedex.catalog.common.definition.table.JoinTableRelation;
 import com.xy.fedex.catalog.common.definition.table.SqlExprTableRelation;
 import com.xy.fedex.catalog.common.definition.table.SubQueryTableRelation;
 import com.xy.fedex.catalog.common.definition.table.TableRelation;
-import com.xy.fedex.catalog.dto.TableAliasDTO;
 import com.xy.fedex.catalog.exception.TableSourceTypeNotSupportException;
-import com.xy.fedex.catalog.service.TableService;
+import com.xy.fedex.catalog.service.meta.TableService;
 import com.xy.fedex.dsl.utility.SQLExprUtils;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.RandomUtils;
-import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class TableServiceImpl implements TableService {
-    @DubboReference
+//    @DubboReference
     private FedexTableFacade fedexTableFacade;
 
     @Override
@@ -39,7 +34,7 @@ public class TableServiceImpl implements TableService {
         String sql = "select * from "+tableSource;
         MySqlSelectQueryBlock selectQueryBlock = (MySqlSelectQueryBlock) SQLExprUtils.parse(sql).getQueryBlock();
         SQLTableSource sqlTableSource = selectQueryBlock.getFrom();
-        return getTables(dsnId,sqlTableSource);
+        return getTableRelation(sqlTableSource);
     }
 
     private TableRelation getTableRelation(SQLTableSource sqlTableSource) {
@@ -68,36 +63,17 @@ public class TableServiceImpl implements TableService {
             SQLSubqueryTableSource sqlSubqueryTableSource = (SQLSubqueryTableSource) sqlTableSource;
             SQLTableSource subQueryTableSource = sqlSubqueryTableSource.getSelect().getQueryBlock().getFrom();
             SubQueryTableRelation subQueryTableRelation = new SubQueryTableRelation();
-            subQueryTableRelation.setAlias();
-            subQueryTableRelation.setSql();
+            subQueryTableRelation.getAlias();
+            subQueryTableRelation.getSql();
         }
         throw new TableSourceTypeNotSupportException("table source type not support:"+sqlTableSource.getClass().getTypeName());
     }
-
-    private List<TableAliasDTO> getTables(Long dsnId, SQLTableSource sqlTableSource) {
-        if(sqlTableSource instanceof SQLExprTableSource) {
-            SQLExprTableSource sqlExprTableSource = (SQLExprTableSource) sqlTableSource;
-            String tableName = sqlExprTableSource.getTableName();
-            TableDetailVO tableDetail = fedexTableFacade.getTable(TableRequest.builder().dsnId(dsnId).tableName(tableName).build());
-            String alias = "t_"+ RandomUtils.nextInt();
-            return Arrays.asList(new TableAliasDTO(alias,tableDetail));
-        }
-        if(sqlTableSource instanceof SQLJoinTableSource) {
-            SQLJoinTableSource sqlJoinTableSource = (SQLJoinTableSource) sqlTableSource;
-            SQLTableSource left = sqlJoinTableSource.getLeft();
-            SQLTableSource right = sqlJoinTableSource.getLeft();
-            return new ArrayList<>(CollectionUtils.union(getTables(dsnId,left),getTables(dsnId,right)));
-        }
-        if(sqlTableSource instanceof SQLSubqueryTableSource) {
-            SQLSubqueryTableSource sqlSubqueryTableSource = (SQLSubqueryTableSource) sqlTableSource;
-            SQLTableSource subQueryTableSource = sqlSubqueryTableSource.getSelect().getQueryBlock().getFrom();
-            return getTables(dsnId,subQueryTableSource);
-        }
-        throw new TableSourceTypeNotSupportException("table source type not support:"+sqlTableSource.getClass().getTypeName());
-    }
-
     @Override
-    public List<TableField> getTableFields(Long bizLineId, Long dsnId, TableRelation tableRelation, List<MetaField> existedMetaFields) {
+    public List<TableField> getTableFields(Long bizLineId, Long dsnId, TableRelation tableRelation, List<TableField> existedMetaFields) {
+        return getTableFields(tableRelation,dsnId);
+    }
+
+    private List<TableField> getTableFields(TableRelation tableRelation,Long dsnId) {
         if(tableRelation instanceof SqlExprTableRelation) {
             SqlExprTableRelation sqlExprTableRelation = (SqlExprTableRelation) tableRelation;
             String tableName = sqlExprTableRelation.getTableName();
@@ -113,7 +89,24 @@ public class TableServiceImpl implements TableService {
             }).collect(Collectors.toList());
             return tableFields;
         }
-        if()
-        return null;
+        if(tableRelation instanceof JoinTableRelation) {
+            JoinTableRelation joinTableRelation = (JoinTableRelation) tableRelation;
+            TableRelation mainTable = joinTableRelation.getMainTable();
+            TableRelation joinTable = joinTableRelation.getJoinTable();
+
+            List<TableField> mainTableFields = getTableFields(mainTable,dsnId);
+            List<TableField> joinTableFields = getTableFields(joinTable,dsnId);
+
+            List<TableField> tableFields = new ArrayList<>();
+            tableFields.addAll(mainTableFields);
+            tableFields.addAll(joinTableFields);
+            return tableFields;
+        }
+        if(tableRelation instanceof SubQueryTableRelation) {
+            SubQueryTableRelation subQueryTableRelation = (SubQueryTableRelation) tableRelation;
+            subQueryTableRelation.getSql();
+            //todo 待实现
+        }
+        throw new TableSourceTypeNotSupportException("table source type not support:"+tableRelation.getClass());
     }
 }

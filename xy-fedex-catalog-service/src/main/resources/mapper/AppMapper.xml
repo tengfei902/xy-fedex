@@ -3,7 +3,6 @@
 <mapper namespace="com.xy.fedex.catalog.dao.AppDao" >
   <resultMap id="BaseResultMap" type="com.xy.fedex.catalog.po.AppPO" >
     <id column="id" property="id" jdbcType="BIGINT" />
-    <result column="tenant_id" property="tenantId" jdbcType="BIGINT" />
     <result column="biz_line_id" property="bizLineId" jdbcType="BIGINT" />
     <result column="app_name" property="appName" jdbcType="VARCHAR" />
     <result column="app_desc" property="appDesc" jdbcType="VARCHAR" />
@@ -13,7 +12,7 @@
     <result column="creator" property="creator" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, tenant_id, biz_line_id, app_name, app_desc, status, create_time, update_time, 
+    id, biz_line_id, app_name, app_desc, status, create_time, update_time,
     creator
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
@@ -27,11 +26,11 @@
     where id = #{id,jdbcType=BIGINT}
   </delete>
   <insert id="insert" parameterType="com.xy.fedex.catalog.po.AppPO" >
-    insert into app (id, tenant_id, biz_line_id, 
+    insert into app (id, biz_line_id,
       app_name, app_desc, status, 
       create_time, update_time, creator
       )
-    values (#{id,jdbcType=BIGINT}, #{tenantId,jdbcType=BIGINT}, #{bizLineId,jdbcType=BIGINT}, 
+    values (#{id,jdbcType=BIGINT}, #{bizLineId,jdbcType=BIGINT},
       #{appName,jdbcType=VARCHAR}, #{appDesc,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, 
       #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{creator,jdbcType=VARCHAR}
       )
@@ -41,9 +40,6 @@
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
         id,
-      </if>
-      <if test="tenantId != null" >
-        tenant_id,
       </if>
       <if test="bizLineId != null" >
         biz_line_id,
@@ -70,9 +66,6 @@
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
         #{id,jdbcType=BIGINT},
-      </if>
-      <if test="tenantId != null" >
-        #{tenantId,jdbcType=BIGINT},
       </if>
       <if test="bizLineId != null" >
         #{bizLineId,jdbcType=BIGINT},
@@ -129,8 +122,7 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.xy.fedex.catalog.po.AppPO" >
     update app
-    set tenant_id = #{tenantId,jdbcType=BIGINT},
-      biz_line_id = #{bizLineId,jdbcType=BIGINT},
+    set biz_line_id = #{bizLineId,jdbcType=BIGINT},
       app_name = #{appName,jdbcType=VARCHAR},
       app_desc = #{appDesc,jdbcType=VARCHAR},
       status = #{status,jdbcType=INTEGER},

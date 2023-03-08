@@ -1,13 +1,15 @@
-package com.xy.fedex.catalog.service.impl;
+package com.xy.fedex.catalog.service.meta.impl;
 
-import com.xy.fedex.catalog.api.dto.AppRequest;
+import com.xy.fedex.catalog.api.dto.request.SaveAppRequest;
 import com.xy.fedex.catalog.common.definition.AppDefinition;
 import com.xy.fedex.catalog.dao.AppDao;
+import com.xy.fedex.catalog.dao.AppMetricModelRelationDao;
 import com.xy.fedex.catalog.dao.AppModelRelationDao;
 import com.xy.fedex.catalog.exception.AppNotFoundException;
+import com.xy.fedex.catalog.po.AppMetricPO;
 import com.xy.fedex.catalog.po.AppModelRelationPO;
 import com.xy.fedex.catalog.po.AppPO;
-import com.xy.fedex.catalog.service.AppService;
+import com.xy.fedex.catalog.service.meta.AppService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,43 +25,44 @@ public class AppServiceImpl implements AppService {
     private AppDao appDao;
     @Autowired
     private AppModelRelationDao appModelRelationDao;
+    @Autowired
+    private AppMetricModelRelationDao appMetricModelRelationDao;
 
     @Transactional
     @Override
-    public Long saveApp(AppRequest appRequest) {
-        Long appId = saveOrUpdateApp(appRequest);
-        saveAppModelRelation(appId,appRequest.getRelatedModelIds());
+    public Long saveApp(SaveAppRequest saveAppRequest) {
+        Long appId = saveOrUpdateApp(saveAppRequest);
+        saveAppModelRelation(appId, saveAppRequest.getRelatedModelIds());
         return appId;
     }
 
-    private Long saveOrUpdateApp(AppRequest appRequest) {
-        Long appId = appRequest.getAppId();
+    private Long saveOrUpdateApp(SaveAppRequest saveAppRequest) {
+        Long appId = saveAppRequest.getAppId();
         if(Objects.isNull(appId)) {
-            return createApp(appRequest);
+            return createApp(saveAppRequest);
         } else {
-            return updateApp(appRequest);
+            return updateApp(saveAppRequest);
         }
     }
 
-    private Long createApp(AppRequest appRequest) {
+    private Long createApp(SaveAppRequest saveAppRequest) {
         AppPO appPO = new AppPO();
-        appPO.setAppName(appRequest.getAppName());
-        appPO.setAppDesc(appRequest.getAppDesc());
-        appPO.setBizLineId(appRequest.getBizLineId());
-        appPO.setTenantId(appRequest.getTenantId());
+        appPO.setAppName(saveAppRequest.getAppName());
+        appPO.setAppDesc(saveAppRequest.getAppDesc());
+        appPO.setBizLineId(saveAppRequest.getBizLineId());
         appDao.insertSelective(appPO);
         return appPO.getId();
     }
 
-    private Long updateApp(AppRequest appRequest) {
-        AppPO app = appDao.selectByPrimaryKey(appRequest.getAppId());
+    private Long updateApp(SaveAppRequest saveAppRequest) {
+        AppPO app = appDao.selectByPrimaryKey(saveAppRequest.getAppId());
         if(Objects.isNull(app)) {
-            throw new AppNotFoundException("app not found:"+appRequest.getAppId());
+            throw new AppNotFoundException("app not found:"+ saveAppRequest.getAppId());
         }
         AppPO updateApp = new AppPO();
-        updateApp.setId(appRequest.getAppId());
-        updateApp.setAppName(appRequest.getAppName());
-        updateApp.setAppDesc(appRequest.getAppDesc());
+        updateApp.setId(saveAppRequest.getAppId());
+        updateApp.setAppName(saveAppRequest.getAppName());
+        updateApp.setAppDesc(saveAppRequest.getAppDesc());
         appDao.updateByPrimaryKeySelective(updateApp);
         return app.getId();
     }
@@ -79,7 +82,7 @@ public class AppServiceImpl implements AppService {
     }
 
     @Override
-    public AppDefinition getApp(Long appId) {
+    public AppDefinition getApp(Long bizLineId,Long appId) {
         AppPO appPO = appDao.selectByPrimaryKey(appId);
         if(Objects.isNull(appPO)) {
             throw new AppNotFoundException("app not found:"+appId);
@@ -94,7 +97,21 @@ public class AppServiceImpl implements AppService {
             appDefinition.setModelIds(appModelRelations.stream().map(AppModelRelationPO::getModelId).collect(Collectors.toList()));
         }
         appDefinition.setDims(null);
-        appDefinition.setMetrics(null);
-        return null;
+        appDefinition.setMetrics(getMetrics(appId));
+        return appDefinition;
+    }
+
+    private List<AppDefinition.Metric> getMetrics(Long appId) {
+        List<AppMetricPO> appMetrics = appMetricModelRelationDao.selectAppMetrics(appId);
+        return appMetrics.stream().map(appMetricPO -> {
+            AppDefinition.Metric metric = new AppDefinition.Metric();
+            metric.setMetricModelId(appMetricPO.getMetricModelId());
+            metric.setMetricId(appMetricPO.getMetricId());
+            metric.setMetricCode(appMetricPO.getMetricCode());
+            metric.setMetricName(appMetricPO.getMetricName());
+            metric.setMetricComment(appMetricPO.getMetricComment());
+            metric.setFormula(appMetricPO.getFormula());
+            return metric;
+        }).collect(Collectors.toList());
     }
 }

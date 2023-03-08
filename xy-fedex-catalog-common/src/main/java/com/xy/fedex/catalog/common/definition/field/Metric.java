@@ -1,33 +1,17 @@
 package com.xy.fedex.catalog.common.definition.field;
 
+import com.xy.fedex.catalog.common.enums.MetricType;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
 public class Metric {
+    private Long metricModelId;
     private Long metricId;
-    private String metric;
-    private String displayName;
-
-    @Data
-    public static class MetricModel {
-        private Long metricModelId;
-        private Long modelId;
-        private String metric;
-        private String displayName;
-        private String formula;
-        private List<String> allowDims;
-        private List<String> forceDims;
-    }
-
-    @Data
-    public static class PrimaryMetricModel extends MetricModel {
-        private boolean assist;
-    }
-
-    @Data
-    public static class DeriveMetricModel extends MetricModel {
-        private List<MetricModel> relateMetricModels;
-    }
+    private String metricCode;
+    private String metricName;
+    private String metricComment;
+    private String formula;
+    private MetricType metricType;
 }

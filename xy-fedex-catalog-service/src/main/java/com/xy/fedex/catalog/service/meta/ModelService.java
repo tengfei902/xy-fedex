@@ -1,4 +1,4 @@
-package com.xy.fedex.catalog.service;
+package com.xy.fedex.catalog.service.meta;
 
 import com.xy.fedex.catalog.api.dto.ModelRequest;
 import com.xy.fedex.catalog.common.definition.ModelDefinition;

@@ -12,4 +12,13 @@ public enum MetricType {
     public int getMetricType() {
         return metricType;
     }
+
+    public static MetricType parse(Integer code) {
+        for(MetricType metricType:MetricType.values()) {
+            if(metricType.metricType == code) {
+                return metricType;
+            }
+        }
+        return null;
+    }
 }

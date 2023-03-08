@@ -1,7 +1,8 @@
 package com.xy.fedex.catalog.service;
 
 import com.xy.fedex.catalog.BaseTest;
-import com.xy.fedex.catalog.api.dto.AppRequest;
+import com.xy.fedex.catalog.api.dto.request.SaveAppRequest;
+import com.xy.fedex.catalog.service.meta.AppService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -13,12 +14,12 @@ public class AppServiceTest extends BaseTest {
 
     @Test
     public void testSaveApp() {
-        AppRequest appRequest = new AppRequest();
-        appRequest.setAppName("交易");
-        appRequest.setAppDesc("交易");
-        appRequest.setBizLineId(0L);
-        appRequest.setTenantId(0L);
-        appRequest.setRelatedModelIds(Arrays.asList(30L));
-        appService.saveApp(appRequest);
+        SaveAppRequest saveAppRequest = new SaveAppRequest();
+        saveAppRequest.setAppName("交易");
+        saveAppRequest.setAppDesc("交易");
+        saveAppRequest.setBizLineId(0L);
+        saveAppRequest.setTenantId(0L);
+        saveAppRequest.setRelatedModelIds(Arrays.asList(30L));
+        appService.saveApp(saveAppRequest);
     }
 }

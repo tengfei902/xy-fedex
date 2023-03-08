@@ -9,8 +9,6 @@ import java.util.Date;
 public class ModelPO implements Serializable {
     private Long id;
 
-    private Long tenantId;
-
     private Long bizLineId;
 
     private String modelName;

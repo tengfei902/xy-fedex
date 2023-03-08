@@ -2,6 +2,9 @@ package com.xy.fedex.catalog.dao;
 
 import com.xy.fedex.catalog.po.MetricPO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 @Mapper
 public interface MetricDao {
@@ -16,4 +19,8 @@ public interface MetricDao {
     int updateByPrimaryKeySelective(MetricPO record);
 
     int updateByPrimaryKey(MetricPO record);
+
+    MetricPO selectByMetricCode(@Param("bizLineId")Long bizLineId,@Param("metricCode")String metricCode);
+
+    List<MetricPO> selectAllMetrics(@Param("bizLineId") Long bizLineId);
 }

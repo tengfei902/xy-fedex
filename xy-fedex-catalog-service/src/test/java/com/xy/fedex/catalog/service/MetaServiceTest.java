@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.xy.fedex.catalog.BaseTest;
 import com.xy.fedex.catalog.common.enums.DimType;
 import com.xy.fedex.catalog.common.enums.MetricFormat;
+import com.xy.fedex.catalog.common.enums.MetricType;
 import com.xy.fedex.catalog.dao.DimDao;
 import com.xy.fedex.catalog.dao.MetricDao;
 import com.xy.fedex.catalog.dto.DimDTO;
@@ -11,6 +12,8 @@ import com.xy.fedex.catalog.dto.MetricDTO;
 import com.xy.fedex.catalog.enums.CatalogStatus;
 import com.xy.fedex.catalog.po.DimPO;
 import com.xy.fedex.catalog.po.MetricPO;
+import com.xy.fedex.catalog.service.meta.MetaService;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,14 +30,14 @@ public class MetaServiceTest extends BaseTest {
 
     @Test
     public void testSaveMetric() {
-        Long tenantId = 0L;
         Long bizLineId = 0L;
 
         MetricDTO metricDTO = MetricDTO.builder()
-                .tenantId(tenantId)
                 .bizLineId(bizLineId)
                 .subjectId(1000L)
+                .metricType(MetricType.PRIMARY)
                 .metricCode("trade_cnt")
+                .formula("sum(trade_cnt)")
                 .metricName("订单数")
                 .metricComment("订单数")
                 .build();
@@ -47,9 +50,20 @@ public class MetaServiceTest extends BaseTest {
         Assert.assertTrue(metricPO.getMetricComment().equals(metricDTO.getMetricComment()));
         Assert.assertTrue(metricPO.getMetricFormat() == MetricFormat.TEXT.getCode());
         Assert.assertTrue(metricPO.getBizLineId().compareTo(metricDTO.getBizLineId()) == 0);
-        Assert.assertTrue(metricPO.getTenantId().compareTo(metricDTO.getTenantId()) == 0);
+        Assert.assertTrue(metricPO.getMetricType().compareTo(MetricType.PRIMARY.getMetricType()) == 0);
+        Assert.assertNotNull(metricPO.getFormula());
 
         System.out.println(new Gson().toJson(metricPO));
+
+        MetricDTO metric = metaService.getMetric(bizLineId,"trade_cnt");
+        Assert.assertNotNull(metric);
+        Assert.assertTrue(metric.getMetricCode().equals(metricDTO.getMetricCode()));
+        Assert.assertTrue(metric.getMetricName().equals(metricDTO.getMetricName()));
+        Assert.assertTrue(metric.getMetricComment().equals(metricDTO.getMetricComment()));
+        Assert.assertTrue(metric.getMetricFormat() == MetricFormat.TEXT.getCode());
+        Assert.assertTrue(metric.getBizLineId().compareTo(metricDTO.getBizLineId()) == 0);
+        Assert.assertTrue(metric.getMetricType() == MetricType.PRIMARY);
+        Assert.assertTrue(StringUtils.equalsIgnoreCase(metric.getFormula(),metricDTO.getFormula()));
     }
 
     @Transactional
@@ -57,52 +71,54 @@ public class MetaServiceTest extends BaseTest {
     @Test
     public void testInitMetrics() {
         //trade cnt
-        Long tenantId = 0L;
         Long bizLineId = 0L;
-        Long subjectId = 1000L;
 
-        MetricDTO tradeCntMetric = MetricDTO.builder().tenantId(tenantId).bizLineId(bizLineId).subjectId(subjectId).metricCode("trade_cnt").metricName("订单数").metricComment("订单数").build();
-        metaService.saveMetric(tradeCntMetric);
+        MetricDTO orderCnt = MetricDTO.builder().bizLineId(bizLineId).metricCode("order_cnt").formula("count(distinct out_trade_no)").metricName("订单数").metricComment("订单数").build();
+        metaService.saveMetric(orderCnt);
 
-        MetricDTO feeMetric = MetricDTO.builder()
-                .tenantId(tenantId)
-                .bizLineId(bizLineId)
-                .subjectId(subjectId)
-                .metricCode("fee")
-                .metricName("手续费")
-                .metricComment("手续费")
-                .build();
+        MetricDTO feeMetric = MetricDTO.builder().bizLineId(bizLineId).metricCode("fee").formula("sum(fee)").metricName("手续费").metricComment("手续费").build();
         metaService.saveMetric(feeMetric);
 
-        MetricDTO totalFeeMetric = MetricDTO.builder()
-                .tenantId(tenantId)
-                .bizLineId(bizLineId)
-                .subjectId(subjectId)
-                .metricCode("total_fee")
-                .metricName("累计手续费")
-                .metricComment("累计手续费")
-                .build();
-        metaService.saveMetric(totalFeeMetric);
-
-        MetricDTO actualAmountMetric = MetricDTO.builder()
-                .tenantId(tenantId)
-                .bizLineId(bizLineId)
-                .subjectId(subjectId)
-                .metricCode("actual_amount")
-                .metricName("实际金额")
-                .metricComment("实际金额")
-                .build();
+        MetricDTO actualAmountMetric = MetricDTO.builder().bizLineId(bizLineId).metricCode("actual_amount").formula("sum(actual_amount)").metricName("实际金额").metricComment("实际金额").build();
         metaService.saveMetric(actualAmountMetric);
 
-        MetricDTO amountMetric = MetricDTO.builder()
-                .tenantId(tenantId)
-                .bizLineId(bizLineId)
-                .subjectId(subjectId)
-                .metricCode("amount")
-                .metricName("交易金额")
-                .metricComment("交易金额")
-                .build();
+        MetricDTO amountMetric = MetricDTO.builder().bizLineId(bizLineId).metricCode("amount").formula("sum(amount)").metricName("交易金额").metricComment("交易金额").build();
         metaService.saveMetric(amountMetric);
+
+        MetricDTO lockAmount = MetricDTO.builder().bizLineId(bizLineId).metricCode("lock_amount").formula("sum(lock_amount)").metricName("锁定金额").build();
+        metaService.saveMetric(lockAmount);
+
+        MetricDTO paidAmount = MetricDTO.builder().bizLineId(bizLineId).metricCode("paid_amount").formula("sum(paid_amount)").metricName("已支付金额").build();
+        metaService.saveMetric(paidAmount);
+
+        MetricDTO totalAmount = MetricDTO.builder().bizLineId(bizLineId).metricCode("total_amount").formula("sum(total_amount)").metricName("总金额").build();
+        metaService.saveMetric(totalAmount);
+
+        MetricDTO agentPayAmount = MetricDTO.builder().bizLineId(bizLineId).metricCode("agent_pay_amount").formula("sum(agent_pay_amount)").metricName("机构支付金额").metricComment("机构支付金额").build();
+        metaService.saveMetric(agentPayAmount);
+
+        MetricDTO refundOrderCnt = MetricDTO.builder().bizLineId(bizLineId).metricCode("refund_order_cnt").formula("count(distinct out_trade_no)").metricName("退款订单").metricComment("退款订单").build();
+        metaService.saveMetric(refundOrderCnt);
+
+        MetricDTO refundAmount = MetricDTO.builder().bizLineId(bizLineId).metricCode("refund_amount").formula("sum(total_fee)").build();
+        metaService.saveMetric(refundAmount);
+
+        MetricDTO refundFee = MetricDTO.builder().bizLineId(bizLineId).metricCode("refund_fee").formula("sum(fee)").build();
+        metaService.saveMetric(refundFee);
+
+        MetricDTO refundActualAmount = MetricDTO.builder().bizLineId(bizLineId).metricCode("refund_actual_amount").formula("sum(actual_amount)").build();
+        metaService.saveMetric(refundActualAmount);
+
+        refundOrderCnt = metaService.getMetric(bizLineId,"refund_order_cnt");
+        orderCnt = metaService.getMetric(bizLineId,"order_cnt");
+
+        MetricDTO refundOrderCntRate = MetricDTO.builder().bizLineId(bizLineId).metricCode("refund_order_cnt_rate").formula(String.format("%s/%s",refundOrderCnt.getMetricId(),orderCnt.getMetricId())).metricType(MetricType.DERIVE).build();
+        metaService.saveMetric(refundOrderCntRate);
+
+        amountMetric = metaService.getMetric(bizLineId,"amount");
+        refundAmount = metaService.getMetric(bizLineId,"refund_amount");
+        MetricDTO refundAmountRate = MetricDTO.builder().bizLineId(bizLineId).metricCode("refund_amount_rate").formula(String.format("%s/%s",refundAmount.getMetricId(),amountMetric.getMetricId())).metricType(MetricType.DERIVE).build();
+        metaService.saveMetric(refundAmountRate);
     }
 
     @Test

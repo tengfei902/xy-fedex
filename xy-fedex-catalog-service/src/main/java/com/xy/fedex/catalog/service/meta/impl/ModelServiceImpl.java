@@ -1,4 +1,4 @@
-package com.xy.fedex.catalog.service.impl;
+package com.xy.fedex.catalog.service.meta.impl;
 
 import com.alibaba.druid.sql.ast.statement.*;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlSelectQueryBlock;
@@ -18,7 +18,7 @@ import com.xy.fedex.catalog.po.DimModelPO;
 import com.xy.fedex.catalog.po.MetricModelPO;
 import com.xy.fedex.catalog.po.ModelPO;
 import com.xy.fedex.catalog.po.ModelTableRelationPO;
-import com.xy.fedex.catalog.service.ModelService;
+import com.xy.fedex.catalog.service.meta.ModelService;
 import com.xy.fedex.catalog.utils.ModelUtils;
 import com.xy.fedex.dsl.utility.SQLExprUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -148,7 +148,6 @@ public class ModelServiceImpl implements ModelService {
         modelPO.setModelName(modelRequest.getModelName());
         modelPO.setModelDesc(modelRequest.getModelDesc());
         modelPO.setBizLineId(modelRequest.getBizLineId());
-        modelPO.setTenantId(modelRequest.getTenantId());
         modelPO.setDsnId(modelRequest.getDsnId());
         modelPO.setCreator(modelRequest.getCreator());
         modelPO.setModelProp(new Gson().toJson(modelRequest.getModelProp()));

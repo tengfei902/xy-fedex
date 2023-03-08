@@ -9,8 +9,6 @@ import java.util.Date;
 public class DimPO implements Serializable {
     private Long id;
 
-    private Long tenantId;
-
     private String dimCode;
 
     private String dimName;

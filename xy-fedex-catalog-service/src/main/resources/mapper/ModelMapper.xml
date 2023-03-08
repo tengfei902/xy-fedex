@@ -3,7 +3,6 @@
 <mapper namespace="com.xy.fedex.catalog.dao.ModelDao" >
   <resultMap id="BaseResultMap" type="com.xy.fedex.catalog.po.ModelPO" >
     <id column="id" property="id" jdbcType="BIGINT" />
-    <result column="tenant_id" property="tenantId" jdbcType="BIGINT" />
     <result column="biz_line_id" property="bizLineId" jdbcType="BIGINT" />
     <result column="model_name" property="modelName" jdbcType="VARCHAR" />
     <result column="model_desc" property="modelDesc" jdbcType="VARCHAR" />
@@ -17,7 +16,7 @@
   </resultMap>
 
   <sql id="Base_Column_List" >
-    id, tenant_id, biz_line_id, model_name, model_desc, dsn_id, status, create_time, 
+    id, biz_line_id, model_name, model_desc, dsn_id, status, create_time,
     update_time, creator,model_definition, model_prop
   </sql>
 
@@ -32,12 +31,12 @@
     where id = #{id,jdbcType=BIGINT}
   </delete>
   <insert id="insert" parameterType="com.xy.fedex.catalog.po.ModelPO" >
-    insert into model (id, tenant_id, biz_line_id, 
+    insert into model (id, biz_line_id,
       model_name, model_desc, dsn_id, 
       status, create_time, update_time, 
       creator, model_definition, model_prop
       )
-    values (#{id,jdbcType=BIGINT}, #{tenantId,jdbcType=BIGINT}, #{bizLineId,jdbcType=BIGINT}, 
+    values (#{id,jdbcType=BIGINT},#{bizLineId,jdbcType=BIGINT},
       #{modelName,jdbcType=VARCHAR}, #{modelDesc,jdbcType=VARCHAR}, #{dsnId,jdbcType=BIGINT}, 
       #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
       #{creator,jdbcType=VARCHAR}, #{modelDefinition,jdbcType=LONGVARCHAR}, #{modelProp,jdbcType=LONGVARCHAR}
@@ -48,9 +47,6 @@
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
         id,
-      </if>
-      <if test="tenantId != null" >
-        tenant_id,
       </if>
       <if test="bizLineId != null" >
         biz_line_id,
@@ -87,9 +83,6 @@
       <if test="id != null" >
         #{id,jdbcType=BIGINT},
       </if>
-      <if test="tenantId != null" >
-        #{tenantId,jdbcType=BIGINT},
-      </if>
       <if test="bizLineId != null" >
         #{bizLineId,jdbcType=BIGINT},
       </if>
@@ -125,9 +118,6 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.xy.fedex.catalog.po.ModelPO" >
     update model
     <set >
-      <if test="tenantId != null" >
-        tenant_id = #{tenantId,jdbcType=BIGINT},
-      </if>
       <if test="bizLineId != null" >
         biz_line_id = #{bizLineId,jdbcType=BIGINT},
       </if>
@@ -163,7 +153,7 @@
   </update>
   <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.xy.fedex.catalog.po.ModelPO" >
     update model
-    set tenant_id = #{tenantId,jdbcType=BIGINT},
+    set
       biz_line_id = #{bizLineId,jdbcType=BIGINT},
       model_name = #{modelName,jdbcType=VARCHAR},
       model_desc = #{modelDesc,jdbcType=VARCHAR},
@@ -178,7 +168,7 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.xy.fedex.catalog.po.ModelPO" >
     update model
-    set tenant_id = #{tenantId,jdbcType=BIGINT},
+    set
       biz_line_id = #{bizLineId,jdbcType=BIGINT},
       model_name = #{modelName,jdbcType=VARCHAR},
       model_desc = #{modelDesc,jdbcType=VARCHAR},

@@ -4,6 +4,7 @@ import com.xy.fedex.catalog.BaseTest;
 import com.xy.fedex.catalog.api.dto.DimModelRequest;
 import com.xy.fedex.catalog.api.dto.MetricModelRequest;
 import com.xy.fedex.catalog.api.dto.ModelRequest;
+import com.xy.fedex.catalog.service.meta.ModelService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Rollback;

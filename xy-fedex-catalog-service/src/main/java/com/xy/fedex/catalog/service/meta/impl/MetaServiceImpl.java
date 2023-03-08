@@ -1,6 +1,9 @@
-package com.xy.fedex.catalog.service.impl;
+package com.xy.fedex.catalog.service.meta.impl;
 
 import com.xy.fedex.admin.api.vo.response.TableDetailVO;
+import com.xy.fedex.catalog.common.definition.column.TableField;
+import com.xy.fedex.catalog.common.definition.field.MetaField;
+import com.xy.fedex.catalog.common.enums.MetricType;
 import com.xy.fedex.catalog.dao.DimDao;
 import com.xy.fedex.catalog.dao.MetricDao;
 import com.xy.fedex.catalog.dto.DimDTO;
@@ -11,12 +14,16 @@ import com.xy.fedex.catalog.exception.MetricNotFoundException;
 import com.xy.fedex.catalog.exception.UpdateFailedException;
 import com.xy.fedex.catalog.po.DimPO;
 import com.xy.fedex.catalog.po.MetricPO;
-import com.xy.fedex.catalog.service.MetaService;
+import com.xy.fedex.catalog.service.meta.MetaMatchService;
+import com.xy.fedex.catalog.service.meta.MetaService;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class MetaServiceImpl implements MetaService {
@@ -24,6 +31,8 @@ public class MetaServiceImpl implements MetaService {
     private MetricDao metricDao;
     @Autowired
     private DimDao dimDao;
+    @Autowired
+    private MetaMatchService metaMatchService;
 
     @Override
     public MetricDTO getMetric(Long metricId) {
@@ -31,7 +40,39 @@ public class MetaServiceImpl implements MetaService {
         if (Objects.isNull(metric)) {
             throw new MetricNotFoundException("metric not found:" + metric);
         }
-        return MetricDTO.builder().metricId(metric.getId()).metricCode(metric.getMetricCode()).metricName(metric.getMetricName()).subjectId(metric.getSubjectId()).metricComment(metric.getMetricComment()).bizLineId(metric.getBizLineId()).tenantId(metric.getTenantId()).metricFormat(metric.getMetricFormat()).build();
+        return MetricDTO.builder().metricId(metric.getId()).metricCode(metric.getMetricCode()).metricName(metric.getMetricName()).subjectId(metric.getSubjectId()).metricComment(metric.getMetricComment()).bizLineId(metric.getBizLineId()).metricFormat(metric.getMetricFormat()).build();
+    }
+
+    @Override
+    public MetricDTO getMetric(Long bizLineId, String metricCode) {
+        MetricPO metric = metricDao.selectByMetricCode(bizLineId,metricCode);
+        if(Objects.isNull(metric)) {
+            throw new MetricNotFoundException(String.format("metric not found, bizLineId:%s,metricCode:%s",bizLineId,metricCode));
+        }
+        return convert(metric);
+    }
+
+    private MetricDTO convert(MetricPO metric) {
+        return MetricDTO.builder()
+                .metricId(metric.getId())
+                .subjectId(metric.getSubjectId())
+                .metricCode(metric.getMetricCode())
+                .formula(metric.getFormula())
+                .bizLineId(metric.getBizLineId())
+                .metricType(MetricType.parse(metric.getMetricType()))
+                .metricName(metric.getMetricName())
+                .metricComment(metric.getMetricComment())
+                .metricFormat(metric.getMetricFormat())
+                .unit(metric.getUnit()).build();
+    }
+
+    @Override
+    public List<MetricDTO> getMetrics(Long bizLineId) {
+        List<MetricPO> allMetrics = metricDao.selectAllMetrics(bizLineId);
+        if(CollectionUtils.isEmpty(allMetrics)) {
+            return Collections.EMPTY_LIST;
+        }
+        return allMetrics.stream().map(metricPO -> convert(metricPO)).collect(Collectors.toList());
     }
 
     @Override
@@ -44,11 +85,15 @@ public class MetaServiceImpl implements MetaService {
     }
 
     @Override
+    public List<DimDTO> getDims(Long bizLineId) {
+        return null;
+    }
+
+    @Override
     public Long saveMetric(MetricDTO metric) {
         MetricPO metricPO = new MetricPO();
         if (Objects.isNull(metric.getMetricId())) {
             //save
-            metricPO.setTenantId(metric.getTenantId());
             metricPO.setBizLineId(metric.getBizLineId());
             metricPO.setSubjectId(metric.getSubjectId());
             metricPO.setMetricCode(metric.getMetricCode());
@@ -56,6 +101,8 @@ public class MetaServiceImpl implements MetaService {
             metricPO.setMetricComment(metric.getMetricComment());
             metricPO.setMetricFormat(metric.getMetricFormat());
             metricPO.setUnit(metric.getUnit());
+            metricPO.setFormula(metric.getFormula());
+            metricPO.setMetricType(Objects.isNull(metric.getMetricType())? MetricType.PRIMARY.getMetricType() : metric.getMetricType().getMetricType());
 
             metricDao.insertSelective(metricPO);
             return metricPO.getId();
@@ -71,6 +118,8 @@ public class MetaServiceImpl implements MetaService {
             updateMetric.setMetricFormat(metric.getMetricFormat());
             updateMetric.setSubjectId(metric.getSubjectId());
             updateMetric.setUnit(metric.getUnit());
+            updateMetric.setFormula(metric.getFormula());
+            updateMetric.setMetricType(Objects.isNull(metric.getMetricType())? MetricType.PRIMARY.getMetricType() : metric.getMetricType().getMetricType());
             updateMetric.setId(metric.getMetricId());
             int cnt = metricDao.updateByPrimaryKeySelective(updateMetric);
             if (cnt <= 0) {
@@ -88,7 +137,6 @@ public class MetaServiceImpl implements MetaService {
             dimPO.setDimCode(dim.getDimCode());
             dimPO.setDimName(dim.getDimName());
             dimPO.setDimComment(dim.getDimComment());
-            dimPO.setTenantId(dim.getTenantId());
             dimDao.insertSelective(dimPO);
             return dimPO.getId();
         } else {
@@ -115,5 +163,15 @@ public class MetaServiceImpl implements MetaService {
 
             }
         }
+    }
+
+    @Override
+    public List<TableField> matchMeta(Long bizLineId,List<TableField> tableFields) {
+        for(TableField tableField:tableFields) {
+            String columnName = tableField.getColumnName();
+            MetaField relateMetaField = metaMatchService.getRelateMetaField(bizLineId,columnName);
+            tableField.setRelateField(relateMetaField);
+        }
+        return tableFields;
     }
 }

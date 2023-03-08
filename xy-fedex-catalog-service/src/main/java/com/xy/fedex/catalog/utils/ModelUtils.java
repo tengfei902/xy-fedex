@@ -7,7 +7,7 @@ import com.xy.fedex.catalog.api.dto.ModelRequest;
 import com.xy.fedex.catalog.dto.DimDTO;
 import com.xy.fedex.catalog.dto.MetricDTO;
 import com.xy.fedex.catalog.exception.ModelDefException;
-import com.xy.fedex.catalog.service.MetaService;
+import com.xy.fedex.catalog.service.meta.MetaService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 

@@ -1,4 +1,4 @@
-package com.xy.fedex.catalog.api.dto;
+package com.xy.fedex.catalog.api.dto.request;
 
 import lombok.Data;
 
@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.util.List;
 
 @Data
-public class AppRequest implements Serializable {
+public class SaveAppRequest implements Serializable {
     private Long appId;
     private String appName;
     private String appDesc;
