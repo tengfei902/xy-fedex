@@ -10,7 +10,6 @@ public class SaveAppRequest implements Serializable {
     private Long appId;
     private String appName;
     private String appDesc;
-    private Long tenantId;
     private Long bizLineId;
     private List<Long> relatedModelIds;
 }

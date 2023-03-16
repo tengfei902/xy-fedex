@@ -10,18 +10,12 @@ import java.util.Map;
 public class ModelRequest implements Serializable {
     private Long modelId;
     private String modelName;
-    private String modelDesc;
+    private String modelComment;
     private Long bizLineId;
     private Long dsnId;
-    private Long tenantId;
-    private String creator;
     private Map<String,String> modelProp;
     private List<MetricModelRequest> metricModels;
     private List<DimModelRequest> dimModels;
     private String tableSource;
     private String condition;
-
-    public String getModelDefinition() {
-        return null;
-    }
 }

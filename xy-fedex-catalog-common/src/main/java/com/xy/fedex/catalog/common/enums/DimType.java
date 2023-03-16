@@ -1,5 +1,7 @@
 package com.xy.fedex.catalog.common.enums;
 
+import com.xy.fedex.catalog.common.exception.EnumTypeNotFoundException;
+
 public enum DimType {
     TEXT(0),
     NUMBER(1),
@@ -18,5 +20,14 @@ public enum DimType {
 
     public int getDimType() {
         return dimType;
+    }
+
+    public static DimType parse(Integer dimTypeCode) {
+        for(DimType dimType : DimType.values()) {
+            if(dimType.dimType == dimTypeCode) {
+                return dimType;
+            }
+        }
+        throw new EnumTypeNotFoundException(DimType.class,dimTypeCode);
     }
 }

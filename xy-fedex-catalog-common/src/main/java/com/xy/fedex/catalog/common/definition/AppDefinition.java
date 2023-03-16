@@ -1,6 +1,6 @@
 package com.xy.fedex.catalog.common.definition;
 
-import com.xy.fedex.catalog.common.definition.field.Dim;
+import com.xy.fedex.catalog.common.enums.DimType;
 import com.xy.fedex.catalog.common.enums.MetricType;
 import lombok.Data;
 
@@ -18,12 +18,19 @@ public class AppDefinition implements Serializable {
 
     @Data
     public static class Metric implements Serializable {
-        private Long metricModelId;
         private Long metricId;
         private String metricCode;
         private String metricName;
         private String metricComment;
-        private String formula;
         private MetricType metricType;
+    }
+
+    @Data
+    public static class Dim implements Serializable {
+        private Long dimId;
+        private String dimCode;
+        private String dimName;
+        private String dimComment;
+        private DimType dimType;
     }
 }
