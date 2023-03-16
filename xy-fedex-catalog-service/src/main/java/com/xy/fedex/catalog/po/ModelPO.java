@@ -19,13 +19,15 @@ public class ModelPO implements Serializable {
 
     private Integer status;
 
+    private String tableSource;
+
+    private String condition;
+
     private Date createTime;
 
     private Date updateTime;
 
     private String creator;
-
-    private String modelDefinition;
 
     private String modelProp;
 }

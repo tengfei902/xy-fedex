@@ -142,4 +142,40 @@
       )
     </foreach>
   </insert>
+
+  <select id="selectByModelIds" resultType="com.xy.fedex.catalog.po.DimPO">
+    select distinct
+        t1.dim_id as dimId,
+        t2.dim_code as dimCode,
+        t2.dim_name as dimName,
+        t2.dim_comment as dimComment,
+        t2.dim_type as dimType
+    from dim_model t1 left join dim t2 on t1.dim_id = t2.id
+    where t1.model_id in
+    <foreach collection="modelIds" item="modelId" open="(" close=")" separator=",">
+      #{modelId}
+    </foreach>
+    and t1.status = 1 and t2.status = 1
+  </select>
+
+  <select id="selectByModelId" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select <include refid="Base_Column_List" />
+    from dim_model
+    where model_id = #{modelId,jdbcType=BIGINT}
+    and status = 1
+  </select>
+
+  <select id="selectDimDetailByModelId" resultType="com.xy.fedex.catalog.po.DimModelDetailPO" parameterType="java.lang.Long" >
+    select
+        t1.id as dimModelId,
+        t1.dim_id as dimId,
+        t1.model_id as modelId,
+        t1.formula as formula,
+        t2.dim_code as dimCode,
+        t2.dim_name as dimName,
+        t2.dim_comment as dimComment
+    from dim_model t1 left join dim t2 on t1.dim_id = t2.id
+    where t1.status = 1 and t2.status = 1 and t1.model_id = #{modelId,jdbcType=BIGINT}
+  </select>
+
 </mapper>

@@ -6,7 +6,7 @@ import lombok.Data;
 @Builder
 @Data
 public class DimDTO {
-    private Long tenantId;
+    private Long bizLineId;
     private Long dimId;
     private String dimCode;
     private String dimName;

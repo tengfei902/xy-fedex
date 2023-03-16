@@ -1,14 +1,12 @@
 package com.xy.fedex.catalog.service.meta.impl;
 
+import com.google.common.collect.Lists;
 import com.xy.fedex.catalog.api.dto.request.SaveAppRequest;
 import com.xy.fedex.catalog.common.definition.AppDefinition;
-import com.xy.fedex.catalog.dao.AppDao;
-import com.xy.fedex.catalog.dao.AppMetricModelRelationDao;
-import com.xy.fedex.catalog.dao.AppModelRelationDao;
+import com.xy.fedex.catalog.common.enums.DimType;
+import com.xy.fedex.catalog.dao.*;
 import com.xy.fedex.catalog.exception.AppNotFoundException;
-import com.xy.fedex.catalog.po.AppMetricPO;
-import com.xy.fedex.catalog.po.AppModelRelationPO;
-import com.xy.fedex.catalog.po.AppPO;
+import com.xy.fedex.catalog.po.*;
 import com.xy.fedex.catalog.service.meta.AppService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,12 +25,17 @@ public class AppServiceImpl implements AppService {
     private AppModelRelationDao appModelRelationDao;
     @Autowired
     private AppMetricModelRelationDao appMetricModelRelationDao;
+    @Autowired
+    private DimModelDao dimModelDao;
+    @Autowired
+    private MetricModelDao metricModelDao;
 
     @Transactional
     @Override
     public Long saveApp(SaveAppRequest saveAppRequest) {
         Long appId = saveOrUpdateApp(saveAppRequest);
         saveAppModelRelation(appId, saveAppRequest.getRelatedModelIds());
+        saveAppMetricModelRelation(appId, saveAppRequest.getRelatedModelIds());
         return appId;
     }
 
@@ -81,6 +84,19 @@ public class AppServiceImpl implements AppService {
         appModelRelationDao.batchInsert(relations);
     }
 
+    private void saveAppMetricModelRelation(Long appId,List<Long> modelIds) {
+        appMetricModelRelationDao.deleteByAppId(appId);
+
+        List<MetricModelPO> metricModels = metricModelDao.selectByModelIds(modelIds);
+        List<AppMetricModelRelationPO> list = metricModels.stream().map(metricModelPO -> {
+            AppMetricModelRelationPO appMetricModelRelationPO = new AppMetricModelRelationPO();
+            appMetricModelRelationPO.setAppId(appId);
+            appMetricModelRelationPO.setMetricModelId(metricModelPO.getId());
+            return appMetricModelRelationPO;
+        }).collect(Collectors.toList());
+        appMetricModelRelationDao.batchInsert(list);
+    }
+
     @Override
     public AppDefinition getApp(Long bizLineId,Long appId) {
         AppPO appPO = appDao.selectByPrimaryKey(appId);
@@ -96,21 +112,35 @@ public class AppServiceImpl implements AppService {
         if(!CollectionUtils.isEmpty(appModelRelations)) {
             appDefinition.setModelIds(appModelRelations.stream().map(AppModelRelationPO::getModelId).collect(Collectors.toList()));
         }
-        appDefinition.setDims(null);
+        appDefinition.setDims(getDims(appDefinition.getModelIds()));
         appDefinition.setMetrics(getMetrics(appId));
         return appDefinition;
     }
 
+    private List<AppDefinition.Dim> getDims(List<Long> relateModelIds) {
+        List<DimPO> dims = dimModelDao.selectByModelIds(relateModelIds);
+        if(CollectionUtils.isEmpty(dims)) {
+            return Lists.newArrayList();
+        }
+        return dims.stream().map(dimPO -> {
+            AppDefinition.Dim dim = new AppDefinition.Dim();
+            dim.setDimId(dimPO.getId());
+            dim.setDimCode(dimPO.getDimCode());
+            dim.setDimName(dimPO.getDimName());
+            dim.setDimComment(dimPO.getDimComment());
+            dim.setDimType(DimType.parse(dimPO.getDimType()));
+            return dim;
+        }).collect(Collectors.toList());
+    }
+
     private List<AppDefinition.Metric> getMetrics(Long appId) {
-        List<AppMetricPO> appMetrics = appMetricModelRelationDao.selectAppMetrics(appId);
+        List<MetricModelDetailPO> appMetrics = appMetricModelRelationDao.selectAppMetrics(appId);
         return appMetrics.stream().map(appMetricPO -> {
             AppDefinition.Metric metric = new AppDefinition.Metric();
-            metric.setMetricModelId(appMetricPO.getMetricModelId());
             metric.setMetricId(appMetricPO.getMetricId());
             metric.setMetricCode(appMetricPO.getMetricCode());
             metric.setMetricName(appMetricPO.getMetricName());
             metric.setMetricComment(appMetricPO.getMetricComment());
-            metric.setFormula(appMetricPO.getFormula());
             return metric;
         }).collect(Collectors.toList());
     }

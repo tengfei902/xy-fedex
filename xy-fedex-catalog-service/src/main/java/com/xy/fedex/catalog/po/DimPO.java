@@ -15,6 +15,8 @@ public class DimPO implements Serializable {
 
     private Integer dimType;
 
+    private Long bizLineId;
+
     private String dimComment;
 
     private Integer status;

@@ -73,58 +73,63 @@ public class MetaServiceTest extends BaseTest {
         //trade cnt
         Long bizLineId = 0L;
 
-        MetricDTO orderCnt = MetricDTO.builder().bizLineId(bizLineId).metricCode("order_cnt").formula("count(distinct out_trade_no)").metricName("订单数").metricComment("订单数").build();
-        metaService.saveMetric(orderCnt);
+//        MetricDTO orderCnt = MetricDTO.builder().bizLineId(bizLineId).metricCode("order_cnt").formula("count(distinct out_trade_no)").metricName("订单数").metricComment("订单数").build();
+//        metaService.saveMetric(orderCnt);
+//
+//        MetricDTO feeMetric = MetricDTO.builder().bizLineId(bizLineId).metricCode("fee").formula("sum(fee)").metricName("手续费").metricComment("手续费").build();
+//        metaService.saveMetric(feeMetric);
+//
+//        MetricDTO actualAmountMetric = MetricDTO.builder().bizLineId(bizLineId).metricCode("actual_amount").formula("sum(actual_amount)").metricName("实际金额").metricComment("实际金额").build();
+//        metaService.saveMetric(actualAmountMetric);
+//
+//        MetricDTO amountMetric = MetricDTO.builder().bizLineId(bizLineId).metricCode("amount").formula("sum(amount)").metricName("交易金额").metricComment("交易金额").build();
+//        metaService.saveMetric(amountMetric);
+//
+//        MetricDTO lockAmount = MetricDTO.builder().bizLineId(bizLineId).metricCode("lock_amount").formula("sum(lock_amount)").metricName("锁定金额").build();
+//        metaService.saveMetric(lockAmount);
+//
+//        MetricDTO paidAmount = MetricDTO.builder().bizLineId(bizLineId).metricCode("paid_amount").formula("sum(paid_amount)").metricName("已支付金额").build();
+//        metaService.saveMetric(paidAmount);
+//
+//        MetricDTO totalAmount = MetricDTO.builder().bizLineId(bizLineId).metricCode("total_amount").formula("sum(total_amount)").metricName("总金额").build();
+//        metaService.saveMetric(totalAmount);
+//
+//        MetricDTO agentPayAmount = MetricDTO.builder().bizLineId(bizLineId).metricCode("agent_pay_amount").formula("sum(agent_pay_amount)").metricName("机构支付金额").metricComment("机构支付金额").build();
+//        metaService.saveMetric(agentPayAmount);
+//
+//        MetricDTO refundOrderCnt = MetricDTO.builder().bizLineId(bizLineId).metricCode("refund_order_cnt").formula("count(distinct out_trade_no)").metricName("退款订单").metricComment("退款订单").build();
+//        metaService.saveMetric(refundOrderCnt);
+//
+//        MetricDTO refundAmount = MetricDTO.builder().bizLineId(bizLineId).metricCode("refund_amount").formula("sum(total_fee)").build();
+//        metaService.saveMetric(refundAmount);
+//
+//        MetricDTO refundFee = MetricDTO.builder().bizLineId(bizLineId).metricCode("refund_fee").formula("sum(fee)").build();
+//        metaService.saveMetric(refundFee);
+//
+//        MetricDTO refundActualAmount = MetricDTO.builder().bizLineId(bizLineId).metricCode("refund_actual_amount").formula("sum(actual_amount)").build();
+//        metaService.saveMetric(refundActualAmount);
+//
+//        refundOrderCnt = metaService.getMetric(bizLineId,"refund_order_cnt");
+//        orderCnt = metaService.getMetric(bizLineId,"order_cnt");
+//
+//        MetricDTO refundOrderCntRate = MetricDTO.builder().bizLineId(bizLineId).metricCode("refund_order_cnt_rate").formula(String.format("%s/%s",refundOrderCnt.getMetricId(),orderCnt.getMetricId())).metricType(MetricType.DERIVE).build();
+//        metaService.saveMetric(refundOrderCntRate);
+//
+//        amountMetric = metaService.getMetric(bizLineId,"amount");
+//        refundAmount = metaService.getMetric(bizLineId,"refund_amount");
+//        MetricDTO refundAmountRate = MetricDTO.builder().bizLineId(bizLineId).metricCode("refund_amount_rate").formula(String.format("%s/%s",refundAmount.getMetricId(),amountMetric.getMetricId())).metricType(MetricType.DERIVE).build();
+//        metaService.saveMetric(refundAmountRate);
 
-        MetricDTO feeMetric = MetricDTO.builder().bizLineId(bizLineId).metricCode("fee").formula("sum(fee)").metricName("手续费").metricComment("手续费").build();
-        metaService.saveMetric(feeMetric);
-
-        MetricDTO actualAmountMetric = MetricDTO.builder().bizLineId(bizLineId).metricCode("actual_amount").formula("sum(actual_amount)").metricName("实际金额").metricComment("实际金额").build();
-        metaService.saveMetric(actualAmountMetric);
-
-        MetricDTO amountMetric = MetricDTO.builder().bizLineId(bizLineId).metricCode("amount").formula("sum(amount)").metricName("交易金额").metricComment("交易金额").build();
-        metaService.saveMetric(amountMetric);
-
-        MetricDTO lockAmount = MetricDTO.builder().bizLineId(bizLineId).metricCode("lock_amount").formula("sum(lock_amount)").metricName("锁定金额").build();
-        metaService.saveMetric(lockAmount);
-
-        MetricDTO paidAmount = MetricDTO.builder().bizLineId(bizLineId).metricCode("paid_amount").formula("sum(paid_amount)").metricName("已支付金额").build();
-        metaService.saveMetric(paidAmount);
-
-        MetricDTO totalAmount = MetricDTO.builder().bizLineId(bizLineId).metricCode("total_amount").formula("sum(total_amount)").metricName("总金额").build();
-        metaService.saveMetric(totalAmount);
-
-        MetricDTO agentPayAmount = MetricDTO.builder().bizLineId(bizLineId).metricCode("agent_pay_amount").formula("sum(agent_pay_amount)").metricName("机构支付金额").metricComment("机构支付金额").build();
-        metaService.saveMetric(agentPayAmount);
-
-        MetricDTO refundOrderCnt = MetricDTO.builder().bizLineId(bizLineId).metricCode("refund_order_cnt").formula("count(distinct out_trade_no)").metricName("退款订单").metricComment("退款订单").build();
-        metaService.saveMetric(refundOrderCnt);
-
-        MetricDTO refundAmount = MetricDTO.builder().bizLineId(bizLineId).metricCode("refund_amount").formula("sum(total_fee)").build();
-        metaService.saveMetric(refundAmount);
-
-        MetricDTO refundFee = MetricDTO.builder().bizLineId(bizLineId).metricCode("refund_fee").formula("sum(fee)").build();
-        metaService.saveMetric(refundFee);
-
-        MetricDTO refundActualAmount = MetricDTO.builder().bizLineId(bizLineId).metricCode("refund_actual_amount").formula("sum(actual_amount)").build();
-        metaService.saveMetric(refundActualAmount);
-
-        refundOrderCnt = metaService.getMetric(bizLineId,"refund_order_cnt");
-        orderCnt = metaService.getMetric(bizLineId,"order_cnt");
-
-        MetricDTO refundOrderCntRate = MetricDTO.builder().bizLineId(bizLineId).metricCode("refund_order_cnt_rate").formula(String.format("%s/%s",refundOrderCnt.getMetricId(),orderCnt.getMetricId())).metricType(MetricType.DERIVE).build();
-        metaService.saveMetric(refundOrderCntRate);
-
-        amountMetric = metaService.getMetric(bizLineId,"amount");
-        refundAmount = metaService.getMetric(bizLineId,"refund_amount");
-        MetricDTO refundAmountRate = MetricDTO.builder().bizLineId(bizLineId).metricCode("refund_amount_rate").formula(String.format("%s/%s",refundAmount.getMetricId(),amountMetric.getMetricId())).metricType(MetricType.DERIVE).build();
-        metaService.saveMetric(refundAmountRate);
+        MetricDTO amount = metaService.getMetric(bizLineId,"refund_amount");
+        MetricDTO fee = metaService.getMetric(bizLineId,"refund_fee");
+        MetricDTO feeRate = MetricDTO.builder().bizLineId(bizLineId).metricCode("refund_fee_rate").formula(String.format("{%s}/{%s}",fee.getMetricId(),amount.getMetricId())).metricType(MetricType.DERIVE).build();
+        metaService.saveMetric(feeRate);
     }
 
     @Test
     public void testSaveDim() {
         DimDTO dimDTO = DimDTO.builder()
-                .tenantId(0L)
+                .bizLineId(0L)
                 .dimCode("dt")
                 .dimName("日期")
                 .dimComment("日期")
@@ -139,45 +144,46 @@ public class MetaServiceTest extends BaseTest {
     @Rollback(value = false)
     @Test
     public void testInitDim() {
-        Long tenantId = 0L;
-        DimDTO dimDTO = DimDTO.builder().tenantId(tenantId).dimCode("dt").dimName("日期").dimComment("日期").dimType(DimType.DATE.getDimType()).build();
-        metaService.saveDim(dimDTO);
-
-        DimDTO hourDim = DimDTO.builder().tenantId(tenantId).dimCode("hour").dimName("小时").dimComment("小时").dimType(DimType.HOUR.getDimType()).build();
-        metaService.saveDim(hourDim);
-
-        DimDTO groupIdDim = DimDTO.builder().tenantId(tenantId).dimCode("group_id").dimName("组").dimComment("组").dimType(DimType.TEXT.getDimType()).build();
-        metaService.saveDim(groupIdDim);
-
-        DimDTO accountStatus = DimDTO.builder().tenantId(tenantId).dimCode("account_status").dimName("账户状态").dimComment("账户状态").dimType(DimType.TEXT.getDimType()).build();
-        metaService.saveDim(accountStatus);
-
-        DimDTO tradeNoDim = DimDTO.builder().tenantId(tenantId).dimCode("out_trade_no").dimName("订单号").dimComment("订单号").dimType(DimType.TEXT.getDimType()).build();
-        metaService.saveDim(tradeNoDim);
-
-        DimDTO oprType = DimDTO.builder().tenantId(tenantId).dimCode("opr_type").dimName("订单类型").dimComment("订单类型").dimType(DimType.TEXT.getDimType()).build();
-        metaService.saveDim(oprType);
-
-        DimDTO providerCode = DimDTO.builder().tenantId(tenantId).dimCode("provider_code").dimName("供应商编号").dimComment("供应商编号").dimType(DimType.TEXT.getDimType()).build();
-        metaService.saveDim(providerCode);
-
-        DimDTO providerName = DimDTO.builder().tenantId(tenantId).dimCode("provider_name").dimName("供应商名称").dimComment("供应商名称").dimType(DimType.TEXT.getDimType()).build();
-        metaService.saveDim(providerName);
-
-        DimDTO mchIdDim = DimDTO.builder().tenantId(tenantId).dimCode("mch_id").dimName("客户id").dimComment("客户id").dimType(DimType.TEXT.getDimType()).build();
-        metaService.saveDim(mchIdDim);
-
-        DimDTO serviceDim = DimDTO.builder().tenantId(tenantId).dimCode("service").dimName("通道类型").dimComment("通道类型").dimType(DimType.TEXT.getDimType()).build();
-        metaService.saveDim(serviceDim);
-
-        DimDTO tradeTypeDim = DimDTO.builder().tenantId(tenantId).dimCode("trade_type").dimName("交易类型").dimComment("交易类型").dimType(DimType.TEXT.getDimType()).build();
-        metaService.saveDim(tradeTypeDim);
-
-        DimDTO payResultDim = DimDTO.builder().tenantId(tenantId).dimCode("pay_result").dimName("交易结果").dimComment("交易结果").dimType(DimType.TEXT.getDimType()).build();
-        metaService.saveDim(payResultDim);
-
-        DimDTO buyerIdDim = DimDTO.builder().tenantId(tenantId).dimCode("buyer_id").dimName("购买方id").dimComment("购买方id").dimType(DimType.TEXT.getDimType()).build();
-        metaService.saveDim(buyerIdDim);
-
+        Long bizLineId = 0L;
+//        DimDTO dimDTO = DimDTO.builder().bizLineId(bizLineId).dimCode("dt").dimName("日期").dimComment("日期").dimType(DimType.DATE.getDimType()).build();
+//        metaService.saveDim(dimDTO);
+//
+//        DimDTO hourDim = DimDTO.builder().bizLineId(bizLineId).dimCode("hour").dimName("小时").dimComment("小时").dimType(DimType.HOUR.getDimType()).build();
+//        metaService.saveDim(hourDim);
+//
+//        DimDTO groupIdDim = DimDTO.builder().bizLineId(bizLineId).dimCode("group_id").dimName("组").dimComment("组").dimType(DimType.TEXT.getDimType()).build();
+//        metaService.saveDim(groupIdDim);
+//
+//        DimDTO accountStatus = DimDTO.builder().bizLineId(bizLineId).dimCode("account_status").dimName("账户状态").dimComment("账户状态").dimType(DimType.TEXT.getDimType()).build();
+//        metaService.saveDim(accountStatus);
+//
+//        DimDTO tradeNoDim = DimDTO.builder().bizLineId(bizLineId).dimCode("out_trade_no").dimName("订单号").dimComment("订单号").dimType(DimType.TEXT.getDimType()).build();
+//        metaService.saveDim(tradeNoDim);
+//
+//        DimDTO oprType = DimDTO.builder().bizLineId(bizLineId).dimCode("opr_type").dimName("订单类型").dimComment("订单类型").dimType(DimType.TEXT.getDimType()).build();
+//        metaService.saveDim(oprType);
+//
+//        DimDTO providerCode = DimDTO.builder().bizLineId(bizLineId).dimCode("provider_code").dimName("供应商编号").dimComment("供应商编号").dimType(DimType.TEXT.getDimType()).build();
+//        metaService.saveDim(providerCode);
+//
+//        DimDTO providerName = DimDTO.builder().bizLineId(bizLineId).dimCode("provider_name").dimName("供应商名称").dimComment("供应商名称").dimType(DimType.TEXT.getDimType()).build();
+//        metaService.saveDim(providerName);
+//
+//        DimDTO mchIdDim = DimDTO.builder().bizLineId(bizLineId).dimCode("mch_id").dimName("客户id").dimComment("客户id").dimType(DimType.TEXT.getDimType()).build();
+//        metaService.saveDim(mchIdDim);
+//
+//        DimDTO serviceDim = DimDTO.builder().bizLineId(bizLineId).dimCode("service").dimName("通道类型").dimComment("通道类型").dimType(DimType.TEXT.getDimType()).build();
+//        metaService.saveDim(serviceDim);
+//
+//        DimDTO tradeTypeDim = DimDTO.builder().bizLineId(bizLineId).dimCode("trade_type").dimName("交易类型").dimComment("交易类型").dimType(DimType.TEXT.getDimType()).build();
+//        metaService.saveDim(tradeTypeDim);
+//
+//        DimDTO payResultDim = DimDTO.builder().bizLineId(bizLineId).dimCode("pay_result").dimName("交易结果").dimComment("交易结果").dimType(DimType.TEXT.getDimType()).build();
+//        metaService.saveDim(payResultDim);
+//
+//        DimDTO buyerIdDim = DimDTO.builder().bizLineId(bizLineId).dimCode("buyer_id").dimName("购买方id").dimComment("购买方id").dimType(DimType.TEXT.getDimType()).build();
+//        metaService.saveDim(buyerIdDim);
+        DimDTO channelProviderName = DimDTO.builder().bizLineId(bizLineId).dimCode("channel_provider_name").dimName("通道类型").dimComment("通道类型").dimType(DimType.TEXT.getDimType()).build();
+        metaService.saveDim(channelProviderName);
     }
 }

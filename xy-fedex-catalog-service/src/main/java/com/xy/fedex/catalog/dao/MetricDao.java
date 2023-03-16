@@ -23,4 +23,6 @@ public interface MetricDao {
     MetricPO selectByMetricCode(@Param("bizLineId")Long bizLineId,@Param("metricCode")String metricCode);
 
     List<MetricPO> selectAllMetrics(@Param("bizLineId") Long bizLineId);
+
+    List<MetricPO> selectByIds(@Param("ids") List<Long> ids);
 }

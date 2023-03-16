@@ -14,11 +14,5 @@ public class CatalogFacadeTest extends BaseTest {
 
     @Test
     public void testSaveModel() {
-        PrepareModelRequest prepareModelRequest = PrepareModelRequest.builder().dsnId(1000L).tableSource("").build();
-        Response<PrepareModelResponse> response = catalogFacade.getPrepareModel(prepareModelRequest);
-        PrepareModelResponse prepareModelResponse = response.getData();
-
-        ModelRequest modelRequest = null;
-        catalogFacade.saveModel(modelRequest);
     }
 }

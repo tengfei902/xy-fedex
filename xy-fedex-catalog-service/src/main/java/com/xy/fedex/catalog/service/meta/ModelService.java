@@ -9,8 +9,6 @@ public interface ModelService {
 
     Long saveModel(ModelRequest modelRequest);
 
-    void saveModel(String sql);
-
     void checkModelRequest(ModelRequest modelRequest);
 
     ModelDefinition getModel(Long modelId);

@@ -17,15 +17,7 @@ public class MetricModelPO implements Serializable {
 
     private String formula;
 
-    private String condition;
-
-    private String allowDims;
-
-    private String forceDims;
-
     private String advanceCalculate;
-
-    private String orderBy;
 
     private Integer status;
 
@@ -34,6 +26,8 @@ public class MetricModelPO implements Serializable {
     private Date updateTime;
 
     private String creator;
+
+    private String relateMetrics;
 
     private static final long serialVersionUID = 1L;
 }

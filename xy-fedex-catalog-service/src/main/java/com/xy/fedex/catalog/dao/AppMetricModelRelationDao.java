@@ -2,10 +2,13 @@ package com.xy.fedex.catalog.dao;
 
 import com.xy.fedex.catalog.po.AppMetricModelRelationPO;
 import com.xy.fedex.catalog.po.AppMetricPO;
+import com.xy.fedex.catalog.po.MetricModelDetailPO;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
+@Mapper
 public interface AppMetricModelRelationDao {
     int deleteByPrimaryKey(Long id);
 
@@ -19,5 +22,9 @@ public interface AppMetricModelRelationDao {
 
     int updateByPrimaryKey(AppMetricModelRelationPO record);
 
-    List<AppMetricPO> selectAppMetrics(@Param("appId") Long appId);
+    List<MetricModelDetailPO> selectAppMetrics(@Param("appId") Long appId);
+
+    int batchInsert(@Param("relations") List<AppMetricModelRelationPO> records);
+
+    int deleteByAppId(@Param("appId") Long appId);
 }

@@ -137,6 +137,7 @@ public class MetaServiceImpl implements MetaService {
             dimPO.setDimCode(dim.getDimCode());
             dimPO.setDimName(dim.getDimName());
             dimPO.setDimComment(dim.getDimComment());
+            dimPO.setBizLineId(dim.getBizLineId());
             dimDao.insertSelective(dimPO);
             return dimPO.getId();
         } else {

@@ -122,4 +122,12 @@
     delete from app_model_relation
     where app_id = #{appId,jdbcType=BIGINT}
   </delete>
+
+  <select id="selectByAppId" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select
+    <include refid="Base_Column_List" />
+    from app_model_relation
+    where app_id = #{appId,jdbcType=BIGINT} and status = 1
+  </select>
+
 </mapper>

@@ -7,17 +7,18 @@
     <result column="model_name" property="modelName" jdbcType="VARCHAR" />
     <result column="model_desc" property="modelDesc" jdbcType="VARCHAR" />
     <result column="dsn_id" property="dsnId" jdbcType="BIGINT" />
+    <result column="table_source" property="tableSource" jdbcType="VARCHAR" />
+    <result column="condition" property="condition" jdbcType="VARCHAR" />
     <result column="status" property="status" jdbcType="INTEGER" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
     <result column="creator" property="creator" jdbcType="VARCHAR" />
-    <result column="model_definition" property="modelDefinition" jdbcType="LONGVARCHAR" />
     <result column="model_prop" property="modelProp" jdbcType="LONGVARCHAR" />
   </resultMap>
 
   <sql id="Base_Column_List" >
-    id, biz_line_id, model_name, model_desc, dsn_id, status, create_time,
-    update_time, creator,model_definition, model_prop
+    id, biz_line_id, model_name, model_desc, dsn_id,table_source,`condition`, status, create_time,
+    update_time, creator, model_prop
   </sql>
 
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
@@ -32,14 +33,14 @@
   </delete>
   <insert id="insert" parameterType="com.xy.fedex.catalog.po.ModelPO" >
     insert into model (id, biz_line_id,
-      model_name, model_desc, dsn_id, 
+      model_name, model_desc, dsn_id,table_source,`condition`,
       status, create_time, update_time, 
-      creator, model_definition, model_prop
+      creator, model_prop
       )
     values (#{id,jdbcType=BIGINT},#{bizLineId,jdbcType=BIGINT},
-      #{modelName,jdbcType=VARCHAR}, #{modelDesc,jdbcType=VARCHAR}, #{dsnId,jdbcType=BIGINT}, 
-      #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
-      #{creator,jdbcType=VARCHAR}, #{modelDefinition,jdbcType=LONGVARCHAR}, #{modelProp,jdbcType=LONGVARCHAR}
+      #{modelName,jdbcType=VARCHAR}, #{modelDesc,jdbcType=VARCHAR}, #{dsnId,jdbcType=BIGINT}, #{tableSource,jdbcType=VARCHAR},
+      #{condition,jdbcType=VARCHAR},#{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP},
+      #{creator,jdbcType=VARCHAR}, #{modelProp,jdbcType=LONGVARCHAR}
       )
   </insert>
   <insert id="insertSelective" keyProperty="id" useGeneratedKeys="true" parameterType="com.xy.fedex.catalog.po.ModelPO" >
@@ -60,6 +61,12 @@
       <if test="dsnId != null" >
         dsn_id,
       </if>
+      <if test="tableSource != null" >
+        table_source,
+      </if>
+      <if test="condition != null" >
+        `condition`,
+      </if>
       <if test="status != null" >
         status,
       </if>
@@ -71,9 +78,6 @@
       </if>
       <if test="creator != null" >
         creator,
-      </if>
-      <if test="modelDefinition != null" >
-        model_definition,
       </if>
       <if test="modelProp != null" >
         model_prop,
@@ -95,6 +99,12 @@
       <if test="dsnId != null" >
         #{dsnId,jdbcType=BIGINT},
       </if>
+      <if test="tableSource != null" >
+        #{tableSource,jdbcType=VARCHAR},
+      </if>
+      <if test="condition != null" >
+        #{condition,jdbcType=VARCHAR},
+      </if>
       <if test="status != null" >
         #{status,jdbcType=INTEGER},
       </if>
@@ -106,9 +116,6 @@
       </if>
       <if test="creator != null" >
         #{creator,jdbcType=VARCHAR},
-      </if>
-      <if test="modelDefinition != null" >
-        #{modelDefinition,jdbcType=LONGVARCHAR},
       </if>
       <if test="modelProp != null" >
         #{modelProp,jdbcType=LONGVARCHAR},
@@ -130,6 +137,12 @@
       <if test="dsnId != null" >
         dsn_id = #{dsnId,jdbcType=BIGINT},
       </if>
+      <if test="tableSource != null" >
+        table_source = #{tableSource,jdbcType=VARCHAR},
+      </if>
+      <if test="condition != null" >
+        `condition` = #{condition,jdbcType=VARCHAR},
+      </if>
       <if test="status != null" >
         status = #{status,jdbcType=INTEGER},
       </if>
@@ -141,9 +154,6 @@
       </if>
       <if test="creator != null" >
         creator = #{creator,jdbcType=VARCHAR},
-      </if>
-      <if test="modelDefinition != null" >
-        model_definition = #{modelDefinition,jdbcType=LONGVARCHAR},
       </if>
       <if test="modelProp != null" >
         model_prop = #{modelProp,jdbcType=LONGVARCHAR},
@@ -158,25 +168,13 @@
       model_name = #{modelName,jdbcType=VARCHAR},
       model_desc = #{modelDesc,jdbcType=VARCHAR},
       dsn_id = #{dsnId,jdbcType=BIGINT},
+      table_source = #{tableSource,jdbcType=BIGINT},
+      `condition` = #{condition,jdbcType=BIGINT},
       status = #{status,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
       creator = #{creator,jdbcType=VARCHAR},
-      model_definition = #{modelDefinition,jdbcType=LONGVARCHAR},
       model_prop = #{modelProp,jdbcType=LONGVARCHAR}
-    where id = #{id,jdbcType=BIGINT}
-  </update>
-  <update id="updateByPrimaryKey" parameterType="com.xy.fedex.catalog.po.ModelPO" >
-    update model
-    set
-      biz_line_id = #{bizLineId,jdbcType=BIGINT},
-      model_name = #{modelName,jdbcType=VARCHAR},
-      model_desc = #{modelDesc,jdbcType=VARCHAR},
-      dsn_id = #{dsnId,jdbcType=BIGINT},
-      status = #{status,jdbcType=INTEGER},
-      create_time = #{createTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
-      creator = #{creator,jdbcType=VARCHAR}
     where id = #{id,jdbcType=BIGINT}
   </update>
 </mapper>

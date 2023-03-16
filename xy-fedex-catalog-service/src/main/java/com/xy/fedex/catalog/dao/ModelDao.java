@@ -14,8 +14,4 @@ public interface ModelDao {
     ModelPO selectByPrimaryKey(Long id);
 
     int updateByPrimaryKeySelective(ModelPO record);
-
-    int updateByPrimaryKeyWithBLOBs(ModelPO record);
-
-    int updateByPrimaryKey(ModelPO record);
 }

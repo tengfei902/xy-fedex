@@ -6,6 +6,7 @@
     <result column="dim_code" property="dimCode" jdbcType="VARCHAR" />
     <result column="dim_name" property="dimName" jdbcType="VARCHAR" />
     <result column="dim_type" property="dimType" jdbcType="INTEGER" />
+    <result column="biz_line_id" property="bizLineId" jdbcType="BIGINT" />
     <result column="dim_comment" property="dimComment" jdbcType="VARCHAR" />
     <result column="status" property="status" jdbcType="INTEGER" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
@@ -13,7 +14,7 @@
     <result column="creator" property="creator" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, dim_code, dim_name, dim_type, dim_comment, status, create_time, update_time,
+    id, dim_code, dim_name, dim_type,biz_line_id, dim_comment, status, create_time, update_time,
     creator
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
@@ -28,11 +29,11 @@
   </delete>
   <insert id="insert" parameterType="com.xy.fedex.catalog.po.DimPO" >
     insert into dim (id, dim_code,
-      dim_name, dim_type, dim_comment,
+      dim_name, dim_type,biz_line_id, dim_comment,
       status, create_time, update_time, 
       creator)
     values (#{id,jdbcType=BIGINT}, #{dimCode,jdbcType=VARCHAR},
-      #{dimName,jdbcType=VARCHAR}, #{dimType,jdbcType=INTEGER}, #{dimComment,jdbcType=VARCHAR},
+      #{dimName,jdbcType=VARCHAR}, #{dimType,jdbcType=INTEGER},#{bizLineId,jdbcType=BIGINT}, #{dimComment,jdbcType=VARCHAR},
       #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
       #{creator,jdbcType=VARCHAR})
   </insert>
@@ -50,6 +51,9 @@
       </if>
       <if test="dimType != null" >
         dim_type,
+      </if>
+      <if test="bizLineId != null" >
+        biz_line_id,
       </if>
       <if test="dimComment != null" >
         dim_comment,
@@ -80,6 +84,9 @@
       <if test="dimType != null" >
         #{dimType,jdbcType=INTEGER},
       </if>
+      <if test="bizLineId != null" >
+        #{bizLineId,jdbcType=BIGINT},
+      </if>
       <if test="dimComment != null" >
         #{dimComment,jdbcType=VARCHAR},
       </if>
@@ -109,6 +116,9 @@
       <if test="dimType != null" >
         dim_type = #{dimType,jdbcType=INTEGER},
       </if>
+      <if test="bizLineId != null" >
+        biz_line_id = #{bizLineId,jdbcType=INTEGER},
+      </if>
       <if test="dimComment != null" >
         dim_comment = #{dimComment,jdbcType=VARCHAR},
       </if>
@@ -133,6 +143,7 @@
       dim_code = #{dimCode,jdbcType=BIGINT},
       dim_name = #{dimName,jdbcType=VARCHAR},
       dim_type = #{dimType,jdbcType=INTEGER},
+      biz_line_id = #{bizLineId,jdbcType=BIGINT},
       dim_comment = #{dimComment,jdbcType=VARCHAR},
       status = #{status,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP},
@@ -140,4 +151,11 @@
       creator = #{creator,jdbcType=VARCHAR}
     where id = #{id,jdbcType=BIGINT}
   </update>
+
+  <select id="selectByDimCode" resultMap="BaseResultMap" >
+    select
+    <include refid="Base_Column_List" />
+    from dim
+    where biz_line_id = #{bizLineId,jdbcType=BIGINT} and dim_code = #{dimCode,jdbcType=VARCHAR}
+  </select>
 </mapper>

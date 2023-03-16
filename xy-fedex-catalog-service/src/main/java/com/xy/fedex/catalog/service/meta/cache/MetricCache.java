@@ -5,7 +5,4 @@ import org.springframework.stereotype.Component;
 @Component
 public class MetricCache {
 
-    public void getMetricByColumn(Long bizLineId, String column) {
-
-    }
 }

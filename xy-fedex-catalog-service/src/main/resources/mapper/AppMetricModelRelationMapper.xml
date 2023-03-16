@@ -1,29 +1,29 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.xy.fedex.catalog.dao.AppMetricModelRelationDao" >
-  <resultMap id="BaseResultMap" type="com.xy.fedex.catalog.po.AppMetricModelRelationPO" >
-    <id column="id" property="id" jdbcType="BIGINT" />
-    <result column="app_id" property="appId" jdbcType="BIGINT" />
-    <result column="metric_model_id" property="metricModelId" jdbcType="BIGINT" />
-    <result column="status" property="status" jdbcType="INTEGER" />
-    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
-    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
-    <result column="creator" property="creator" jdbcType="VARCHAR" />
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xy.fedex.catalog.dao.AppMetricModelRelationDao">
+  <resultMap id="BaseResultMap" type="com.xy.fedex.catalog.po.AppMetricModelRelationPO">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="app_id" jdbcType="BIGINT" property="appId" />
+    <result column="metric_model_id" jdbcType="BIGINT" property="metricModelId" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="creator" jdbcType="VARCHAR" property="creator" />
   </resultMap>
-  <sql id="Base_Column_List" >
+  <sql id="Base_Column_List">
     id, app_id, metric_model_id, status, create_time, update_time, creator
   </sql>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
     from app_metric_model_relation
     where id = #{id,jdbcType=BIGINT}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     delete from app_metric_model_relation
     where id = #{id,jdbcType=BIGINT}
   </delete>
-  <insert id="insert" parameterType="com.xy.fedex.catalog.po.AppMetricModelRelationPO" >
+  <insert id="insert" parameterType="com.xy.fedex.catalog.po.AppMetricModelRelationPO">
     insert into app_metric_model_relation (id, app_id, metric_model_id, 
       status, create_time, update_time, 
       creator)
@@ -31,80 +31,80 @@
       #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
       #{creator,jdbcType=VARCHAR})
   </insert>
-  <insert id="insertSelective" parameterType="com.xy.fedex.catalog.po.AppMetricModelRelationPO" >
+  <insert id="insertSelective" parameterType="com.xy.fedex.catalog.po.AppMetricModelRelationPO">
     insert into app_metric_model_relation
-    <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
         id,
       </if>
-      <if test="appId != null" >
+      <if test="appId != null">
         app_id,
       </if>
-      <if test="metricModelId != null" >
+      <if test="metricModelId != null">
         metric_model_id,
       </if>
-      <if test="status != null" >
+      <if test="status != null">
         status,
       </if>
-      <if test="createTime != null" >
+      <if test="createTime != null">
         create_time,
       </if>
-      <if test="updateTime != null" >
+      <if test="updateTime != null">
         update_time,
       </if>
-      <if test="creator != null" >
+      <if test="creator != null">
         creator,
       </if>
     </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
         #{id,jdbcType=BIGINT},
       </if>
-      <if test="appId != null" >
+      <if test="appId != null">
         #{appId,jdbcType=BIGINT},
       </if>
-      <if test="metricModelId != null" >
+      <if test="metricModelId != null">
         #{metricModelId,jdbcType=BIGINT},
       </if>
-      <if test="status != null" >
+      <if test="status != null">
         #{status,jdbcType=INTEGER},
       </if>
-      <if test="createTime != null" >
+      <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="updateTime != null" >
+      <if test="updateTime != null">
         #{updateTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="creator != null" >
+      <if test="creator != null">
         #{creator,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.xy.fedex.catalog.po.AppMetricModelRelationPO" >
+  <update id="updateByPrimaryKeySelective" parameterType="com.xy.fedex.catalog.po.AppMetricModelRelationPO">
     update app_metric_model_relation
-    <set >
-      <if test="appId != null" >
+    <set>
+      <if test="appId != null">
         app_id = #{appId,jdbcType=BIGINT},
       </if>
-      <if test="metricModelId != null" >
+      <if test="metricModelId != null">
         metric_model_id = #{metricModelId,jdbcType=BIGINT},
       </if>
-      <if test="status != null" >
+      <if test="status != null">
         status = #{status,jdbcType=INTEGER},
       </if>
-      <if test="createTime != null" >
+      <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="updateTime != null" >
+      <if test="updateTime != null">
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="creator != null" >
+      <if test="creator != null">
         creator = #{creator,jdbcType=VARCHAR},
       </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.xy.fedex.catalog.po.AppMetricModelRelationPO" >
+  <update id="updateByPrimaryKey" parameterType="com.xy.fedex.catalog.po.AppMetricModelRelationPO">
     update app_metric_model_relation
     set app_id = #{appId,jdbcType=BIGINT},
       metric_model_id = #{metricModelId,jdbcType=BIGINT},
@@ -115,18 +115,39 @@
     where id = #{id,jdbcType=BIGINT}
   </update>
 
-  <select id="getAppMetrics" resultType="com.xy.fedex.catalog.po.AppMetricPO" parameterType="java.lang.Long" >
-    select
-        t1.metric_model_id as metricModelId,
+  <select id="getAppMetrics" parameterType="java.lang.Long" resultType="com.xy.fedex.catalog.po.AppMetricPO">
+    select distinct
         t2.metric_type as metricType,
         t2.metric_id as metricId,
-        t2.model_id as modelId,
-        t2.formula as formula,
         t1.metric_code as metricCode,
         t1.metric_name as metricName,
         t1.metric_comment as metricComment
     from app_metric_model_relation t1 left join metric_model t2 on t1.metric_model_id = t2.id
     left join metric t3 on t2.metric_id = t3.id
-    where app_id = #{appId,jdbcType=BIGINT} and status = 0
+    where app_id = #{appId,jdbcType=BIGINT} and status = 0 and t3.id is not null
   </select>
+
+  <insert id="batchInsert">
+    insert into app_metric_model_relation (app_id, metric_model_id)
+    values 
+        <foreach close="" collection="relations" item="relation" open="" separator=",">
+          (#{relation.appId,jdbcType=BIGINT}, #{relation.metricModelId,jdbcType=BIGINT})
+        </foreach>
+  </insert>
+
+  <delete id="deleteByAppId" parameterType="java.lang.Long">
+    delete from app_metric_model_relation
+    where app_id = #{appId,jdbcType=BIGINT}
+  </delete>
+
+  <select id="selectAppMetrics" parameterType="java.lang.Long" resultType="com.xy.fedex.catalog.po.MetricModelDetailPO">
+    select distinct
+    t3.metric_code as metricCode,
+    t3.metric_name as metricName,
+    t3.metric_comment as metricComment,
+    t3.id as metricId
+    from app_metric_model_relation t1 left join metric_model t2 on t1.metric_model_id = t2.id left join metric t3 on t2.metric_id = t3.id
+    where t1.app_id = #{appId,jdbcType=BIGINT} and t1.status = 1 and t2.status = 1 and t3.status = 1
+  </select>
+
 </mapper>
