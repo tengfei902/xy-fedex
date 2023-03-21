@@ -3,7 +3,7 @@ server:
 dubbo:
   protocol:
     name: dubbo
-    port: -1
+    port: 20880
   registry:
     address: zookeeper://127.0.0.1:2181
   scan:

@@ -44,28 +44,28 @@ public class ModelMatchServiceImpl implements ModelMatchService {
 
         QueryMatchedModelDTO queryMatchedModelDTO = new QueryMatchedModelDTO(logicalSelect);
 
-        for (String metric : metrics) {
-            MetaContainer.MetricDTO metricDTO = MetaContainer.getApp(appId).getMetric(metric);
-            List<Metric.MetricModel> metricModels = metricDTO.getMetricModels();
-
-            List<Metric.MetricModel> matchedMetricModels = metricModels.stream().filter(metricModel -> {
-                if(CollectionUtils.isEmpty(metricModel.getAllowDims()) && CollectionUtils.isEmpty(dims)) {
-                    return true;
-                }
-                if(!CollectionUtils.isEmpty(metricModel.getForceDims())) {
-                    if(!dims.containsAll(metricModel.getForceDims())) {
-                        return false;
-                    }
-                }
-                return metricModel.getAllowDims().containsAll(dims);
-            }).collect(Collectors.toList());
-
-            if(CollectionUtils.isEmpty(matchedMetricModels)) {
-                throw new NoModelMatchedForMetricException(metric,dims,logicalSelect.toString());
-            }
-
-            queryMatchedModelDTO.addMetricMatchedModels(metric,metricDTO.getMetric(),matchedMetricModels);
-        }
+//        for (String metric : metrics) {
+//            MetaContainer.MetricDTO metricDTO = MetaContainer.getApp(appId).getMetric(metric);
+//            List<Metric.MetricModel> metricModels = metricDTO.getMetricModels();
+//
+//            List<Metric.MetricModel> matchedMetricModels = metricModels.stream().filter(metricModel -> {
+//                if(CollectionUtils.isEmpty(metricModel.getAllowDims()) && CollectionUtils.isEmpty(dims)) {
+//                    return true;
+//                }
+//                if(!CollectionUtils.isEmpty(metricModel.getForceDims())) {
+//                    if(!dims.containsAll(metricModel.getForceDims())) {
+//                        return false;
+//                    }
+//                }
+//                return metricModel.getAllowDims().containsAll(dims);
+//            }).collect(Collectors.toList());
+//
+//            if(CollectionUtils.isEmpty(matchedMetricModels)) {
+//                throw new NoModelMatchedForMetricException(metric,dims,logicalSelect.toString());
+//            }
+//
+//            queryMatchedModelDTO.addMetricMatchedModels(metric,metricDTO.getMetric(),matchedMetricModels);
+//        }
 
         return queryMatchedModelDTO;
     }

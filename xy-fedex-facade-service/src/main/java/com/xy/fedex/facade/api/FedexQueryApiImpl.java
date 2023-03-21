@@ -4,14 +4,14 @@ import com.alibaba.druid.sql.ast.SQLExpr;
 import com.xy.fedex.facade.api.dto.FedexQueryRequest;
 import com.xy.fedex.facade.api.dto.Response;
 import com.xy.fedex.facade.service.FedexQueryService;
+import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
 
-@Service
-public class FedexFacadeApiImpl implements FedexFacadeApi {
+@DubboService(version = "${dubbo.server.version}")
+public class FedexQueryApiImpl implements FedexQueryApi {
     @Autowired
     private FedexQueryService fedexQueryService;
 

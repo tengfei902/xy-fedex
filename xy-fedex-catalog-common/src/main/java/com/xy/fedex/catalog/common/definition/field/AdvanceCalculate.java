@@ -2,10 +2,11 @@ package com.xy.fedex.catalog.common.definition.field;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Data
-public class AdvanceCalculate {
+public class AdvanceCalculate implements Serializable {
     private String agg;
     private String condition;
     private List<String> groupByDims;

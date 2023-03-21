@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * 查询服务
  */
-public interface FedexFacadeApi {
+public interface FedexQueryApi {
     Response<List<Map<String, Object>>> select(String select);
 
     Response<List<Map<String,Object>>> select(FedexQueryRequest request);

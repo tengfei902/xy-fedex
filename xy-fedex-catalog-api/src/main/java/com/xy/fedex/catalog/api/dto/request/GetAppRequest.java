@@ -1,9 +1,11 @@
 package com.xy.fedex.catalog.api.dto.request;
 
+import lombok.Builder;
 import lombok.Data;
 
 import java.io.Serializable;
 
+@Builder
 @Data
 public class GetAppRequest implements Serializable {
 //    @NotNull
