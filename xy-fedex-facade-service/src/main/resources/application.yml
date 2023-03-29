@@ -18,11 +18,11 @@ spring:
       discovery:
         service-id: xy-fedex-facade-service
         enabled: on
-
 dubbo.server.version: 1.0.0
-spring.cache.redis
 
 redis:
   hosts:
-    - host: 127.0.0.1
-      port: 6379
+    list:
+      - host: 127.0.0.1
+        port: 6379
+

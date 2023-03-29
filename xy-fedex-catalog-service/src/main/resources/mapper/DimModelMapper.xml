@@ -178,4 +178,18 @@
     where t1.status = 1 and t2.status = 1 and t1.model_id = #{modelId,jdbcType=BIGINT}
   </select>
 
+  <select id="selectByAppDimId" resultType="com.xy.fedex.catalog.po.DimModelDetailPO">
+    select
+      t1.id as dimModelId,
+      t1.model_id as modelId,
+      t1.dim_id as dimId,
+      t1.formula,
+      t3.dim_code as dimCode,
+      t3.dim_name as dimName,
+      t3.dim_comment as dimComment
+    from dim_model t1 left join app_model_relation t2 on t1.model_id = t2.model_id
+                      left join dim t3 on t1.dim_id = t3.id
+    where t2.status = 1 and t1.status = 1 and t3.status = 1 and t2.app_id = #{appId,jdbcType=BIGINT}
+      and t1.dim_id = #{dimId,jdbcType=BIGINT}
+  </select>
 </mapper>

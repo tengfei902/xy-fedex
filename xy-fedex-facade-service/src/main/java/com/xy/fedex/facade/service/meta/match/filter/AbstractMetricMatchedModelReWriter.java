@@ -15,9 +15,9 @@ public abstract class AbstractMetricMatchedModelReWriter implements MetricMatche
         List<Long> matchedModelIds = new ArrayList<>();
 
         List<QueryMatchedModelDTO.MetricMatchedModelDTO> metricMatchedModels = queryModelMatch.getMetricMatchedModelList();
-        for(QueryMatchedModelDTO.MetricMatchedModelDTO metricMatchedModel:metricMatchedModels) {
-            matchedModelIds.addAll(metricMatchedModel.getMetricModels().stream().map(Metric.MetricModel::getModelId).collect(Collectors.toList()));
-        }
+//        for(QueryMatchedModelDTO.MetricMatchedModelDTO metricMatchedModel:metricMatchedModels) {
+//            matchedModelIds.addAll(metricMatchedModel.getMetricModels().stream().map(Metric.MetricModel::getModelId).collect(Collectors.toList()));
+//        }
         matchedModelIds = matchedModelIds.stream().distinct().collect(Collectors.toList());
 
         doFilter(queryModelMatch.getLogicalSelect(),matchedModelIds);

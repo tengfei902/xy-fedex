@@ -10,8 +10,6 @@ import java.util.List;
 public class MetricModel extends MetaField {
     private Long metricModelId;
     private Long metricId;
-    private String condition;
     private List<String> allowDims;
-    private List<String> forceDims;
     private AdvanceCalculate advanceCalculate;
 }

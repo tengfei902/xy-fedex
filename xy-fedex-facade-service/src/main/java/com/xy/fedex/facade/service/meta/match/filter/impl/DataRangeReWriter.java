@@ -4,7 +4,6 @@ import com.alibaba.druid.sql.ast.SQLExpr;
 import com.alibaba.druid.sql.ast.statement.SQLSelect;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlSelectQueryBlock;
 import com.xy.fedex.dsl.utility.SQLExprUtils;
-import com.xy.fedex.facade.service.cs.dto.MetaContainer;
 import com.xy.fedex.facade.service.meta.match.filter.AbstractMetricMatchedModelReWriter;
 import org.springframework.stereotype.Component;
 
@@ -21,13 +20,13 @@ public class DataRangeReWriter extends AbstractMetricMatchedModelReWriter {
         SQLExpr logicalCondition = mySqlSelectQueryBlock.getWhere();
 
         Long appId = Long.parseLong(SQLExprUtils.getTableSource(logicalSelect));
-        MetaContainer.AppDTO app = MetaContainer.getApp(appId);
-        for(Long matchedModelId:matchedModelIds) {
-            MetaContainer.ModelDTO model = app.getModel(matchedModelId);
-
-            SQLExpr sqlExpr = model.getCondition();
-
-        }
+//        MetaContainer.AppDTO app = MetaContainer.getApp(appId);
+//        for(Long matchedModelId:matchedModelIds) {
+//            MetaContainer.ModelDTO model = app.getModel(matchedModelId);
+//
+//            SQLExpr sqlExpr = model.getCondition();
+//
+//        }
         return null;
     }
 }

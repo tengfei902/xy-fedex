@@ -27,4 +27,6 @@ public interface MetricModelDao {
     List<MetricModelPO> selectByModelIds(@Param("modelIds") List<Long> modelIds);
 
     List<MetricModelDetailPO> selectMetricDetailByModelId(@Param("modelId") Long modelId);
+
+    MetricModelPO selectByModelMetric(@Param("modelId") Long modelId,@Param("metricId")Long metricId);
 }

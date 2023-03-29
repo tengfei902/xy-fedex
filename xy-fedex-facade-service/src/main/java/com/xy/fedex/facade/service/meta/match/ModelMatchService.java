@@ -5,5 +5,5 @@ import com.xy.fedex.facade.service.meta.dto.QueryMatchedModelDTO;
 
 public interface ModelMatchService {
 
-    QueryMatchedModelDTO getMetaMatchedModels(SQLSelect logicalSelect);
+    QueryMatchedModelDTO getMetricMatchedModels(SQLSelect logicalSelect);
 }

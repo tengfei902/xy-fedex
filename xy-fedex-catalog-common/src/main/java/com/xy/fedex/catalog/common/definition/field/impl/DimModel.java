@@ -5,6 +5,7 @@ import lombok.Data;
 
 @Data
 public class DimModel extends MetaField {
+    private Long modelId;
     private Long dimModelId;
     private Long dimId;
 }

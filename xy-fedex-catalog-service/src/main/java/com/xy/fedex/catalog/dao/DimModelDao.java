@@ -28,4 +28,6 @@ public interface DimModelDao {
     List<DimModelPO> selectByModelId(@Param("modelId") Long modelId);
 
     List<DimModelDetailPO> selectDimDetailByModelId(@Param("modelId") Long modelId);
+
+    List<DimModelDetailPO> selectByAppDimId(@Param("appId")Long appId,@Param("dimId")Long dimId);
 }

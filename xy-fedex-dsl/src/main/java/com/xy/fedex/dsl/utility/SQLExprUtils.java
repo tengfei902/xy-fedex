@@ -2,14 +2,16 @@ package com.xy.fedex.dsl.utility;
 
 import com.alibaba.druid.DbType;
 import com.alibaba.druid.sql.SQLUtils;
+import com.alibaba.druid.sql.ast.SQLExpr;
 import com.alibaba.druid.sql.ast.SQLStatement;
-import com.alibaba.druid.sql.ast.statement.SQLSelect;
-import com.alibaba.druid.sql.ast.statement.SQLSelectItem;
-import com.alibaba.druid.sql.ast.statement.SQLSelectQuery;
-import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
+import com.alibaba.druid.sql.ast.expr.SQLIdentifierExpr;
+import com.alibaba.druid.sql.ast.expr.SQLIntegerExpr;
+import com.alibaba.druid.sql.ast.expr.SQLLiteralExpr;
+import com.alibaba.druid.sql.ast.statement.*;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlCreateTableStatement;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlSelectQueryBlock;
 import com.alibaba.druid.sql.parser.SQLParserUtils;
+import com.xy.fedex.dsl.exceptions.SQLExprNotSupportException;
 
 import java.util.List;
 
@@ -53,4 +55,20 @@ public class SQLExprUtils {
         return null;
     }
 
+    public static String getTableName(SQLExprTableSource tableSource) {
+        SQLExpr sqlExpr = tableSource.getExpr();
+        if(sqlExpr instanceof SQLIntegerExpr) {
+            SQLIntegerExpr sqlIntegerExpr = (SQLIntegerExpr) sqlExpr;
+            return String.valueOf(sqlIntegerExpr.getNumber());
+        }
+        if(sqlExpr instanceof SQLLiteralExpr) {
+            SQLLiteralExpr sqlLiteralExpr = (SQLLiteralExpr) sqlExpr;
+            return null;
+        }
+        if(sqlExpr instanceof SQLIdentifierExpr) {
+            SQLIdentifierExpr sqlIdentifierExpr = (SQLIdentifierExpr) sqlExpr;
+            return sqlIdentifierExpr.getName();
+        }
+        throw new SQLExprNotSupportException("sqlExpr type not support:"+sqlExpr.getClass().getName());
+    }
 }

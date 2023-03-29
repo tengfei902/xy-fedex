@@ -27,4 +27,8 @@ public interface AppMetricModelRelationDao {
     int batchInsert(@Param("relations") List<AppMetricModelRelationPO> records);
 
     int deleteByAppId(@Param("appId") Long appId);
+
+    MetricModelDetailPO selectAppMetricModel(@Param("appId")Long appId,@Param("metricModelId") Long metricModelId);
+
+    List<MetricModelDetailPO> selectAppMetricModels(@Param("appId") Long appId,@Param("metricId") Long metricId);
 }

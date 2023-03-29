@@ -2,6 +2,8 @@ package com.xy.fedex.facade.service.meta.dto;
 
 import com.alibaba.druid.sql.ast.statement.SQLSelect;
 import com.xy.fedex.catalog.common.definition.field.Metric;
+import com.xy.fedex.catalog.common.definition.field.impl.DimModel;
+import com.xy.fedex.catalog.common.definition.field.impl.MetricModel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -17,7 +19,7 @@ public class QueryMatchedModelDTO {
         this.logicalSelect = logicalSelect;
     }
 
-    public void addMetricMatchedModels(String metricName, Metric metric, List<Metric.MetricModel> metricModels) {
+    public void addMetricMatchedModels(String metricName, Metric metric, List<MetricModel> metricModels) {
         MetricMatchedModelDTO metricMatchedModelDTO = new MetricMatchedModelDTO(metricName,metric,metricModels);
         metricMatchedModelList.add(metricMatchedModelDTO);
     }
@@ -27,6 +29,6 @@ public class QueryMatchedModelDTO {
     public static class MetricMatchedModelDTO {
         private String metricName;
         private Metric metric;
-        private List<Metric.MetricModel> metricModels;
+        private List<MetricModel> metricModels;
     }
 }

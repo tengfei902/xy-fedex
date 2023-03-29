@@ -1,9 +1,9 @@
 package com.xy.fedex.catalog.service.meta;
 
 import com.xy.fedex.catalog.common.definition.column.TableField;
-import com.xy.fedex.catalog.dto.DimDTO;
-import com.xy.fedex.catalog.dto.MetricDTO;
-import com.xy.fedex.catalog.dto.TableAliasDTO;
+import com.xy.fedex.catalog.common.definition.field.impl.DimModel;
+import com.xy.fedex.catalog.common.definition.field.impl.MetricModel;
+import com.xy.fedex.catalog.dto.*;
 
 import java.util.List;
 
@@ -25,4 +25,10 @@ public interface MetaService {
     void matchMetricAndDim(List<TableAliasDTO> tableAliasList);
 
     List<TableField> matchMeta(Long bizLineId,List<TableField> tableFields);
+
+    List<MetricModel> getMetricModels(MetricModelRequest metricModelRequest);
+
+    MetricModel getMetricModel(MetricModelRequest metricModelRequest);
+
+    List<DimModel> getDimModels(DimModelRequest dimModelRequest);
 }

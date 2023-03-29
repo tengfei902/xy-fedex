@@ -9,23 +9,28 @@ import com.xy.fedex.catalog.common.definition.AppDefinition;
 import com.xy.fedex.catalog.common.definition.field.impl.DimModel;
 import com.xy.fedex.catalog.common.definition.field.impl.MetricModel;
 import com.xy.fedex.catalog.common.enums.DimType;
+import com.xy.fedex.facade.exceptions.FieldNotFoundException;
+import com.xy.fedex.facade.utils.ApplicationContextUtils;
 import lombok.Data;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Component
 public class AppHolder {
-    @DubboReference
     private static CatalogAppFacade catalogAppFacade;
-    @DubboReference
     private static CatalogMetaFacade catalogMetaFacade;
 
+    static {
+        catalogAppFacade = ApplicationContextUtils.getBean(CatalogAppFacade.class);
+        catalogMetaFacade = ApplicationContextUtils.getBean(CatalogMetaFacade.class);
+    }
 
     public App getApp(Long appId) {
         AppDefinition appDefinition = catalogAppFacade.getApp(GetAppRequest.builder().appId(appId).build());
@@ -45,6 +50,10 @@ public class AppHolder {
         private List<Long> modelIds;
         private List<Metric> metrics;
         private List<Dim> dims;
+
+        private Map<String,Metric> metricMap;
+
+        private Map<String,Dim> dimMap;
 
         public App(AppDefinition appDefinition) {
             this.appId = appDefinition.getAppId();
@@ -68,11 +77,27 @@ public class AppHolder {
                 }).collect(Collectors.toList());
             }
         }
+
+        public Field findField(String fieldName) {
+            Metric metric = metricMap.get(fieldName);
+            if(!Objects.isNull(metric)) {
+                return metric;
+            }
+            Dim dim = dimMap.get(fieldName);
+            if(!Objects.isNull(dim)) {
+                return dim;
+            }
+            throw new FieldNotFoundException(String.format("field:%s not found in app:%s",fieldName,this.appId));
+        }
     }
 
     @Data
-    public static class Metric implements Serializable {
-        private Long appId;
+    public static class Field implements Serializable {
+        protected Long appId;
+    }
+
+    @Data
+    public static class Metric extends Field {
         private Long metricId;
         private String metricCode;
         private String metricName;
@@ -90,8 +115,7 @@ public class AppHolder {
     }
 
     @Data
-    public static class Dim implements Serializable {
-        private Long appId;
+    public static class Dim extends Field {
         private Long dimId;
         private String dimCode;
         private String dimName;

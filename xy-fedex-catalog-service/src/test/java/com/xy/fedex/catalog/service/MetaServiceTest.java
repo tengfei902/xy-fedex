@@ -2,13 +2,17 @@ package com.xy.fedex.catalog.service;
 
 import com.google.gson.Gson;
 import com.xy.fedex.catalog.BaseTest;
+import com.xy.fedex.catalog.common.definition.field.impl.DimModel;
+import com.xy.fedex.catalog.common.definition.field.impl.MetricModel;
 import com.xy.fedex.catalog.common.enums.DimType;
 import com.xy.fedex.catalog.common.enums.MetricFormat;
 import com.xy.fedex.catalog.common.enums.MetricType;
 import com.xy.fedex.catalog.dao.DimDao;
 import com.xy.fedex.catalog.dao.MetricDao;
 import com.xy.fedex.catalog.dto.DimDTO;
+import com.xy.fedex.catalog.dto.DimModelRequest;
 import com.xy.fedex.catalog.dto.MetricDTO;
+import com.xy.fedex.catalog.dto.MetricModelRequest;
 import com.xy.fedex.catalog.enums.CatalogStatus;
 import com.xy.fedex.catalog.po.DimPO;
 import com.xy.fedex.catalog.po.MetricPO;
@@ -19,6 +23,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 public class MetaServiceTest extends BaseTest {
     @Autowired
@@ -185,5 +191,24 @@ public class MetaServiceTest extends BaseTest {
 //        metaService.saveDim(buyerIdDim);
         DimDTO channelProviderName = DimDTO.builder().bizLineId(bizLineId).dimCode("channel_provider_name").dimName("通道类型").dimComment("通道类型").dimType(DimType.TEXT.getDimType()).build();
         metaService.saveDim(channelProviderName);
+    }
+
+    @Test
+    public void testGetMetricModel() {
+        MetricModel metricModel = metaService.getMetricModel(MetricModelRequest.builder().appId(21L).metricId(14L).modelId(10L).build());
+        System.out.println(new Gson().toJson(metricModel));
+        Assert.assertNotNull(metricModel);
+    }
+
+    @Test
+    public void testGetMetricModels() {
+        List<MetricModel> metricModels = metaService.getMetricModels(MetricModelRequest.builder().appId(21L).metricId(14L).build());
+        System.out.println(new Gson().toJson(metricModels));
+    }
+
+    @Test
+    public void testGetDimModels() {
+        List<DimModel> dimModels = metaService.getDimModels(DimModelRequest.builder().appId(21L).dimId(9L).build());
+        System.out.println(new Gson().toJson(dimModels));
     }
 }

@@ -150,4 +150,33 @@
     where t1.app_id = #{appId,jdbcType=BIGINT} and t1.status = 1 and t2.status = 1 and t3.status = 1
   </select>
 
+  <select id="selectAppMetricModel" resultType="com.xy.fedex.catalog.po.MetricModelDetailPO">
+    select
+      t1.metric_model_id as metricModelId,
+      t2.model_id as modelId,
+      t3.id as metricId,
+      t2.metric_type as metricType,
+      t2.formula as formula,
+      t2.advance_calculate as advanceCalculate,
+      t3.metric_code as metricCode,
+      t3.metric_name as metricName,
+      t3.metric_comment as metricComment
+    from app_metric_model_relation t1 left join metric_model t2 on t1.metric_model_id = t2.id left join metric t3 on t2.metric_id = t3.id
+    where t1.app_id = #{appId,jdbcType=BIGINT} and t1.metric_model_id = #{metricModelId,jdbcType=BIGINT} and t1.status = 1 and t2.status = 1 and t3.status = 1
+  </select>
+
+  <select id="selectAppMetricModels" resultType="com.xy.fedex.catalog.po.MetricModelDetailPO">
+    select
+      t1.metric_model_id as metricModelId,
+      t2.model_id as modelId,
+      t3.id as metricId,
+      t2.metric_type as metricType,
+      t2.formula as formula,
+      t2.advance_calculate as advanceCalculate,
+      t3.metric_code as metricCode,
+      t3.metric_name as metricName,
+      t3.metric_comment as metricComment
+    from app_metric_model_relation t1 left join metric_model t2 on t1.metric_model_id = t2.id left join metric t3 on t2.metric_id = t3.id
+    where t1.app_id = #{appId,jdbcType=BIGINT} and t2.metric_id = #{metricId,jdbcType=BIGINT} and t1.status = 1 and t2.status = 1 and t3.status = 1
+  </select>
 </mapper>

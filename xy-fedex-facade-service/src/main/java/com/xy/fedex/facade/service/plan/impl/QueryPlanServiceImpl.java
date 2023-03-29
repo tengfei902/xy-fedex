@@ -1,44 +1,63 @@
 package com.xy.fedex.facade.service.plan.impl;
 
+import com.alibaba.druid.sql.ast.SQLExpr;
 import com.alibaba.druid.sql.ast.statement.*;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlSelectQueryBlock;
 import com.xy.fedex.dsl.sql.from.impl.SubQueryTableSource;
+import com.xy.fedex.facade.service.cs.AppHolder;
+import com.xy.fedex.facade.service.meta.dto.QueryMatchedModelDTO;
+import com.xy.fedex.facade.service.meta.match.ModelMatchService;
 import com.xy.fedex.facade.service.plan.QueryPlanService;
-import com.xy.fedex.facade.service.plan.dto.QueryPlan;
+import com.xy.fedex.facade.service.plan.dto.LogicalPlan;
+import com.xy.fedex.facade.service.plan.dto.PhysicalPlan;
 import org.apache.commons.lang3.RandomUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class QueryPlanServiceImpl implements QueryPlanService {
+    @Autowired
+    private AppHolder appHolder;
+    @Autowired
+    private ModelMatchService modelMatchService;
 
     @Override
-    public QueryPlan getQueryPlan(SQLSelect logicalSelect) {
-        QueryPlan queryPlan = new QueryPlan(logicalSelect);
+    public LogicalPlan getLogicalPlan(SQLSelect logicalSelect) {
+        LogicalPlan logicalPlan = new LogicalPlan(logicalSelect);
         MySqlSelectQueryBlock mySqlSelectQueryBlock = (MySqlSelectQueryBlock) logicalSelect.getQueryBlock();
-        queryPlan.add(getQueryPlanNode(mySqlSelectQueryBlock));
-        return queryPlan;
+        logicalPlan.add(getQueryPlanNode(mySqlSelectQueryBlock));
+        return logicalPlan;
     }
 
-    private QueryPlan.Node getQueryPlanNode(MySqlSelectQueryBlock mySqlSelectQueryBlock) {
+    private LogicalPlan.Node getQueryPlanNode(MySqlSelectQueryBlock mySqlSelectQueryBlock) {
+        return getQueryPlanNode(mySqlSelectQueryBlock,null);
+    }
+
+    private LogicalPlan.Node getQueryPlanNode(MySqlSelectQueryBlock mySqlSelectQueryBlock,String alias) {
         SQLTableSource tableSource = mySqlSelectQueryBlock.getFrom();
-        return getQueryPlanNode(mySqlSelectQueryBlock,tableSource);
+        return getQueryPlanNode(mySqlSelectQueryBlock,tableSource,alias);
     }
 
-    private QueryPlan.Node getQueryPlanNode(MySqlSelectQueryBlock parent,SQLTableSource tableSource) {
+    private LogicalPlan.Node getQueryPlanNode(MySqlSelectQueryBlock parent, SQLTableSource tableSource,String alias) {
         if(tableSource instanceof SQLExprTableSource) {
-            return QueryPlan.Node.newNode(parent,getTableAlias());
+            return LogicalPlan.Node.newNode(parent,alias);
         }
         //这种场景下join的表只能是SubQuery
         if(tableSource instanceof SQLJoinTableSource) {
             SQLJoinTableSource joinTableSource = (SQLJoinTableSource) tableSource;
             SQLTableSource left = joinTableSource.getLeft();
-            QueryPlan.Node leftNode = getQueryPlanNode(parent,left);
+            LogicalPlan.Node leftNode = getQueryPlanNode(parent,left,left.getAlias());
 
             SQLTableSource right = joinTableSource.getRight();
-            QueryPlan.Node rightNode = getQueryPlanNode(parent,right);
+            LogicalPlan.Node rightNode = getQueryPlanNode(parent,right,right.getAlias());
 
             MySqlSelectQueryBlock replacedSelect = getReplacedSelect(parent);
-            QueryPlan.Node x = QueryPlan.Node.newNode(replacedSelect,getTableAlias());
+            LogicalPlan.Node x = LogicalPlan.Node.newNode(replacedSelect,getTableAlias());
             x.add(leftNode);
             x.add(rightNode);
 
@@ -48,13 +67,7 @@ public class QueryPlanServiceImpl implements QueryPlanService {
             SQLSubqueryTableSource subQueryTableSource = (SQLSubqueryTableSource) tableSource;
             SQLSelect subQuerySelect = subQueryTableSource.getSelect();
             MySqlSelectQueryBlock subQueryBlock = (MySqlSelectQueryBlock) subQuerySelect.getQueryBlock();
-            QueryPlan.Node node = getQueryPlanNode(subQueryBlock);
-
-            MySqlSelectQueryBlock replacedSelect = getReplacedSelect(parent);
-            QueryPlan.Node x = QueryPlan.Node.newNode(replacedSelect,subQueryTableSource.getAlias());
-            x.add(node);
-
-            return x;
+            return getQueryPlanNode(subQueryBlock,subQueryTableSource.getAlias());
         }
 
         throw new IllegalArgumentException();
@@ -86,5 +99,19 @@ public class QueryPlanServiceImpl implements QueryPlanService {
 
     private String getTableAlias() {
         return String.format("t_%s", RandomUtils.nextInt());
+    }
+
+    /**
+     * 逻辑查询 -> 物理查询
+     * 1.指标->模型映射关系
+     * 2.指标->模型排序
+     * 3.指标物理查询构建
+     * @param logicalSelect
+     * @return
+     */
+    @Override
+    public PhysicalPlan getPhysicalPlan(SQLSelect logicalSelect) {
+        QueryMatchedModelDTO queryMatchedModelDTO = modelMatchService.getMetricMatchedModels(logicalSelect);
+        return null;
     }
 }

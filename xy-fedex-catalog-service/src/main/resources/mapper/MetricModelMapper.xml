@@ -215,4 +215,11 @@
       #{modelId,jdbcType=BIGINT}
     </foreach>
   </select>
+
+  <select id="selectByModelMetric" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from metric_model
+    where model_id = #{modelId,jdbcType=BIGINT} and metric_id = #{metricId,jdbcType=BIGINT} and status = 1
+  </select>
 </mapper>
