@@ -12,7 +12,7 @@ public class ModelMatchServiceTest extends BaseTest {
 
     @Test
     public void testGetMetaMatchedModels() {
-        String sql = "select order_cnt,fee,actual_amount,amount,lock_amount,paid_amount,total_amount,dt,opr_type from 21 where dt between 20230101 and 20230301 group by dt,opr_type";
+        String sql = "select fee,actual_amount,amount,fee_rate,order_cnt,dt,channel_provider_code from 21 where dt between 20230101 and 20230301 group by dt,channel_provider_code";
         modelMatchService.getMetricMatchedModels(SQLExprUtils.parse(sql));
     }
 }

@@ -14,7 +14,7 @@ spring:
   application:
     name: xy-fedex-catalog-service
   datasource:
-    url: jdbc:mysql://172.17.0.3:3306/xy_cs?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&rewriteBatchedStatements=true
+    url: jdbc:mysql://172.18.0.2:3306/xy_cs?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&rewriteBatchedStatements=true
     username: root
     password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver

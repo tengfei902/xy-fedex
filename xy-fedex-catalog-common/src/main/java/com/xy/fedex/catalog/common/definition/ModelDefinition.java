@@ -5,6 +5,9 @@ import lombok.Data;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Data
 public class ModelDefinition implements Serializable {
@@ -16,6 +19,17 @@ public class ModelDefinition implements Serializable {
     private Map<String,String> modelProp;
     private List<Metric> metrics;
     private List<Dim> dims;
+
+    private transient Map<String,Dim> dimMap;
+
+    public Dim getDim(String dimCode) {
+        if(Objects.isNull(dimMap)) {
+            synchronized (this) {
+                dimMap = this.dims.stream().collect(Collectors.toMap(Dim::getDimCode, Function.identity()));
+            }
+        }
+        return dimMap.get(dimCode);
+    }
 
     @Data
     public static class Metric implements Serializable {

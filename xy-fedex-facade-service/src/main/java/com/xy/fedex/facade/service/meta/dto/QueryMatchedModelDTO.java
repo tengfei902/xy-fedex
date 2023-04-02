@@ -1,6 +1,9 @@
 package com.xy.fedex.facade.service.meta.dto;
 
+import com.alibaba.druid.sql.ast.SQLExpr;
 import com.alibaba.druid.sql.ast.statement.SQLSelect;
+import com.alibaba.druid.sql.ast.statement.SQLTableSource;
+import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlSelectQueryBlock;
 import com.xy.fedex.catalog.common.definition.field.Metric;
 import com.xy.fedex.catalog.common.definition.field.impl.DimModel;
 import com.xy.fedex.catalog.common.definition.field.impl.MetricModel;
@@ -30,5 +33,14 @@ public class QueryMatchedModelDTO {
         private String metricName;
         private Metric metric;
         private List<MetricModel> metricModels;
+    }
+
+    @Data
+    public static class MetricModel {
+        private String metricCode;
+        private Long metricModelId;
+        private Long metricId;
+        private List<Long> modelIds;
+        private MySqlSelectQueryBlock metricSelect;
     }
 }

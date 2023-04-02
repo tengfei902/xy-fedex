@@ -1,10 +1,8 @@
 package com.xy.fedex.facade.service.plan.impl;
 
-import com.alibaba.druid.sql.ast.SQLExpr;
 import com.alibaba.druid.sql.ast.statement.*;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlSelectQueryBlock;
 import com.xy.fedex.dsl.sql.from.impl.SubQueryTableSource;
-import com.xy.fedex.facade.service.cs.AppHolder;
 import com.xy.fedex.facade.service.meta.dto.QueryMatchedModelDTO;
 import com.xy.fedex.facade.service.meta.match.ModelMatchService;
 import com.xy.fedex.facade.service.plan.QueryPlanService;
@@ -14,15 +12,8 @@ import org.apache.commons.lang3.RandomUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 @Service
 public class QueryPlanServiceImpl implements QueryPlanService {
-    @Autowired
-    private AppHolder appHolder;
     @Autowired
     private ModelMatchService modelMatchService;
 

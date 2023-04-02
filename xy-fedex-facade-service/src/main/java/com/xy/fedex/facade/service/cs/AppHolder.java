@@ -9,20 +9,20 @@ import com.xy.fedex.catalog.common.definition.AppDefinition;
 import com.xy.fedex.catalog.common.definition.field.impl.DimModel;
 import com.xy.fedex.catalog.common.definition.field.impl.MetricModel;
 import com.xy.fedex.catalog.common.enums.DimType;
+import com.xy.fedex.def.Response;
 import com.xy.fedex.facade.exceptions.FieldNotFoundException;
 import com.xy.fedex.facade.utils.ApplicationContextUtils;
 import lombok.Data;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
-import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
-@Component
 public class AppHolder {
     private static CatalogAppFacade catalogAppFacade;
     private static CatalogMetaFacade catalogMetaFacade;
@@ -32,13 +32,13 @@ public class AppHolder {
         catalogMetaFacade = ApplicationContextUtils.getBean(CatalogMetaFacade.class);
     }
 
-    public App getApp(Long appId) {
+    public static App getApp(Long appId) {
         AppDefinition appDefinition = catalogAppFacade.getApp(GetAppRequest.builder().appId(appId).build());
         App app = new App(appDefinition);
-        return null;
+        return app;
     }
 
-    public App getApp(String appId) {
+    public static App getApp(String appId) {
         return getApp(Long.parseLong(appId));
     }
 
@@ -79,9 +79,19 @@ public class AppHolder {
         }
 
         public Field findField(String fieldName) {
+            if(Objects.isNull(this.metricMap)) {
+                synchronized (this) {
+                    this.metricMap = this.metrics.stream().collect(Collectors.toMap(metric -> metric.getMetricCode(), Function.identity()));
+                }
+            }
             Metric metric = metricMap.get(fieldName);
             if(!Objects.isNull(metric)) {
                 return metric;
+            }
+            if(Objects.isNull(this.dimMap)) {
+                synchronized (this) {
+                    this.dimMap = this.dims.stream().collect(Collectors.toMap(dim -> dim.getDimCode(),Function.identity()));
+                }
             }
             Dim dim = dimMap.get(fieldName);
             if(!Objects.isNull(dim)) {
@@ -104,13 +114,13 @@ public class AppHolder {
         private String metricComment;
 
         public List<MetricModel> getMetricModels() {
-            List<MetricModel> metricModels = catalogMetaFacade.getMetricModels(GetMetricModelRequest.builder().appId(this.appId).metricId(this.metricId).build());
-            return metricModels;
+            Response<List<MetricModel>> response = catalogMetaFacade.getMetricModels(GetMetricModelRequest.builder().appId(this.appId).metricId(this.metricId).build());
+            return response.getData();
         }
 
         public MetricModel getMetricModel(Long modelId) {
-            MetricModel metricModel = catalogMetaFacade.getMetricModel(GetMetricModelRequest.builder().appId(this.appId).modelId(modelId).metricId(this.metricId).build());
-            return metricModel;
+            Response<MetricModel> response = catalogMetaFacade.getMetricModel(GetMetricModelRequest.builder().appId(this.appId).modelId(modelId).metricId(this.metricId).build());
+            return response.getData();
         }
     }
 
@@ -123,8 +133,8 @@ public class AppHolder {
         private DimType dimType;
 
         public List<DimModel> getDimModels() {
-            List<DimModel> dimModels = catalogMetaFacade.getDimModels(GetDimModelRequest.builder().appId(this.appId).dimId(this.dimId).build());
-            return dimModels;
+            Response<List<DimModel>> response = catalogMetaFacade.getDimModels(GetDimModelRequest.builder().appId(this.appId).dimId(this.dimId).build());
+            return response.getData();
         }
 
         public DimModel getDimModel(Long modelId) {

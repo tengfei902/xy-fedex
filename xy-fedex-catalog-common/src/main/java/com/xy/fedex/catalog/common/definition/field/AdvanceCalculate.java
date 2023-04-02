@@ -26,7 +26,7 @@ public class AdvanceCalculate implements Serializable {
     /**
      * 是否辅助维度，辅助维度不强制allowDims满足全部场景维度
      */
-    private Boolean assist;
+    private boolean assist = false;
 
     private String sortType;
     private Integer limit;

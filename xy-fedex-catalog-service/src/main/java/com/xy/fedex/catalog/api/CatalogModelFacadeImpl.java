@@ -1,13 +1,16 @@
 package com.xy.fedex.catalog.api;
 
 import com.xy.fedex.catalog.api.dto.ModelRequest;
+import com.xy.fedex.catalog.api.dto.request.GetModelRequest;
 import com.xy.fedex.catalog.api.dto.request.PrepareModelRequest;
 import com.xy.fedex.catalog.api.dto.response.PrepareModelResponse;
+import com.xy.fedex.catalog.common.definition.ModelDefinition;
 import com.xy.fedex.catalog.common.definition.column.TableField;
 import com.xy.fedex.catalog.common.definition.table.TableRelation;
 import com.xy.fedex.catalog.service.meta.MetaService;
 import com.xy.fedex.catalog.service.meta.ModelService;
 import com.xy.fedex.catalog.service.meta.TableService;
+import com.xy.fedex.def.Response;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -43,5 +46,11 @@ public class CatalogModelFacadeImpl implements CatalogModelFacade {
         Long dsnId = modelRequest.getDsnId();
 
         return modelService.saveModel(modelRequest);
+    }
+
+    @Override
+    public Response<ModelDefinition> getModel(GetModelRequest request) {
+        ModelDefinition modelDefinition = modelService.getModel(request.getModelId());
+        return Response.success(modelDefinition);
     }
 }

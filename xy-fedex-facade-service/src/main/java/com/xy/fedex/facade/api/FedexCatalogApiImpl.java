@@ -14,8 +14,6 @@ import java.util.List;
 
 @DubboService(version = "${dubbo.server.version}")
 public class FedexCatalogApiImpl implements FedexCatalogApi {
-    @Autowired
-    private AppHolder appHolder;
     /**
      * 元数据正交矩阵
      * @param orthogonalRequest
@@ -26,7 +24,7 @@ public class FedexCatalogApiImpl implements FedexCatalogApi {
         List<String> selectedMetrics = orthogonalRequest.getMetrics();
         List<String> selectedDims = orthogonalRequest.getDims();
 
-        AppHolder.App app = appHolder.getApp(orthogonalRequest.getApp());
+        AppHolder.App app = AppHolder.getApp(orthogonalRequest.getApp());
         List<AppHolder.Metric> metrics = app.getMetrics();
 
 
