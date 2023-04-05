@@ -15,6 +15,7 @@ import com.xy.fedex.catalog.common.definition.field.SecondaryCalculate;
 import com.xy.fedex.catalog.common.definition.field.impl.DeriveMetricModel;
 import com.xy.fedex.catalog.common.definition.field.impl.MetricModel;
 import com.xy.fedex.catalog.common.definition.field.impl.PrimaryMetricModel;
+import com.xy.fedex.dsl.sql.from.impl.JoinTableSource;
 import com.xy.fedex.dsl.utility.SQLExprUtils;
 import com.xy.fedex.facade.exceptions.NoMetricModelMatchedException;
 import com.xy.fedex.facade.service.cs.AppHolder;
@@ -39,9 +40,9 @@ public class ModelMatchServiceImpl implements ModelMatchService {
     @Override
     public QueryMatchedModelDTO getMetricMatchedModels(SQLSelect logicalSelect) {
         QueryMatchedModelDTO queryMatchedModelDTO = getQueryMatchedModelsByDim(logicalSelect);
-        for (MetricMatchedModelReWriter rewriter : filters) {
-            queryMatchedModelDTO = rewriter.rewrite(queryMatchedModelDTO);
-        }
+//        for (MetricMatchedModelReWriter rewriter : filters) {
+//            queryMatchedModelDTO = rewriter.rewrite(queryMatchedModelDTO);
+//        }
         return queryMatchedModelDTO;
     }
 
@@ -56,16 +57,14 @@ public class ModelMatchServiceImpl implements ModelMatchService {
         SelectFields selectFields = new SelectFields(logicalSelect);
         QueryMatchedModelDTO queryMatchedModelDTO = new QueryMatchedModelDTO(logicalSelect);
 
-        List<AppHolder.Dim> dims = selectFields.getDims();
-        List<String> dimCodes = dims.stream().map(AppHolder.Dim::getDimCode).distinct().collect(Collectors.toList());
-
-        for (AppHolder.Metric metric : selectFields.getMetrics()) {
-            List<MetricModel> metricModels = metric.getMetricModels().stream().filter(metricModel -> checkMetricModelMatchDims(metricModel, dimCodes)).collect(Collectors.toList());
+        for (String metricAlias : selectFields.selectMetricMap.keySet()) {
+            AppHolder.Metric metric = selectFields.selectMetricMap.get(metricAlias);
+            List<MetricModel> metricModels = metric.getMetricModels().stream().filter(metricModel -> checkMetricModelMatchDims(metricModel, selectFields.getAllDims())).collect(Collectors.toList());
             if (CollectionUtils.isEmpty(metricModels)) {
                 throw new NoMetricModelMatchedException(String.format("no metric model matched for metric:%s in select:%s", metric.getMetricCode(), logicalSelect.toString()));
             }
-            List<QueryMatchedModelDTO.MetricModel> matchedMetricModels = getMatchedMetricModels(metricModels,null,null,logicalQueryBlock);
-            queryMatchedModelDTO.addMetricMatchedModels(null,null,matchedMetricModels);
+            List<QueryMatchedModelDTO.MetricModel> matchedMetricModels = getMatchedMetricModels(metricModels, metricAlias, selectFields.getSelectDimMap(), logicalQueryBlock);
+            queryMatchedModelDTO.addMetricMatchedModels(null, null, matchedMetricModels);
         }
         return queryMatchedModelDTO;
     }
@@ -76,10 +75,10 @@ public class ModelMatchServiceImpl implements ModelMatchService {
             if (!CollectionUtils.isEmpty(primaryMetricModel.getAdvanceCalculate().getForceDims()) && !new HashSet<>(dimCodes).containsAll(primaryMetricModel.getAdvanceCalculate().getForceDims())) {
                 return false;
             }
-            if(CollectionUtils.isEmpty(dimCodes)) {
+            if (CollectionUtils.isEmpty(dimCodes)) {
                 return true;
             }
-            if(primaryMetricModel.getAdvanceCalculate().isAssist()) {
+            if (primaryMetricModel.getAdvanceCalculate().isAssist()) {
                 return true;
             }
             return new HashSet<>(metricModel.getAdvanceCalculate().getAllowDims()).containsAll(dimCodes);
@@ -95,146 +94,180 @@ public class ModelMatchServiceImpl implements ModelMatchService {
         }
     }
 
-    private List<QueryMatchedModelDTO.MetricModel> getMatchedMetricModels(List<MetricModel> metricModels,String alias, List<Pair<String, String>> dims,MySqlSelectQueryBlock logicalSelect) {
-        return metricModels.stream().map(metricModel -> getMatchedMetricModel(metricModel,alias,dims,logicalSelect)).collect(Collectors.toList());
+    private List<QueryMatchedModelDTO.MetricModel> getMatchedMetricModels(List<MetricModel> metricModels, String alias, Map<String, AppHolder.Dim> dims, MySqlSelectQueryBlock logicalSelect) {
+        return metricModels.stream().map(metricModel -> getMatchedMetricModel(metricModel, alias, dims, logicalSelect)).collect(Collectors.toList());
     }
 
-    private QueryMatchedModelDTO.MetricModel getMatchedMetricModel(MetricModel metricModel, String alias, List<Pair<String, String>> dims,MySqlSelectQueryBlock logicalSelect) {
+    private QueryMatchedModelDTO.MetricModel getMatchedMetricModel(MetricModel metricModel, String alias, Map<String, AppHolder.Dim> dims, MySqlSelectQueryBlock logicalSelect) {
         QueryMatchedModelDTO.MetricModel selectMetric = new QueryMatchedModelDTO.MetricModel();
         selectMetric.setMetricId(metricModel.getMetricId());
         selectMetric.setMetricModelId(metricModel.getMetricModelId());
         selectMetric.setModelIds(null);
-        MySqlSelectQueryBlock metricSelect = getMetricSelect(metricModel,alias,dims,logicalSelect);
+        MySqlSelectQueryBlock metricSelect = getMetricSelect(metricModel, alias, dims, logicalSelect);
         selectMetric.setMetricSelect(metricSelect);
         return selectMetric;
     }
 
-    private MySqlSelectQueryBlock getMetricSelect(MetricModel metricModel, String alias, List<Pair<String, String>> dims,MySqlSelectQueryBlock logicalSelect) {
+    private MySqlSelectQueryBlock getMetricSelect(MetricModel metricModel, String alias, Map<String, AppHolder.Dim> dims, MySqlSelectQueryBlock logicalSelect) {
         if (metricModel instanceof PrimaryMetricModel) {
             PrimaryMetricModel primaryMetricModel = (PrimaryMetricModel) metricModel;
             ModelDefinition model = ModelHolder.getModel(primaryMetricModel.getModelId());
-            MySqlSelectQueryBlock metricSelect = getMetricSelectSql(primaryMetricModel,alias,dims,model,logicalSelect);
-            return metricSelect;
+            return getMetricSelectSql(primaryMetricModel, alias, dims, model, logicalSelect);
         } else {
             DeriveMetricModel deriveMetricModel = (DeriveMetricModel) metricModel;
-            List<MetricModel> relateMetricModels = deriveMetricModel.getRelateMetricModels();
             String formula = deriveMetricModel.getFormula();
-
             List<SQLSubqueryTableSource> relateMetricSelects = new ArrayList<>();
 
-            for(int i = 0;i < deriveMetricModel.getRelateMetricModels().size(); i++) {
+            for (int i = 0; i < deriveMetricModel.getRelateMetricModels().size(); i++) {
                 MetricModel relateMetricModel = deriveMetricModel.getRelateMetricModels().get(i);
-                Long metricModelId = relateMetricModel.getMetricModelId();
                 String metricCode = relateMetricModel.getCode();
-                String metricAlias = metricCode+"_"+i;
-                MySqlSelectQueryBlock relateMetricSelect = getMetricSelect(metricModel,metricAlias,dims,logicalSelect);
+                String metricAlias = metricCode + "_" + i;
+                MySqlSelectQueryBlock relateMetricSelect = getMetricSelect(relateMetricModel, metricAlias, dims, logicalSelect);
 
-                String tableAlias = "t_"+deriveMetricModel.getMetricModelId()+"_"+i;
-                SQLSubqueryTableSource sqlSubqueryTableSource = new SQLSubqueryTableSource(relateMetricSelect,tableAlias);
-                formula = formula.replaceAll(String.format("\\${%s}",i),tableAlias+"."+metricAlias);
+                String tableAlias = "t_" + deriveMetricModel.getMetricModelId() + "_" + i;
+                SQLSubqueryTableSource sqlSubqueryTableSource = new SQLSubqueryTableSource(relateMetricSelect, tableAlias);
+                formula = formula.replace(String.format("${%s}", i), tableAlias + "." + metricAlias);
 
                 relateMetricSelects.add(sqlSubqueryTableSource);
             }
 
             SQLTableSource tableSource = getJoinTableSource(relateMetricSelects);
-
             MySqlSelectQueryBlock metricSelect = new MySqlSelectQueryBlock();
-
-            metricSelect.addSelectItem(formula,alias);
-            for(Pair<String, String> dim:dims) {
-                metricSelect.addSelectItem(dim.getLeft(),dim.getLeft());
+            metricSelect.addSelectItem(formula, alias);
+            for (String dimAlias : dims.keySet()) {
+                metricSelect.addSelectItem(getDeriveDimColumn(tableSource,dimAlias), dimAlias);
             }
             metricSelect.setFrom(tableSource);
             return metricSelect;
         }
     }
 
+    private String getDeriveDimColumn(SQLTableSource tableSource,String dimAlias) {
+        if(tableSource instanceof SQLJoinTableSource) {
+            SQLJoinTableSource sqlJoinTableSource = (SQLJoinTableSource) tableSource;
+            SQLTableSource left = sqlJoinTableSource.getLeft();
+            String result = getDeriveDimColumn(left,dimAlias);
+            if(!StringUtils.isEmpty(result)) {
+                return result;
+            }
+            SQLTableSource right = sqlJoinTableSource.getRight();
+            result = getDeriveDimColumn(right,dimAlias);
+            if(StringUtils.isEmpty(result)) {
+                throw new RuntimeException("no dim found in sub queries:"+dimAlias);
+            }
+            return result;
+        }
+        if(tableSource instanceof SQLSubqueryTableSource) {
+            List<String> selectItems = SQLExprUtils.getSelectItemAliases(((SQLSubqueryTableSource) tableSource).getSelect());
+            if(selectItems.contains(dimAlias)) {
+                return tableSource.getAlias()+"."+dimAlias;
+            } else {
+                return null;
+            }
+        }
+        throw new RuntimeException("table source type not support:"+tableSource.getClass().getName());
+    }
+
     private SQLTableSource getJoinTableSource(List<SQLSubqueryTableSource> relateMetricSelects) {
         SQLTableSource tableSource = null;
         SQLSubqueryTableSource subQueryTableSource = relateMetricSelects.get(0);
-        for(int i = 1;i<relateMetricSelects.size();i++) {
-            SQLExpr condition = getJoinCondition(subQueryTableSource,relateMetricSelects.get(i));
+        for (int i = 1; i < relateMetricSelects.size(); i++) {
+            SQLExpr condition = getJoinCondition(subQueryTableSource, relateMetricSelects.get(i));
             //TODO JOIN TYPE INPUT
-            if(Objects.isNull(tableSource)) {
-                tableSource = new SQLJoinTableSource(subQueryTableSource, SQLJoinTableSource.JoinType.INNER_JOIN, relateMetricSelects.get(i),condition);
+            if (Objects.isNull(tableSource)) {
+                tableSource = new SQLJoinTableSource(subQueryTableSource, SQLJoinTableSource.JoinType.INNER_JOIN, relateMetricSelects.get(i), condition);
             } else {
-                tableSource = new SQLJoinTableSource(tableSource,SQLJoinTableSource.JoinType.INNER_JOIN, relateMetricSelects.get(i),condition);
+                tableSource = new SQLJoinTableSource(tableSource, SQLJoinTableSource.JoinType.INNER_JOIN, relateMetricSelects.get(i), condition);
             }
         }
         return tableSource;
     }
 
-    private SQLExpr getJoinCondition(SQLSubqueryTableSource subQueryTableSource1,SQLSubqueryTableSource subQueryTableSource2) {
-        List<String> names1 = subQueryTableSource1.getColumns().stream().map(SQLName::getSimpleName).collect(Collectors.toList());
-        List<String> names2 = subQueryTableSource2.getColumns().stream().map(SQLName::getSimpleName).collect(Collectors.toList());
+    private SQLExpr getJoinCondition(SQLSubqueryTableSource subQueryTableSource1, SQLSubqueryTableSource subQueryTableSource2) {
+        List<String> names1 = SQLExprUtils.getSelectItemAliases(subQueryTableSource1.getSelect());
+        List<String> names2 = SQLExprUtils.getSelectItemAliases(subQueryTableSource2.getSelect());
 
         List<String> conditions = new ArrayList<>();
-
-        for(String name : names1) {
-            if(names2.contains(name)) {
-                conditions.add(String.format("%s.%s = %s.%s",subQueryTableSource1.getAlias(),name,subQueryTableSource2.getAlias(),name));
+        for (String name : names1) {
+            if (names2.contains(name)) {
+                conditions.add(String.format("%s.%s = %s.%s", subQueryTableSource1.getAlias(), name, subQueryTableSource2.getAlias(), name));
             }
         }
 
         return SQLUtils.toMySqlExpr(Joiner.on(" and ").join(conditions));
     }
 
-    private MySqlSelectQueryBlock getMetricSelectSql(PrimaryMetricModel metricModel, String alias, List<Pair<String, String>> dims, ModelDefinition model,MySqlSelectQueryBlock logicalSelect) {
-        List<String> groupByDimCodes = dims.stream().map(Pair::getRight).distinct().collect(Collectors.toList());
-        SecondaryCalculate localSecondaryCalculate = getLocalSecondaryCalculate(metricModel.getAdvanceCalculate().getSecondary(),dims);
+    private MySqlSelectQueryBlock getMetricSelectSql(PrimaryMetricModel metricModel, String alias, Map<String, AppHolder.Dim> dims, ModelDefinition model, MySqlSelectQueryBlock logicalSelect) {
+        SecondaryCalculate localSecondaryCalculate = getLocalSecondaryCalculate(metricModel.getAdvanceCalculate().getSecondary(), dims);
 
-        if(!Objects.isNull(localSecondaryCalculate)) {
-            SQLExpr metric = SQLUtils.toMySqlExpr(String.format("%s as %s",metricModel.getFormula(),alias));
+        if (!Objects.isNull(localSecondaryCalculate)) {
+            SQLExpr metric = SQLUtils.toMySqlExpr(metricModel.getFormula());
             List<String> secondaryGroupByItems = localSecondaryCalculate.getGroupByList();
             //group by items
-            List<Pair<String,String>> groupByItems = new ArrayList<>(dims);
-            groupByItems.addAll(secondaryGroupByItems.stream().map(s -> new ImmutablePair<>(s,s +"_"+ RandomUtils.nextInt())).collect(Collectors.toList()));
-
+            List<Pair<String, String>> groupByItems = getGroupByItemForMetricModel(metricModel,dims);
+            groupByItems.addAll(secondaryGroupByItems.stream().map(s -> new ImmutablePair<>(s + "_" + RandomUtils.nextInt(),s)).collect(Collectors.toList()));
             //from
-            SQLExpr tableSource = SQLUtils.toMySqlExpr(model.getTableSource());
+            SQLTableSource tableSource = SQLExprUtils.getTableSource(model.getTableSource());
             //condition
             String modelCondition = model.getCondition();
-            SQLExpr logicalCondition = getLocalizedLogicalCondition(logicalSelect,model);
-            SQLExpr conditionExpr = getCondition(modelCondition,logicalCondition);
+            SQLExpr logicalCondition = getLocalizedLogicalCondition(logicalSelect, model);
+            SQLExpr conditionExpr = getCondition(modelCondition, logicalCondition);
 
-            MySqlSelectQueryBlock secondaryMetricSelect = getMetricSelect(metric,groupByItems,tableSource,conditionExpr,model);
+            MySqlSelectQueryBlock secondaryMetricSelect = getMetricSelect(metric, alias, groupByItems, tableSource, conditionExpr, model);
 
             MySqlSelectQueryBlock metricSelect = new MySqlSelectQueryBlock();
+            String tableAlias = "t_" + RandomUtils.nextInt();
+            metricSelect.setFrom(secondaryMetricSelect, tableAlias);
+
             SQLSelectGroupByClause groupByClause = new SQLSelectGroupByClause();
             metricSelect.setGroupBy(groupByClause);
             //metric
-            metricSelect.addSelectItem(String.format("%s(%s)",localSecondaryCalculate.getAgg(),alias),alias);
+            metricSelect.addSelectItem(String.format("%s(%s.%s)", localSecondaryCalculate.getAgg(),tableAlias, alias), alias);
             //dims
-            for(Pair<String, String> dimPair : dims) {
-                String dimAlias = dimPair.getLeft();
-                ModelDefinition.Dim dim = model.getDim(dimPair.getRight());
-
-                SQLExpr expr = SQLUtils.toSQLExpr(dim.getFormula(), DbType.mysql);
+            for (String dimAlias : dims.keySet()) {
+                SQLExpr expr = SQLUtils.toSQLExpr(tableAlias+"."+dimAlias, DbType.mysql);
                 SQLSelectItem selectItem = new SQLSelectItem(expr, dimAlias);
 
                 metricSelect.addSelectItem(selectItem);
                 groupByClause.addItem(expr);
             }
-            metricSelect.setFrom(secondaryMetricSelect,"t_"+RandomUtils.nextInt());
             return metricSelect;
         } else {
-            SQLExpr metric = SQLUtils.toMySqlExpr(String.format("%s as %s",metricModel.getFormula(),alias));
-            List<Pair<String,String>> groupByItems = new ArrayList<>(dims);
-            SQLExpr tableSource = SQLUtils.toMySqlExpr(model.getTableSource());
+            SQLExpr metric = SQLUtils.toMySqlExpr(metricModel.getFormula());
+            List<Pair<String, String>> groupByItems = getGroupByItemForMetricModel(metricModel,dims);
+            SQLTableSource tableSource = SQLExprUtils.getTableSource(model.getTableSource());
             //condition
             String modelCondition = model.getCondition();
-            SQLExpr logicalCondition = getLocalizedLogicalCondition(logicalSelect,model);
-            SQLExpr conditionExpr = getCondition(modelCondition,logicalCondition);
-            return getMetricSelect(metric,groupByItems,tableSource,conditionExpr,model);
+            SQLExpr logicalCondition = getLocalizedLogicalCondition(logicalSelect, model);
+            SQLExpr conditionExpr = getCondition(modelCondition, logicalCondition);
+            return getMetricSelect(metric, alias, groupByItems, tableSource, conditionExpr, model);
         }
     }
 
-    private SecondaryCalculate getLocalSecondaryCalculate(SecondaryCalculate secondaryCalculate,List<Pair<String,String>> logicalDims) {
-        if(Objects.isNull(secondaryCalculate) || StringUtils.isEmpty(secondaryCalculate.getAgg()) || CollectionUtils.isEmpty(secondaryCalculate.getGroupByList())) {
+    private List<Pair<String,String>> getGroupByItemForMetricModel(PrimaryMetricModel metricModel,Map<String, AppHolder.Dim> dims) {
+        List<String> allowDims = metricModel.getAdvanceCalculate().getAllowDims();
+        boolean isAssist = metricModel.getAdvanceCalculate().isAssist();
+        if(!isAssist) {
+            return dims.keySet().stream().map(s -> {
+                return new ImmutablePair<>(s, dims.get(s).getDimCode());
+            }).collect(Collectors.toList());
+        }
+        List<String> keys = dims.keySet().stream().filter(s -> {
+            AppHolder.Dim dim = dims.get(s);
+            return allowDims.contains(dim.getDimCode());
+        }).collect(Collectors.toList());
+
+        return dims.keySet().stream().filter(keys::contains).map(s -> {
+            return new ImmutablePair<>(s, dims.get(s).getDimCode());
+        }).collect(Collectors.toList());
+    }
+
+    private SecondaryCalculate getLocalSecondaryCalculate(SecondaryCalculate secondaryCalculate, Map<String, AppHolder.Dim> logicalDims) {
+        if (Objects.isNull(secondaryCalculate) || StringUtils.isEmpty(secondaryCalculate.getAgg()) || CollectionUtils.isEmpty(secondaryCalculate.getGroupByList())) {
             return null;
         }
-        List<String> logicalDimCodes = logicalDims.stream().map(Pair::getRight).collect(Collectors.toList());
-        if(new HashSet<>(logicalDimCodes).containsAll(secondaryCalculate.getGroupByList())) {
+        List<String> logicalDimCodes = logicalDims.values().stream().map(AppHolder.Dim::getDimCode).distinct().collect(Collectors.toList());
+        if (new HashSet<>(logicalDimCodes).containsAll(secondaryCalculate.getGroupByList())) {
             return null;
         }
         SecondaryCalculate localSecondaryCalculate = new SecondaryCalculate();
@@ -245,25 +278,25 @@ public class ModelMatchServiceImpl implements ModelMatchService {
         return localSecondaryCalculate;
     }
 
-    private SQLExpr getCondition(String modelCondition,SQLExpr logicalCondition) {
-        if(StringUtils.isEmpty(modelCondition)) {
+    private SQLExpr getCondition(String modelCondition, SQLExpr logicalCondition) {
+        if (StringUtils.isEmpty(modelCondition)) {
             return logicalCondition;
         }
-        if(Objects.isNull(logicalCondition)) {
+        if (Objects.isNull(logicalCondition)) {
             return SQLUtils.toMySqlExpr(modelCondition);
         }
         SQLExpr modelConditionExpr = SQLUtils.toMySqlExpr(modelCondition);
-        return new SQLBinaryOpExpr(modelConditionExpr, SQLBinaryOperator.BooleanAnd,logicalCondition);
+        return new SQLBinaryOpExpr(modelConditionExpr, SQLBinaryOperator.BooleanAnd, logicalCondition);
     }
 
-    private MySqlSelectQueryBlock getMetricSelect(SQLExpr metric, List<Pair<String, String>> dims,SQLExpr tableSource, SQLExpr condition,ModelDefinition model) {
+    private MySqlSelectQueryBlock getMetricSelect(SQLExpr metric, String alias, List<Pair<String, String>> dims, SQLTableSource tableSource, SQLExpr condition, ModelDefinition model) {
         MySqlSelectQueryBlock metricSelect = new MySqlSelectQueryBlock();
         //指标
-        metricSelect.addSelectItem(metric);
+        metricSelect.addSelectItem(metric, alias);
         //维度
         SQLSelectGroupByClause groupByClause = new SQLSelectGroupByClause();
         metricSelect.setGroupBy(groupByClause);
-        for(Pair<String, String> dimPair : dims) {
+        for (Pair<String, String> dimPair : dims) {
             String dimAlias = dimPair.getLeft();
             ModelDefinition.Dim dim = model.getDim(dimPair.getRight());
 
@@ -280,9 +313,9 @@ public class ModelMatchServiceImpl implements ModelMatchService {
         return metricSelect;
     }
 
-    private SQLExpr getLocalizedLogicalCondition(MySqlSelectQueryBlock logicalSelect,ModelDefinition model) {
+    private SQLExpr getLocalizedLogicalCondition(MySqlSelectQueryBlock logicalSelect, ModelDefinition model) {
         SQLExpr condition = logicalSelect.getWhere().clone();
-        SQLExprUtils.getSqlConditionFieldExpr(condition,new LocalizedFieldCallBackFunction(model));
+        SQLExprUtils.getSqlConditionFieldExpr(condition, new LocalizedFieldCallBackFunction(model));
         return condition;
     }
 
@@ -292,9 +325,10 @@ public class ModelMatchServiceImpl implements ModelMatchService {
         public LocalizedFieldCallBackFunction(ModelDefinition modelDefinition) {
             this.modelDefinition = modelDefinition;
         }
+
         @Override
         public void doCallBack(SQLExpr expr) {
-            if(expr instanceof SQLIdentifierExpr) {
+            if (expr instanceof SQLIdentifierExpr) {
                 SQLIdentifierExpr sqlIdentifierExpr = (SQLIdentifierExpr) expr;
                 String name = sqlIdentifierExpr.getName();
                 ModelDefinition.Dim dim = modelDefinition.getDim(name);
@@ -309,13 +343,14 @@ public class ModelMatchServiceImpl implements ModelMatchService {
 
     @Data
     public static class SelectFields {
-        private Map<String, AppHolder.Metric> metricMap = new HashMap<>();
-        private Map<String, AppHolder.Dim> dimMap = new HashMap<>();
+        private Map<String, AppHolder.Metric> selectMetricMap = new HashMap<>();
+        private Map<String, AppHolder.Dim> selectDimMap = new HashMap<>();
+        private List<String> allDims = new ArrayList<>();
 
         public SelectFields(SQLSelect logicalSelect) {
             MySqlSelectQueryBlock selectQueryBlock = (MySqlSelectQueryBlock) logicalSelect.getQueryBlock();
             AppHolder.App app = AppHolder.getApp(SQLExprUtils.getTableSource(logicalSelect));
-
+            //查询指标和维度
             List<SQLSelectItem> selectItems = selectQueryBlock.getSelectList();
             for (SQLSelectItem item : selectItems) {
                 SQLIdentifierExpr itemExpr = (SQLIdentifierExpr) item.getExpr();
@@ -323,24 +358,32 @@ public class ModelMatchServiceImpl implements ModelMatchService {
                 AppHolder.Field field = app.findField(itemExpr.getName());
 
                 if (field instanceof AppHolder.Metric) {
-                    metricMap.put(alias, (AppHolder.Metric) field);
+                    selectMetricMap.put(alias, (AppHolder.Metric) field);
                 } else {
-                    dimMap.put(alias, (AppHolder.Dim) field);
+                    selectDimMap.put(alias, (AppHolder.Dim) field);
+                }
+            }
+            //所有维度
+            List<String> allFields = SQLExprUtils.getAllFields(logicalSelect);
+            for (String fieldName : allFields) {
+                AppHolder.Field field = app.findField(fieldName);
+                if(field instanceof AppHolder.Dim) {
+                    allDims.add(fieldName);
                 }
             }
         }
 
         public List<AppHolder.Metric> getMetrics() {
-            return new ArrayList<>(this.metricMap.values());
+            return new ArrayList<>(this.selectMetricMap.values());
         }
 
         public List<AppHolder.Dim> getDims() {
-            return new ArrayList<>(this.dimMap.values());
+            return new ArrayList<>(this.selectDimMap.values());
         }
 
         public List<Pair<String, AppHolder.Dim>> getDimWithAlias() {
-            return dimMap.keySet().stream().map(s -> {
-                Pair<String, AppHolder.Dim> pair = new ImmutablePair<>(s,dimMap.get(s));
+            return selectDimMap.keySet().stream().map(s -> {
+                Pair<String, AppHolder.Dim> pair = new ImmutablePair<>(s, selectDimMap.get(s));
                 return pair;
             }).collect(Collectors.toList());
         }

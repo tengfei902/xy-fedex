@@ -10,8 +10,12 @@ import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlCreateTableStateme
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlSelectQueryBlock;
 import com.alibaba.druid.sql.parser.SQLParserUtils;
 import com.xy.fedex.dsl.exceptions.SQLExprNotSupportException;
+import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class SQLExprUtils {
     public static void testParse() {
@@ -23,6 +27,14 @@ public class SQLExprUtils {
         return mySqlSelectQueryBlock.getFrom().toString();
     }
 
+    public static SQLTableSource getTableSource(String tableSource) {
+        SQLExpr sqlExpr = SQLUtils.toMySqlExpr("select * from "+tableSource);
+        SQLQueryExpr sqlQueryExpr = (SQLQueryExpr) sqlExpr;
+        SQLSelect sqlSelect = sqlQueryExpr.getSubQuery();
+        MySqlSelectQueryBlock mySqlSelectQueryBlock = (MySqlSelectQueryBlock) sqlSelect.getQueryBlock();
+        return mySqlSelectQueryBlock.getFrom();
+    }
+
     public static SQLSelect parse(String sql) {
         SQLStatement sqlStatement = SQLUtils.parseSingleStatement(sql,DbType.mysql);
         SQLSelectStatement sqlSelectStatement = (SQLSelectStatement) sqlStatement;
@@ -30,19 +42,29 @@ public class SQLExprUtils {
         //MySqlSelectQueryBlock mySqlSelectQueryBlock = (MySqlSelectQueryBlock) sqlSelectStatement.getSelect().getQuery();
     }
 
+    public static List<String> getAllFields(SQLSelect select) {
+        List<String> allFields = new ArrayList<>();
+        SQLExprFunction sqlExprFunction = new SQLExprFunction() {
+            @Override
+            public void doCallBack(SQLExpr expr) {
+                SQLIdentifierExpr sqlIdentifierExpr = (SQLIdentifierExpr) expr;
+                allFields.add(sqlIdentifierExpr.getName());
+            }
+        };
+        MySqlSelectQueryBlock selectQueryBlock = (MySqlSelectQueryBlock) select.getQueryBlock();
+        //select items
+        for(SQLSelectItem selectItem : selectQueryBlock.getSelectList()) {
+            getSelectItemExpr(selectItem.getExpr(),sqlExprFunction);
+        }
+        //condition
+        SQLExpr condition = selectQueryBlock.getWhere();
+        getSqlConditionFieldExpr(condition, sqlExprFunction);
+        return allFields.stream().distinct().collect(Collectors.toList());
+    }
+
     public static void parseCreateTable(String sql) {
         SQLStatement sqlStatement = SQLUtils.parseSingleStatement(sql,DbType.mysql);
         MySqlCreateTableStatement createTableStatement = (MySqlCreateTableStatement) sqlStatement;
-    }
-
-    public static List<String> getAllFields(SQLSelect select) {
-        SQLSelectQuery sqlSelectQuery = select.getQuery();
-        if(sqlSelectQuery instanceof MySqlSelectQueryBlock) {
-            MySqlSelectQueryBlock mySqlSelectQueryBlock = (MySqlSelectQueryBlock) sqlSelectQuery;
-            List<SQLSelectItem> selectItems = mySqlSelectQueryBlock.getSelectList();
-//            selectItems.stream().map(sqlSelectItem -> sqlSelectItem.get)
-        }
-        return null;
     }
 
     public static List<String> getMetrics(SQLSelect select) {
@@ -71,6 +93,9 @@ public class SQLExprUtils {
     }
 
     public static void getSqlConditionFieldExpr(SQLExpr expr,SQLExprFunction callBackFunc) {
+        if(Objects.isNull(expr)) {
+            return;
+        }
         if(expr instanceof SQLBinaryOpExpr && ((SQLBinaryOpExpr) expr).getOperator().isLogical()) {
             SQLBinaryOpExpr binaryOpExpr = (SQLBinaryOpExpr) expr;
             SQLExpr left = binaryOpExpr.getLeft();
@@ -117,6 +142,111 @@ public class SQLExprUtils {
             return;
         }
         throw new SQLExprNotSupportException("SQL expr type not support:"+expr.getClass().getName());
+    }
+
+    public static List<String> getSelectItemAliases(SQLSelect select) {
+        List<String> selectItemAliases = new ArrayList<>();
+        SQLExprFunction sqlExprFunction = new SQLExprFunction() {
+            @Override
+            public void doCallBack(SQLExpr expr) {
+                if(expr instanceof SQLIdentifierExpr) {
+                    selectItemAliases.add(((SQLIdentifierExpr) expr).getName());
+                }
+            }
+        };
+        MySqlSelectQueryBlock block = (MySqlSelectQueryBlock) select.getQueryBlock();
+        for(SQLSelectItem item:block.getSelectList()) {
+            if(!StringUtils.isEmpty(item.getAlias())) {
+                selectItemAliases.add(item.getAlias());
+            } else {
+                getSelectItemExpr(item.getExpr(),sqlExprFunction);
+            }
+        }
+        return selectItemAliases.stream().filter(Objects::nonNull).distinct().collect(Collectors.toList());
+    }
+
+    public static void getSelectItemExpr(SQLExpr sqlExpr,SQLExprFunction callBackFunc) {
+        if(sqlExpr instanceof SQLBinaryOpExpr) {
+            SQLBinaryOpExpr sqlBinaryOpExpr = (SQLBinaryOpExpr) sqlExpr;
+            getSelectItemExpr(sqlBinaryOpExpr.getLeft(),callBackFunc);
+            getSelectItemExpr(sqlBinaryOpExpr.getRight(),callBackFunc);
+            return;
+        }
+        if(sqlExpr instanceof SQLAggregateExpr) {
+            SQLAggregateExpr sqlAggregateExpr = (SQLAggregateExpr) sqlExpr;
+            List<SQLExpr> arguments = sqlAggregateExpr.getArguments();
+            for(SQLExpr argument:arguments) {
+                getSelectItemExpr(argument,callBackFunc);
+            }
+            return;
+        }
+        if(sqlExpr instanceof SQLCaseExpr) {
+            SQLCaseExpr sqlCaseExpr = (SQLCaseExpr) sqlExpr;
+            List<SQLCaseExpr.Item> items = sqlCaseExpr.getItems();
+            for(SQLCaseExpr.Item item:items) {
+                getSelectItemExpr(item.getConditionExpr(),callBackFunc);
+            }
+            return;
+        }
+        if(sqlExpr instanceof SQLCastExpr) {
+            SQLCastExpr sqlCastExpr = (SQLCastExpr) sqlExpr;
+            SQLExpr castExpr = sqlCastExpr.getExpr();
+            getSelectItemExpr(castExpr,callBackFunc);
+            return;
+        }
+        if(sqlExpr instanceof SQLIntegerExpr) {
+            return;
+        }
+        if(sqlExpr instanceof SQLCharExpr) {
+            return;
+        }
+        if(sqlExpr instanceof SQLBigIntExpr) {
+            return;
+        }
+        if(sqlExpr instanceof SQLBooleanExpr) {
+            return;
+        }
+        if(sqlExpr instanceof SQLDateExpr) {
+            return;
+        }
+        if(sqlExpr instanceof SQLDateTimeExpr) {
+            return;
+        }
+        if(sqlExpr instanceof SQLDecimalExpr) {
+            return;
+        }
+        if(sqlExpr instanceof SQLDoubleExpr) {
+            return;
+        }
+        if(sqlExpr instanceof SQLFloatExpr) {
+            return;
+        }
+        if(sqlExpr instanceof SQLJSONExpr) {
+            return;
+        }
+        if(sqlExpr instanceof SQLNumberExpr) {
+            return;
+        }
+        if(sqlExpr instanceof SQLSmallIntExpr) {
+            return;
+        }
+        if(sqlExpr instanceof SQLTimeExpr) {
+            return;
+        }
+        if(sqlExpr instanceof SQLTimestampExpr) {
+            return;
+        }
+        if(sqlExpr instanceof SQLTinyIntExpr) {
+            return;
+        }
+        if(sqlExpr instanceof SQLValuesExpr) {
+            return;
+        }
+        if(sqlExpr instanceof SQLIdentifierExpr) {
+            callBackFunc.doCallBack(sqlExpr);
+            return;
+        }
+        throw new SQLExprNotSupportException("SQL expr type not support:"+sqlExpr.getClass().getName());
     }
 
     public interface SQLExprFunction {

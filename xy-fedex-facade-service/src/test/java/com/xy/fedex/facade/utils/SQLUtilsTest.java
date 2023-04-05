@@ -7,6 +7,7 @@ import com.alibaba.druid.sql.ast.SQLStatement;
 import com.alibaba.druid.sql.ast.expr.*;
 import com.alibaba.druid.sql.ast.statement.*;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlSelectQueryBlock;
+import com.google.gson.Gson;
 import com.xy.fedex.dsl.utility.SQLExprUtils;
 import com.xy.fedex.facade.exceptions.SQLExprTypeNotSupportException;
 import org.junit.jupiter.api.Test;
@@ -113,5 +114,16 @@ public class SQLUtilsTest {
         SQLJoinTableSource sqlJoinTableSource = new SQLJoinTableSource();
         SQLSubqueryTableSource sqlSubqueryTableSource = new SQLSubqueryTableSource();
 //        sqlJoinTableSource.setLeft();
+    }
+
+    @Test
+    public void testGetSelectItemExpr() {
+        String sql = "select sum(sale_num) as sale_num2,sum(sale_amount)/sum(sale_num) as roi," +
+                "case when trade_type = 1 then 'mt' else dp end as trade_type," +
+                "dt as datetime from t where dt between 20230101 and 20230301 and channel_provider_code = 11 group by t,case when trade_type = 1 then 'mt' else dp end";
+
+        SQLSelect sqlSelect = SQLExprUtils.parse(sql);
+        List<String> allFields = SQLExprUtils.getAllFields(sqlSelect);
+        System.out.println(new Gson().toJson(allFields));
     }
 }

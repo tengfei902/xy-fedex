@@ -24,8 +24,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class AppHolder {
-    private static CatalogAppFacade catalogAppFacade;
-    private static CatalogMetaFacade catalogMetaFacade;
+    private static final CatalogAppFacade catalogAppFacade;
+    private static final CatalogMetaFacade catalogMetaFacade;
 
     static {
         catalogAppFacade = ApplicationContextUtils.getBean(CatalogAppFacade.class);
