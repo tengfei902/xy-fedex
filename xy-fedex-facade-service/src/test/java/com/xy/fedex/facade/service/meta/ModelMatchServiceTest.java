@@ -91,7 +91,7 @@ public class ModelMatchServiceTest extends BaseTest {
     @Test
     public void testGetMetaMatchedModels() {
         String sql = "select fee,actual_amount,amount,fee_rate,order_cnt,dt,channel_provider_code,out_trade_no from 21 where dt between 20230101 and 20230301 group by dt,channel_provider_code,out_trade_no";
-        modelMatchService.getMetricMatchedModels(SQLExprUtils.parse(sql));
+        modelMatchService.getMetricMatchedModels((MySqlSelectQueryBlock) SQLExprUtils.parse(sql).getQueryBlock());
     }
 
     /**
@@ -105,7 +105,7 @@ public class ModelMatchServiceTest extends BaseTest {
         initAppDefinition(Arrays.asList(sql1,sql2));
 
         String logicalSelect = "select sale_amount,poi_cnt ,dt,poi_name from 12222 where sell_type = 10 group by dt,poi_name";
-        QueryMatchedModelDTO queryMatchedModelDTO = modelMatchService.getMetricMatchedModels(SQLExprUtils.parse(logicalSelect));
+        QueryMatchedModelDTO queryMatchedModelDTO = modelMatchService.getMetricMatchedModels((MySqlSelectQueryBlock) SQLExprUtils.parse(logicalSelect).getQueryBlock());
 
         Assert.assertNotNull(queryMatchedModelDTO);
         List<QueryMatchedModelDTO.MetricMatchedModelDTO> metricMatchedModels = queryMatchedModelDTO.getMetricMatchedModelList();
@@ -135,7 +135,7 @@ public class ModelMatchServiceTest extends BaseTest {
         }
 
         String select2 = "select uv as pageuv,page_id as page,dt from 12222 where dt between 20230101 and 20230401 group by page_id,dt";
-        queryMatchedModelDTO = modelMatchService.getMetricMatchedModels(SQLExprUtils.parse(select2));
+        queryMatchedModelDTO = modelMatchService.getMetricMatchedModels((MySqlSelectQueryBlock) SQLExprUtils.parse(select2).getQueryBlock());
         for(QueryMatchedModelDTO.MetricMatchedModelDTO metricMatchedModel : queryMatchedModelDTO.getMetricMatchedModelList()) {
             for(QueryMatchedModelDTO.MetricModel metricModel: metricMatchedModel.getMetricModels()) {
                 System.out.println(metricModel.getMetricSelect().toString());
@@ -187,7 +187,7 @@ public class ModelMatchServiceTest extends BaseTest {
         Mockito.when(catalogMetaFacade.getMetricModels(GetMetricModelRequest.builder().appId(app.getAppId()).metricId(roi.getMetricId()).build())).thenReturn(Response.success(Arrays.asList(roiMetricModel)));
 
         String logicalSelect = "select roi ,dt from 12222 where dt between 20230101 and 20230301 group by dt";
-        QueryMatchedModelDTO queryMatchedModelDTO = modelMatchService.getMetricMatchedModels(SQLExprUtils.parse(logicalSelect));
+        QueryMatchedModelDTO queryMatchedModelDTO = modelMatchService.getMetricMatchedModels((MySqlSelectQueryBlock) SQLExprUtils.parse(logicalSelect).getQueryBlock());
         for(QueryMatchedModelDTO.MetricMatchedModelDTO metricMatchedModelDTO:queryMatchedModelDTO.getMetricMatchedModelList()) {
             for(QueryMatchedModelDTO.MetricModel metricModel:metricMatchedModelDTO.getMetricModels()) {
                 System.out.println(metricModel.getMetricSelect().toString());

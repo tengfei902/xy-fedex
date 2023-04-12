@@ -6,8 +6,11 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/**
+ * 数据范围过滤
+ */
 @Component
-public class ModelAvailabilityReWriter implements MetricModelReWriter {
+public class ModelDataScopeReWriter implements MetricModelReWriter {
     @Override
     public List<MetricModel> rewrite(List<MetricModel> metricModels, List<String> dims) {
         return metricModels;

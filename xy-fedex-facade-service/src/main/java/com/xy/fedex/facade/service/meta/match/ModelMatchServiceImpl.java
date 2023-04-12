@@ -3,7 +3,6 @@ package com.xy.fedex.facade.service.meta.match;
 import com.alibaba.druid.DbType;
 import com.alibaba.druid.sql.SQLUtils;
 import com.alibaba.druid.sql.ast.SQLExpr;
-import com.alibaba.druid.sql.ast.SQLName;
 import com.alibaba.druid.sql.ast.expr.SQLBinaryOpExpr;
 import com.alibaba.druid.sql.ast.expr.SQLBinaryOperator;
 import com.alibaba.druid.sql.ast.expr.SQLIdentifierExpr;
@@ -15,13 +14,12 @@ import com.xy.fedex.catalog.common.definition.field.SecondaryCalculate;
 import com.xy.fedex.catalog.common.definition.field.impl.DeriveMetricModel;
 import com.xy.fedex.catalog.common.definition.field.impl.MetricModel;
 import com.xy.fedex.catalog.common.definition.field.impl.PrimaryMetricModel;
-import com.xy.fedex.dsl.sql.from.impl.JoinTableSource;
 import com.xy.fedex.dsl.utility.SQLExprUtils;
 import com.xy.fedex.facade.exceptions.NoMetricModelMatchedException;
 import com.xy.fedex.facade.service.cs.AppHolder;
 import com.xy.fedex.facade.service.cs.ModelHolder;
 import com.xy.fedex.facade.service.meta.dto.QueryMatchedModelDTO;
-import com.xy.fedex.facade.service.meta.match.filter.MetricMatchedModelReWriter;
+import com.xy.fedex.facade.service.meta.match.filter.MetricModelReWriter;
 import lombok.Data;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.RandomUtils;
@@ -35,63 +33,41 @@ import java.util.stream.Collectors;
 
 @Service
 public class ModelMatchServiceImpl implements ModelMatchService {
-    private List<MetricMatchedModelReWriter> filters;
+    private List<MetricModelReWriter> filters;
 
-    @Override
-    public QueryMatchedModelDTO getMetricMatchedModels(SQLSelect logicalSelect) {
-        QueryMatchedModelDTO queryMatchedModelDTO = getQueryMatchedModelsByDim(logicalSelect);
-//        for (MetricMatchedModelReWriter rewriter : filters) {
-//            queryMatchedModelDTO = rewriter.rewrite(queryMatchedModelDTO);
-//        }
-        return queryMatchedModelDTO;
+    public List<MetricModelReWriter> getFilters() {
+        return filters;
     }
 
-    /**
-     * 指标维度正交关系匹配初始化
-     *
-     * @param logicalSelect
-     * @return
-     */
-    private QueryMatchedModelDTO getQueryMatchedModelsByDim(SQLSelect logicalSelect) {
-        MySqlSelectQueryBlock logicalQueryBlock = (MySqlSelectQueryBlock) logicalSelect.getQueryBlock();
-        SelectFields selectFields = new SelectFields(logicalSelect);
-        QueryMatchedModelDTO queryMatchedModelDTO = new QueryMatchedModelDTO(logicalSelect);
+    public void setFilters(List<MetricModelReWriter> filters) {
+        this.filters = filters;
+    }
+
+    @Override
+    public QueryMatchedModelDTO getMetricMatchedModels(MySqlSelectQueryBlock select) {
+        SelectFields selectFields = new SelectFields(select);
+        QueryMatchedModelDTO queryMatchedModelDTO = new QueryMatchedModelDTO(select);
 
         for (String metricAlias : selectFields.selectMetricMap.keySet()) {
             AppHolder.Metric metric = selectFields.selectMetricMap.get(metricAlias);
-            List<MetricModel> metricModels = metric.getMetricModels().stream().filter(metricModel -> checkMetricModelMatchDims(metricModel, selectFields.getAllDims())).collect(Collectors.toList());
-            if (CollectionUtils.isEmpty(metricModels)) {
-                throw new NoMetricModelMatchedException(String.format("no metric model matched for metric:%s in select:%s", metric.getMetricCode(), logicalSelect.toString()));
-            }
-            List<QueryMatchedModelDTO.MetricModel> matchedMetricModels = getMatchedMetricModels(metricModels, metricAlias, selectFields.getSelectDimMap(), logicalQueryBlock);
-            queryMatchedModelDTO.addMetricMatchedModels(null, null, matchedMetricModels);
+            List<MetricModel> metricModels = metric.getMetricModels();
+            //过滤模型
+            metricModels = getMetricModelMatchResult(metric.getMetricCode(),select.toString(),metricModels,selectFields.getAllDims());
+            //获取模型查询
+            List<QueryMatchedModelDTO.MetricModel> matchedMetricModels = getMatchedMetricModels(metricModels, metricAlias, selectFields.getSelectDimMap(), select);
+            queryMatchedModelDTO.addMetricMatchedModels(metric.getMetricCode(), null, matchedMetricModels);
         }
         return queryMatchedModelDTO;
     }
 
-    private boolean checkMetricModelMatchDims(MetricModel metricModel, List<String> dimCodes) {
-        if (metricModel instanceof PrimaryMetricModel) {
-            PrimaryMetricModel primaryMetricModel = (PrimaryMetricModel) metricModel;
-            if (!CollectionUtils.isEmpty(primaryMetricModel.getAdvanceCalculate().getForceDims()) && !new HashSet<>(dimCodes).containsAll(primaryMetricModel.getAdvanceCalculate().getForceDims())) {
-                return false;
+    private List<MetricModel> getMetricModelMatchResult(String metricCode,String logicalSelect,List<MetricModel> metricModels,List<String> dims) {
+        for(MetricModelReWriter filter : filters) {
+            metricModels = filter.rewrite(metricModels,dims);
+            if (CollectionUtils.isEmpty(metricModels)) {
+                throw new NoMetricModelMatchedException(String.format("no metric model matched for metric:%s in select:%s", metricCode, logicalSelect));
             }
-            if (CollectionUtils.isEmpty(dimCodes)) {
-                return true;
-            }
-            if (primaryMetricModel.getAdvanceCalculate().isAssist()) {
-                return true;
-            }
-            return new HashSet<>(metricModel.getAdvanceCalculate().getAllowDims()).containsAll(dimCodes);
-        } else {
-            DeriveMetricModel deriveMetricModel = (DeriveMetricModel) metricModel;
-            List<MetricModel> relateMetricModels = deriveMetricModel.getRelateMetricModels();
-            for (MetricModel relateMetricModel : relateMetricModels) {
-                if (!checkMetricModelMatchDims(relateMetricModel, dimCodes)) {
-                    return false;
-                }
-            }
-            return true;
         }
+        return metricModels;
     }
 
     private List<QueryMatchedModelDTO.MetricModel> getMatchedMetricModels(List<MetricModel> metricModels, String alias, Map<String, AppHolder.Dim> dims, MySqlSelectQueryBlock logicalSelect) {
@@ -347,11 +323,10 @@ public class ModelMatchServiceImpl implements ModelMatchService {
         private Map<String, AppHolder.Dim> selectDimMap = new HashMap<>();
         private List<String> allDims = new ArrayList<>();
 
-        public SelectFields(SQLSelect logicalSelect) {
-            MySqlSelectQueryBlock selectQueryBlock = (MySqlSelectQueryBlock) logicalSelect.getQueryBlock();
-            AppHolder.App app = AppHolder.getApp(SQLExprUtils.getTableSource(logicalSelect));
+        public SelectFields(MySqlSelectQueryBlock logicalSelect) {
+            AppHolder.App app = AppHolder.getApp(logicalSelect.getFrom().toString());
             //查询指标和维度
-            List<SQLSelectItem> selectItems = selectQueryBlock.getSelectList();
+            List<SQLSelectItem> selectItems = logicalSelect.getSelectList();
             for (SQLSelectItem item : selectItems) {
                 SQLIdentifierExpr itemExpr = (SQLIdentifierExpr) item.getExpr();
                 String alias = StringUtils.isEmpty(item.getAlias()) ? itemExpr.getName() : item.getAlias();

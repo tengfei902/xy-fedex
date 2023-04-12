@@ -7,7 +7,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.*;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.ImportResource;
 
+@ImportResource(locations = "classpath:spring.xml")
+@ComponentScan(basePackages = "com.xy")
 @EnableDubbo
 @EnableConfigurationProperties
 @SpringBootApplication(exclude=DataSourceAutoConfiguration.class)

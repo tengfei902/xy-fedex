@@ -102,7 +102,7 @@ public class QueryPlanServiceImpl implements QueryPlanService {
      */
     @Override
     public PhysicalPlan getPhysicalPlan(SQLSelect logicalSelect) {
-        QueryMatchedModelDTO queryMatchedModelDTO = modelMatchService.getMetricMatchedModels(logicalSelect);
+//        QueryMatchedModelDTO queryMatchedModelDTO = modelMatchService.getMetricMatchedModels(logicalSelect);
         return null;
     }
 }

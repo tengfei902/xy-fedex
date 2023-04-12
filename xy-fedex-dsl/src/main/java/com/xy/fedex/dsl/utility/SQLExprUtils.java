@@ -42,7 +42,7 @@ public class SQLExprUtils {
         //MySqlSelectQueryBlock mySqlSelectQueryBlock = (MySqlSelectQueryBlock) sqlSelectStatement.getSelect().getQuery();
     }
 
-    public static List<String> getAllFields(SQLSelect select) {
+    public static List<String> getAllFields(MySqlSelectQueryBlock selectQueryBlock) {
         List<String> allFields = new ArrayList<>();
         SQLExprFunction sqlExprFunction = new SQLExprFunction() {
             @Override
@@ -51,7 +51,6 @@ public class SQLExprUtils {
                 allFields.add(sqlIdentifierExpr.getName());
             }
         };
-        MySqlSelectQueryBlock selectQueryBlock = (MySqlSelectQueryBlock) select.getQueryBlock();
         //select items
         for(SQLSelectItem selectItem : selectQueryBlock.getSelectList()) {
             getSelectItemExpr(selectItem.getExpr(),sqlExprFunction);
