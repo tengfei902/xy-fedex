@@ -36,7 +36,5 @@ public class FedexQueryServiceImpl implements FedexQueryService {
             QueryMatchedModelDTO queryMatchedModelDTO = modelMatchService.getMetricMatchedModels(select);
         }
         return null;
-//        logicalPlan.lrd().stream().forEach(node -> );
-//        return fedexExecuteService.execute(queryPlan);
     }
 }
