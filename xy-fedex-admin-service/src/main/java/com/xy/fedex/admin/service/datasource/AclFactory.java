@@ -35,48 +35,48 @@ public class AclFactory {
     }
 
     private ACL buildAcl(DsnDTO dsn) {
-        switch (dsn.getDbType()) {
-            case MYSQL:
-            case ORACLE:
-            case DB2:
-            case SQLSERVER:
-            case TIDB:
-                RdbmsConnectInfo rdbmsConnectInfo = (RdbmsConnectInfo) dsn.getConnectInfo();
-                DruidDataSource druidDataSource = new DruidDataSource();
-                druidDataSource.setUsername(rdbmsConnectInfo.getUsername());
-                druidDataSource.setPassword(rdbmsConnectInfo.getPassword());
-                druidDataSource.setUrl(rdbmsConnectInfo.getHost());
-                druidDataSource.setMaxActive(10);
-                druidDataSource.setDefaultAutoCommit(true);
-
-                JdbcTemplate jdbcTemplate = new JdbcTemplate();
-                jdbcTemplate.setDataSource(druidDataSource);
-
-                MySqlAcl mySqlAcl = new MySqlAcl();
-                mySqlAcl.setJdbcTemplate(jdbcTemplate);
-
-                return mySqlAcl;
-            case ES:
-                break;
-            case HIVE:
-                break;
-            case HBASE:
-                break;
-            case TAIR:
-                break;
-            case REDIS:
-                break;
-            case DORIS:
-                break;
-            case DRUID:
-                break;
-            case KYLIN:
-                break;
-            case IGNITE:
-                break;
-            case CLICKHOUSE:
-                break;
-        }
+//        switch (dsn.getDbType()) {
+//            case MYSQL:
+//            case ORACLE:
+//            case DB2:
+//            case SQLSERVER:
+//            case TIDB:
+//                RdbmsConnectInfo rdbmsConnectInfo = (RdbmsConnectInfo) dsn.getConnectInfo();
+//                DruidDataSource druidDataSource = new DruidDataSource();
+//                druidDataSource.setUsername(rdbmsConnectInfo.getUsername());
+//                druidDataSource.setPassword(rdbmsConnectInfo.getPassword());
+//                druidDataSource.setUrl(rdbmsConnectInfo.getHost());
+//                druidDataSource.setMaxActive(10);
+//                druidDataSource.setDefaultAutoCommit(true);
+//
+//                JdbcTemplate jdbcTemplate = new JdbcTemplate();
+//                jdbcTemplate.setDataSource(druidDataSource);
+//
+//                MySqlAcl mySqlAcl = new MySqlAcl();
+//                mySqlAcl.setJdbcTemplate(jdbcTemplate);
+//
+//                return mySqlAcl;
+//            case ES:
+//                break;
+//            case HIVE:
+//                break;
+//            case HBASE:
+//                break;
+//            case TAIR:
+//                break;
+//            case REDIS:
+//                break;
+//            case DORIS:
+//                break;
+//            case DRUID:
+//                break;
+//            case KYLIN:
+//                break;
+//            case IGNITE:
+//                break;
+//            case CLICKHOUSE:
+//                break;
+//        }
 
         throw new DbTypeNotSupportException(String.format("db type:%s not support",dsn.getDbType().name()));
     }

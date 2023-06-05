@@ -40,17 +40,16 @@ public class QueryMatchedModelDTO {
     @Data
     public static class MetricModel {
         private String metricCode;
+        private String alias;
         private Long metricId;
         private Long metricModelId;
         private String formula;
         private List<Long> modelIds;
-        private MySqlSelectQueryBlock metricSelect;
     }
 
     @Data
     public static class PrimaryMetricModel extends MetricModel {
         private Long modelId;
-        private TableSource tableSource;
         private List<String> groupByItems;
         private SQLExpr condition;
         private SecondaryCalculate secondary;

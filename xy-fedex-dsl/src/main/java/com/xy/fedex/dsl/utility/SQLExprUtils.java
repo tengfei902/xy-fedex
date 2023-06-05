@@ -108,6 +108,9 @@ public class SQLExprUtils {
             SQLBinaryOpExpr binaryOpExpr = (SQLBinaryOpExpr) expr;
             SQLExpr left = binaryOpExpr.getLeft();
             getSqlConditionFieldExpr(left,callBackFunc);
+
+            SQLExpr right = binaryOpExpr.getRight();
+            getSqlConditionFieldExpr(right,callBackFunc);
             return;
         }
         if(expr instanceof SQLBetweenExpr) {
@@ -144,6 +147,11 @@ public class SQLExprUtils {
     }
 
     public static List<String> getSelectItemAliases(SQLSelect select) {
+        MySqlSelectQueryBlock sqlSelectQuery = (MySqlSelectQueryBlock) select.getQueryBlock();
+        return getSelectItemAliases(sqlSelectQuery);
+    }
+
+    public static List<String> getSelectItemAliases(MySqlSelectQueryBlock block) {
         List<String> selectItemAliases = new ArrayList<>();
         SQLExprFunction sqlExprFunction = new SQLExprFunction() {
             @Override
@@ -153,7 +161,6 @@ public class SQLExprUtils {
                 }
             }
         };
-        MySqlSelectQueryBlock block = (MySqlSelectQueryBlock) select.getQueryBlock();
         for(SQLSelectItem item:block.getSelectList()) {
             if(!StringUtils.isEmpty(item.getAlias())) {
                 selectItemAliases.add(item.getAlias());
@@ -162,6 +169,23 @@ public class SQLExprUtils {
             }
         }
         return selectItemAliases.stream().filter(Objects::nonNull).distinct().collect(Collectors.toList());
+    }
+
+    public static String getSelectItemAlias(SQLSelectItem selectItem) {
+        if(!StringUtils.isEmpty(selectItem.getAlias())) {
+            return selectItem.getAlias();
+        }
+        List<String> selectItemAliases = new ArrayList<>();
+        SQLExprFunction sqlExprFunction = new SQLExprFunction() {
+            @Override
+            public void doCallBack(SQLExpr expr) {
+                if(expr instanceof SQLIdentifierExpr) {
+                    selectItemAliases.add(((SQLIdentifierExpr) expr).getName());
+                }
+            }
+        };
+        getSelectItemExpr(selectItem.getExpr(),sqlExprFunction);
+        return selectItemAliases.get(0);
     }
 
     public static void getSelectItemExpr(SQLExpr sqlExpr,SQLExprFunction callBackFunc) {

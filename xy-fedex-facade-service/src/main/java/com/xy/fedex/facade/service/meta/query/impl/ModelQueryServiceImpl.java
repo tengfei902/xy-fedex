@@ -1,19 +1,17 @@
 package com.xy.fedex.facade.service.meta.query.impl;
 
-import com.alibaba.druid.sql.ast.statement.SQLJoinTableSource;
 import com.alibaba.druid.sql.ast.statement.SQLSelectItem;
 import com.alibaba.druid.sql.ast.statement.SQLSubqueryTableSource;
 import com.alibaba.druid.sql.ast.statement.SQLTableSource;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlSelectQueryBlock;
+import com.xy.fedex.dsl.utility.SQLExprUtils;
 import com.xy.fedex.facade.service.meta.dto.QueryMatchedModelDTO;
 import com.xy.fedex.facade.service.meta.query.ModelQueryService;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
 public class ModelQueryServiceImpl implements ModelQueryService {
@@ -38,41 +36,32 @@ public class ModelQueryServiceImpl implements ModelQueryService {
         private Map<String,MySqlSelectQueryBlock> queryBlockMap;
 
         public MySqlSelectQueryBlock addMetricSelect(MySqlSelectQueryBlock metricSelect) {
-            if(Objects.isNull(this.finalSelect)) {
-                this.finalSelect = metricSelect;
-            }
-            SQLTableSource tableSource = metricSelect.getFrom();
-            if(tableSource instanceof SQLSubqueryTableSource) {
-                SQLSubqueryTableSource sqlSubqueryTableSource = (SQLSubqueryTableSource) tableSource;
-                MySqlSelectQueryBlock subQueryMergedSelect = addMetricSelect((MySqlSelectQueryBlock) sqlSubqueryTableSource.getSelect().getQueryBlock());
-                MySqlSelectQueryBlock mergedSelect = metricSelect.clone();
-            }
-            if(tableSource instanceof SQLJoinTableSource) {
-
-            }
-            else {
+            SQLTableSource sqlTableSource = metricSelect.getFrom();
+            if(sqlTableSource instanceof SQLSubqueryTableSource) {
+                SQLSubqueryTableSource sqlSubqueryTableSource = (SQLSubqueryTableSource) sqlTableSource;
+                MySqlSelectQueryBlock subQueryBlock = (MySqlSelectQueryBlock) sqlSubqueryTableSource.getSelect().getQueryBlock();
+                addMetricSelect(subQueryBlock);
+            } else {
                 String tableSourceSignature = getTableSourceSignature(metricSelect);
                 if(queryBlockMap.containsKey(tableSourceSignature)) {
-                    List<SQLSelectItem> metricSelectItems = metricSelect.getSelectList();
-                    MySqlSelectQueryBlock select = queryBlockMap.get(tableSourceSignature);
-
-                    Map<String,SQLSelectItem> selectItemMap = select.getSelectList().stream().collect(Collectors.toMap(SQLSelectItem::getAlias, Function.identity()));
-                    for(SQLSelectItem selectItem:metricSelectItems) {
-                        if(selectItemMap.containsKey(selectItem.getAlias())) {
+                    MySqlSelectQueryBlock existSelect = queryBlockMap.get(tableSourceSignature);
+                    List<String> existFields = SQLExprUtils.getSelectItemAliases(existSelect);
+                    for(SQLSelectItem selectItem:metricSelect.getSelectList()) {
+                        String metricSelectAlias = SQLExprUtils.getSelectItemAlias(selectItem);
+                        if(existFields.contains(metricSelectAlias)) {
                             continue;
                         }
-                        select.addSelectItem(selectItem.clone());
+                        existSelect.addSelectItem(selectItem.getExpr().clone());
                     }
                 } else {
                     queryBlockMap.put(tableSourceSignature,metricSelect.clone());
                 }
-                return queryBlockMap.get(tableSourceSignature);
             }
         }
 
         private String getTableSourceSignature(MySqlSelectQueryBlock metricSelect) {
             //from xxx where xxx
-
+            return null;
         }
 
         public List<MySqlSelectQueryBlock> getModelQuery() {

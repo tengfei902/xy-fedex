@@ -31,7 +31,7 @@ public class DsnServiceImpl implements DsnService {
      */
     @Override
     public DsnDTO createDsn(DsnDTO dsn) {
-        ConnectPreCheck.preCheck(dsn.getDbType(),dsn.getConnectInfo());
+        ConnectPreCheck.preCheck(null,dsn.getConnectInfo());
         saveOrUpdateDsn(dsn);
         return getDsn(dsn.getDsnName());
     }
@@ -79,7 +79,7 @@ public class DsnServiceImpl implements DsnService {
             throw new DsnNotFoundException("dsn not found:"+dsn);
         }
         DbType dbType = DbType.parse(dsnPO.getDbType());
-        return DsnDTO.builder().dsnId(dsnPO.getId()).dsnName(dsnPO.getDsn()).connectInfo(ConnectUtils.getConnectInfo(dbType,dsnPO.getConnectInfo())).creator(dsnPO.getCreator()).dbType(dbType).build();
+        return DsnDTO.builder().dsnId(dsnPO.getId()).dsnName(dsnPO.getDsn()).connectInfo(ConnectUtils.getConnectInfo(dbType,dsnPO.getConnectInfo())).creator(dsnPO.getCreator()).dbType(null).build();
     }
 
     @Override

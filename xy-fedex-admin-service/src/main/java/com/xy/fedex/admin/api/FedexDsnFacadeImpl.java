@@ -20,7 +20,7 @@ public class FedexDsnFacadeImpl implements FedexDsnFacade {
         //创建dsn
         DsnDTO dsnDTO = DsnDTO.builder()
                 .dsnName(createDsnRequest.getDsn())
-                .dbType(createDsnRequest.getDbType())
+                .dbType(null)
                 .connectInfo(createDsnRequest.getConnectInfo())
                 .creator("").build();
         dsnDTO = dsnService.createDsn(dsnDTO);

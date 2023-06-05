@@ -10,6 +10,7 @@ import com.alibaba.druid.sql.ast.statement.*;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlSelectQueryBlock;
 import com.google.common.base.Joiner;
 import com.xy.fedex.catalog.common.definition.ModelDefinition;
+import com.xy.fedex.catalog.common.definition.field.AdvanceCalculate;
 import com.xy.fedex.catalog.common.definition.field.SecondaryCalculate;
 import com.xy.fedex.catalog.common.definition.field.impl.DeriveMetricModel;
 import com.xy.fedex.catalog.common.definition.field.impl.MetricModel;
@@ -75,13 +76,62 @@ public class ModelMatchServiceImpl implements ModelMatchService {
     }
 
     private QueryMatchedModelDTO.MetricModel getMatchedMetricModel(MetricModel metricModel, String alias, Map<String, AppHolder.Dim> dims, MySqlSelectQueryBlock logicalSelect) {
-        QueryMatchedModelDTO.MetricModel selectMetric = new QueryMatchedModelDTO.MetricModel();
-        selectMetric.setMetricId(metricModel.getMetricId());
-        selectMetric.setMetricModelId(metricModel.getMetricModelId());
-        selectMetric.setModelIds(null);
-        MySqlSelectQueryBlock metricSelect = getMetricSelect(metricModel, alias, dims, logicalSelect);
-        selectMetric.setMetricSelect(metricSelect);
+        if(metricModel instanceof PrimaryMetricModel) {
+            PrimaryMetricModel primaryMetricModel = (PrimaryMetricModel) metricModel;
+            QueryMatchedModelDTO.PrimaryMetricModel selectMetric = new QueryMatchedModelDTO.PrimaryMetricModel();
+            selectMetric.setMetricId(primaryMetricModel.getMetricId());
+            selectMetric.setMetricModelId(primaryMetricModel.getMetricModelId());
+            selectMetric.setAlias(alias);
+            selectMetric.setFormula(primaryMetricModel.getFormula());
+            selectMetric.setModelId(primaryMetricModel.getModelId());
+
+            ModelDefinition modelDefinition = ModelHolder.getModel(primaryMetricModel.getModelId());
+            SQLExpr metricWhere = getMetricWhere(modelDefinition,logicalSelect.getWhere());
+            //metric where
+            selectMetric.setCondition(metricWhere);
+            //group by items
+            selectMetric.setGroupByItems(getGroupByItems());
+            //secondary calculate
+            SecondaryCalculate secondaryCalculate = getSecondaryCalculate(selectMetric,primaryMetricModel.getAdvanceCalculate());
+            selectMetric.setSecondary(secondaryCalculate);
+        } else {
+
+        }
         return selectMetric;
+    }
+
+    private SecondaryCalculate getSecondaryCalculate(QueryMatchedModelDTO.PrimaryMetricModel selectMetric, AdvanceCalculate advanceCalculate) {
+        if(Objects.isNull(advanceCalculate.getSecondary())) {
+            return null;
+        }
+        if(new HashSet<>(selectMetric.getGroupByItems()).containsAll(advanceCalculate.getSecondary().getGroupByList())) {
+            return null;
+        }
+        SecondaryCalculate secondaryCalculate = new SecondaryCalculate();
+        secondaryCalculate.setAgg(advanceCalculate.getSecondary().getAgg());
+        secondaryCalculate.setGroupByList(advanceCalculate.getSecondary().getGroupByList());
+        return secondaryCalculate;
+    }
+
+    private SQLExpr getMetricWhere(ModelDefinition model, SQLExpr logicalWhere) {
+        SQLExpr metricWhere = logicalWhere.clone();
+        List<String> dims = model.getDims().stream().map(ModelDefinition.Dim::getDimCode).collect(Collectors.toList());
+        SQLExprUtils.getSqlConditionFieldExpr(metricWhere, new SQLExprUtils.SQLExprFunction() {
+            @Override
+            public void doCallBack(SQLExpr expr) {
+                if(expr instanceof SQLIdentifierExpr) {
+                    SQLIdentifierExpr sqlIdentifierExpr = (SQLIdentifierExpr) expr;
+                    String name = sqlIdentifierExpr.getName();
+                    if(!dims.contains(name)) {
+
+                    }
+                }
+            }
+        });
+    }
+
+    private List<String> getGroupByItems() {
+        return null;
     }
 
     private MySqlSelectQueryBlock getMetricSelect(MetricModel metricModel, String alias, Map<String, AppHolder.Dim> dims, MySqlSelectQueryBlock logicalSelect) {
