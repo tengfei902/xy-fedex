@@ -58,6 +58,6 @@ public class QueryMatchedModelDTO {
 
     @Data
     public static class DeriveMetricModel extends MetricModel {
-        private List<PrimaryMetricModel> relateMetricModels;
+        private List<MetricModel> relateMetricModels;
     }
 }

@@ -53,7 +53,10 @@ public class ModelMatchServiceImpl implements ModelMatchService {
             AppHolder.Metric metric = selectFields.selectMetricMap.get(metricAlias);
             List<MetricModel> metricModels = metric.getMetricModels();
             //过滤模型
-            metricModels = getMetricModelMatchResult(metric.getMetricCode(),select.toString(),metricModels,selectFields.getAllDims());
+            metricModels = metricModels.stream().filter(metricModel -> checkMetricModelMatch(metricModel,selectFields.getAllDims())).collect(Collectors.toList());
+            if(CollectionUtils.isEmpty(metricModels)) {
+                throw new NoMetricModelMatchedException(String.format("No metric model matched for metric:%s in query:%s",metricAlias,select.toString()));
+            }
             //获取模型查询
             List<QueryMatchedModelDTO.MetricModel> matchedMetricModels = getMatchedMetricModels(metricModels, metricAlias, selectFields.getSelectDimMap(), select);
             queryMatchedModelDTO.addMetricMatchedModels(metric.getMetricCode(), null, matchedMetricModels);
@@ -61,14 +64,31 @@ public class ModelMatchServiceImpl implements ModelMatchService {
         return queryMatchedModelDTO;
     }
 
-    private List<MetricModel> getMetricModelMatchResult(String metricCode,String logicalSelect,List<MetricModel> metricModels,List<String> dims) {
-        for(MetricModelReWriter filter : filters) {
-            metricModels = filter.rewrite(metricModels,dims);
-            if (CollectionUtils.isEmpty(metricModels)) {
-                throw new NoMetricModelMatchedException(String.format("no metric model matched for metric:%s in select:%s", metricCode, logicalSelect));
+    private boolean checkMetricModelMatch(MetricModel metricModel,List<String> dims) {
+        if(CollectionUtils.isEmpty(dims)) {
+            return true;
+        }
+        if(metricModel instanceof PrimaryMetricModel) {
+            PrimaryMetricModel primaryMetricModel = (PrimaryMetricModel) metricModel;
+            if(primaryMetricModel.getAdvanceCalculate().isAssist()) {
+                return true;
+            }
+            if(!new HashSet<>(primaryMetricModel.getAdvanceCalculate().getAllowDims()).containsAll(dims)) {
+                return false;
+            }
+            if(!CollectionUtils.isEmpty(primaryMetricModel.getAdvanceCalculate().getForceDims()) && !new HashSet<>(dims).containsAll(primaryMetricModel.getAdvanceCalculate().getForceDims())) {
+                return false;
+            }
+        } else {
+            DeriveMetricModel deriveMetricModel = (DeriveMetricModel) metricModel;
+            List<MetricModel> relateMetricModels = deriveMetricModel.getRelateMetricModels();
+            for(MetricModel relateMetricModel:relateMetricModels) {
+                if(!checkMetricModelMatch(relateMetricModel,dims)) {
+                    return false;
+                }
             }
         }
-        return metricModels;
+        return true;
     }
 
     private List<QueryMatchedModelDTO.MetricModel> getMatchedMetricModels(List<MetricModel> metricModels, String alias, Map<String, AppHolder.Dim> dims, MySqlSelectQueryBlock logicalSelect) {
@@ -94,10 +114,26 @@ public class ModelMatchServiceImpl implements ModelMatchService {
             //secondary calculate
             SecondaryCalculate secondaryCalculate = getSecondaryCalculate(selectMetric,primaryMetricModel.getAdvanceCalculate());
             selectMetric.setSecondary(secondaryCalculate);
+            return selectMetric;
         } else {
+            DeriveMetricModel deriveMetricModel = (DeriveMetricModel) metricModel;
+            List<MetricModel> relateMetricModels = deriveMetricModel.getRelateMetricModels();
+            List<QueryMatchedModelDTO.MetricModel> relateSelectMetrics = new ArrayList<>();
+            for(int i = 0;i<relateMetricModels.size();i++) {
+                QueryMatchedModelDTO.MetricModel relateSelectMetric = getMatchedMetricModel(relateMetricModels.get(i),alias+"_",dims,logicalSelect);
+                relateSelectMetrics.add(relateSelectMetric);
+            }
 
+            QueryMatchedModelDTO.DeriveMetricModel selectMetric = new QueryMatchedModelDTO.DeriveMetricModel();
+            selectMetric.setMetricId(deriveMetricModel.getMetricId());
+            selectMetric.setMetricModelId(deriveMetricModel.getMetricModelId());
+            selectMetric.setMetricCode(deriveMetricModel.getCode());
+            selectMetric.setAlias(alias);
+            selectMetric.setFormula(deriveMetricModel.getFormula());
+            selectMetric.setRelateMetricModels(relateSelectMetrics);
+
+            return selectMetric;
         }
-        return selectMetric;
     }
 
     private SecondaryCalculate getSecondaryCalculate(QueryMatchedModelDTO.PrimaryMetricModel selectMetric, AdvanceCalculate advanceCalculate) {
