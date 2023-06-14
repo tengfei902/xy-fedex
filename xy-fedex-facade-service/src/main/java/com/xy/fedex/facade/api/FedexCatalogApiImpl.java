@@ -1,13 +1,12 @@
 package com.xy.fedex.facade.api;
 
 
-import com.xy.fedex.catalog.common.definition.field.Dim;
-import com.xy.fedex.catalog.common.definition.field.Metric;
+import com.xy.fedex.catalog.common.definition.field.DimModel;
+import com.xy.fedex.catalog.common.definition.field.MetricModel;
 import com.xy.fedex.facade.api.request.OrthogonalRequest;
 import com.xy.fedex.facade.api.response.OrthogonalMatrix;
 import com.xy.fedex.facade.service.cs.AppHolder;
 import org.apache.dubbo.config.annotation.DubboService;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,8 +27,8 @@ public class FedexCatalogApiImpl implements FedexCatalogApi {
         List<AppHolder.Metric> metrics = app.getMetrics();
 
 
-        List<Metric> candidateMetrics = new ArrayList<>();
-        List<Dim> candidateDims = new ArrayList<>();
+        List<MetricModel> candidateMetrics = new ArrayList<>();
+        List<DimModel> candidateDims = new ArrayList<>();
         return null;
     }
 

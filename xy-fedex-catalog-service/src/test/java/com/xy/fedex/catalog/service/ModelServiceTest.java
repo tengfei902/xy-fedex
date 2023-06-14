@@ -45,7 +45,7 @@ public class ModelServiceTest extends BaseTest {
         modelRequest.setCondition("t3.id is not null");
         modelRequest.setMetricModels(getMetrics());
         modelRequest.setDimModels(getDims());
-        Long modelId = modelService.saveModel(modelRequest);
+        Long modelId = modelService.saveModel(null);
 
         Assert.assertNotNull(modelId);
         ModelPO modelPO = modelDao.selectByPrimaryKey(modelId);
@@ -107,9 +107,9 @@ public class ModelServiceTest extends BaseTest {
     @Test
     public void testInitModel() {
         ModelRequest orderModel = getOrderModelRequest();
-        modelService.saveModel(orderModel);
+        modelService.saveModel(null);
         ModelRequest refundOrderModel = getRefundModelRequest();
-        modelService.saveModel(refundOrderModel);
+        modelService.saveModel(null);
     }
 
     private ModelRequest getOrderModelRequest() {

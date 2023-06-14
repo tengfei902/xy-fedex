@@ -5,9 +5,10 @@ import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlSelectQueryBlock;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.xy.fedex.admin.api.FedexDsnFacade;
-import com.xy.fedex.catalog.api.dto.DimModelRequest;
-import com.xy.fedex.catalog.api.dto.MetricModelRequest;
 import com.xy.fedex.catalog.api.dto.ModelRequest;
+import com.xy.fedex.catalog.api.dto.request.save.SaveModelRequest;
+import com.xy.fedex.catalog.api.dto.request.save.field.dim.SaveDimModelRequest;
+import com.xy.fedex.catalog.api.dto.request.save.field.metric.SaveMetricModelRequest;
 import com.xy.fedex.catalog.common.definition.ModelDefinition;
 import com.xy.fedex.catalog.common.definition.field.AdvanceCalculate;
 import com.xy.fedex.catalog.common.enums.MetricType;
@@ -29,8 +30,6 @@ import org.springframework.util.CollectionUtils;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -66,7 +65,7 @@ public class ModelServiceImpl implements ModelService {
 
     @Transactional
     @Override
-    public Long saveModel(ModelRequest modelRequest) {
+    public Long saveModel(SaveModelRequest modelRequest) {
         //save model
         ModelPO model = saveOrUpdateModel(modelRequest);
         //save metric model
@@ -78,7 +77,7 @@ public class ModelServiceImpl implements ModelService {
         return model.getId();
     }
 
-    private ModelPO saveOrUpdateModel(ModelRequest modelRequest) {
+    private ModelPO saveOrUpdateModel(SaveModelRequest modelRequest) {
         Long modelId = modelRequest.getModelId();
         if (!Objects.isNull(modelId)) {
             return updateModel(modelRequest);
@@ -87,7 +86,7 @@ public class ModelServiceImpl implements ModelService {
         }
     }
 
-    private void saveModelTableRelation(Long modelId, ModelRequest modelRequest) {
+    private void saveModelTableRelation(Long modelId, SaveModelRequest modelRequest) {
         String modelDefinition = ModelUtils.getModelDefinition(modelRequest);
         SQLSelect sqlSelect = SQLExprUtils.parse(modelDefinition);
         MySqlSelectQueryBlock mySqlSelectQueryBlock = (MySqlSelectQueryBlock) sqlSelect.getQueryBlock();
@@ -128,7 +127,7 @@ public class ModelServiceImpl implements ModelService {
         }
     }
 
-    private ModelPO updateModel(ModelRequest modelRequest) {
+    private ModelPO updateModel(SaveModelRequest modelRequest) {
         ModelPO modelPO = modelDao.selectByPrimaryKey(modelRequest.getModelId());
         if (Objects.isNull(modelPO)) {
             throw new ModelNotFoundException("model not found:" + modelRequest.getModelId());
@@ -144,7 +143,7 @@ public class ModelServiceImpl implements ModelService {
         return modelDao.selectByPrimaryKey(modelRequest.getModelId());
     }
 
-    private ModelPO createModel(ModelRequest modelRequest) {
+    private ModelPO createModel(SaveModelRequest modelRequest) {
         ModelPO modelPO = new ModelPO();
         modelPO.setModelName(modelRequest.getModelName());
         modelPO.setModelDesc(modelRequest.getModelComment());
@@ -158,34 +157,34 @@ public class ModelServiceImpl implements ModelService {
         return modelDao.selectByPrimaryKey(modelPO.getId());
     }
 
-    private void saveOrUpdateMetricModels(Long modelId, ModelRequest modelRequest) {
-        List<MetricModelRequest> metricModelRequests = modelRequest.getMetricModels();
+    private void saveOrUpdateMetricModels(Long modelId, SaveModelRequest modelRequest) {
+        List<SaveMetricModelRequest> metricModelRequests = modelRequest.getMetricModels();
         if (CollectionUtils.isEmpty(metricModelRequests)) {
             return;
         }
         metricModelRequests.forEach(metricModelRequest -> fillMetricId(modelRequest.getBizLineId(),metricModelRequest));
-        List<MetricModelRequest> newMetricModels = metricModelRequests.stream().filter(metricModelRequest -> Objects.isNull(metricModelRequest.getMetricModelId())).collect(Collectors.toList());
-        List<MetricModelRequest> updateMetricModels = metricModelRequests.stream().filter(metricModelRequest -> !Objects.isNull(metricModelRequest.getMetricModelId())).collect(Collectors.toList());
+        List<SaveMetricModelRequest> newMetricModels = metricModelRequests.stream().filter(metricModelRequest -> Objects.isNull(metricModelRequest.getMetricModelId())).collect(Collectors.toList());
+        List<SaveMetricModelRequest> updateMetricModels = metricModelRequests.stream().filter(metricModelRequest -> !Objects.isNull(metricModelRequest.getMetricModelId())).collect(Collectors.toList());
 
         saveMetricModels(modelId, newMetricModels);
         updateMetricModels(updateMetricModels);
     }
 
-    private void fillMetricId(Long bizLineId,MetricModelRequest metricModelRequest) {
+    private void fillMetricId(Long bizLineId,SaveMetricModelRequest metricModelRequest) {
         if(!Objects.isNull(metricModelRequest.getMetricId())) {
             return;
         }
-        if(StringUtils.isEmpty(metricModelRequest.getMetricCode())) {
+        if(StringUtils.isEmpty(metricModelRequest.getCode())) {
             throw new IllegalArgumentException("metricId or metricCode should be set in MetricModelRequest");
         }
-        MetricPO metric = metricDao.selectByMetricCode(bizLineId,metricModelRequest.getMetricCode());
+        MetricPO metric = metricDao.selectByMetricCode(bizLineId,metricModelRequest.getCode());
         if(Objects.isNull(metric)) {
-            throw new MetricNotFoundException(String.format("metric not found ,bizLineId:%s,metricCode:%s",bizLineId,metricModelRequest.getMetricCode()));
+            throw new MetricNotFoundException(String.format("metric not found ,bizLineId:%s,metricCode:%s",bizLineId,metricModelRequest.getCode()));
         }
         metricModelRequest.setMetricId(metric.getId());
     }
 
-    private void saveMetricModels(Long modelId, List<MetricModelRequest> metricModels) {
+    private void saveMetricModels(Long modelId, List<SaveMetricModelRequest> metricModels) {
         if (CollectionUtils.isEmpty(metricModels)) {
             return;
         }
@@ -195,23 +194,23 @@ public class ModelServiceImpl implements ModelService {
             metricModelPO.setMetricId(metricModelRequest.getMetricId());
             metricModelPO.setFormula(metricModelRequest.getFormula());
             metricModelPO.setMetricType(MetricType.PRIMARY.getMetricType());
-            if (!Objects.isNull(metricModelRequest.getAdvanceCalculate())) {
-                metricModelPO.setAdvanceCalculate(new Gson().toJson(metricModelRequest.getAdvanceCalculate()));
-            }
+//            if (!Objects.isNull(metricModelRequest.getAdvanceCalculate())) {
+//                metricModelPO.setAdvanceCalculate(new Gson().toJson(metricModelRequest.getAdvanceCalculate()));
+//            }
             return metricModelPO;
         }).collect(Collectors.toList());
         metricModelDao.batchInsert(metricModelPOS);
     }
 
-    private void updateMetricModels(List<MetricModelRequest> metricModels) {
+    private void updateMetricModels(List<SaveMetricModelRequest> metricModels) {
         if (CollectionUtils.isEmpty(metricModels)) {
             return;
         }
         List<MetricModelPO> metricModelList = metricModels.stream().map(metricModelRequest -> {
             MetricModelPO updateMetricModel = new MetricModelPO();
-            updateMetricModel.setId(metricModelRequest.getMetricModelId());
+            updateMetricModel.setId(metricModelRequest.getMetricId());
             updateMetricModel.setFormula(metricModelRequest.getFormula());
-            updateMetricModel.setAdvanceCalculate(new Gson().toJson(Optional.ofNullable(metricModelRequest.getAdvanceCalculate()).get()));
+//            updateMetricModel.setAdvanceCalculate(new Gson().toJson(Optional.ofNullable(metricModelRequest.getAdvanceCalculate()).get()));
             return updateMetricModel;
         }).collect(Collectors.toList());
 
@@ -223,18 +222,18 @@ public class ModelServiceImpl implements ModelService {
         });
     }
 
-    private void saveOrUpdateDimModels(Long modelId, ModelRequest modelRequest) {
+    private void saveOrUpdateDimModels(Long modelId, SaveModelRequest modelRequest) {
         if (CollectionUtils.isEmpty(modelRequest.getDimModels())) {
             return;
         }
-        List<DimModelRequest> newDimModelRequests = modelRequest.getDimModels().stream().filter(dimModelRequest -> Objects.isNull(dimModelRequest.getDimModelId())).collect(Collectors.toList());
-        List<DimModelRequest> updateDimModelRequests = modelRequest.getDimModels().stream().filter(dimModelRequest -> !Objects.isNull(dimModelRequest.getDimModelId())).collect(Collectors.toList());
+        List<SaveDimModelRequest> newDimModelRequests = modelRequest.getDimModels().stream().filter(dimModelRequest -> Objects.isNull(dimModelRequest.getDimModelId())).collect(Collectors.toList());
+        List<SaveDimModelRequest> updateDimModelRequests = modelRequest.getDimModels().stream().filter(dimModelRequest -> !Objects.isNull(dimModelRequest.getDimModelId())).collect(Collectors.toList());
 
         saveDimModels(modelRequest.getBizLineId(),modelId, newDimModelRequests);
         updateDimModels(updateDimModelRequests);
     }
 
-    private void saveDimModels(Long bizLineId,Long modelId, List<DimModelRequest> dimModelRequests) {
+    private void saveDimModels(Long bizLineId,Long modelId, List<SaveDimModelRequest> dimModelRequests) {
         if (CollectionUtils.isEmpty(dimModelRequests)) {
             return;
         }
@@ -250,21 +249,21 @@ public class ModelServiceImpl implements ModelService {
         dimModelDao.batchInsert(dimModelPOs);
     }
 
-    private void fillDimId(Long bizLineId,DimModelRequest dimModelRequest) {
+    private void fillDimId(Long bizLineId,SaveDimModelRequest dimModelRequest) {
         if(!Objects.isNull(dimModelRequest.getDimId())) {
             return;
         }
-        if(StringUtils.isEmpty(dimModelRequest.getDimCode())) {
+        if(StringUtils.isEmpty(dimModelRequest.getCode())) {
             throw new IllegalArgumentException("dimId or dimCode should be set in dimModelRequest");
         }
-        DimPO dimPO = dimDao.selectByDimCode(bizLineId,dimModelRequest.getDimCode());
+        DimPO dimPO = dimDao.selectByDimCode(bizLineId,dimModelRequest.getCode());
         if(Objects.isNull(dimPO)) {
-            throw new DimNotFoundException(String.format("dim not found:%s,%s",bizLineId,dimModelRequest.getDimCode()));
+            throw new DimNotFoundException(String.format("dim not found:%s,%s",bizLineId,dimModelRequest.getCode()));
         }
         dimModelRequest.setDimId(dimPO.getId());
     }
 
-    private void updateDimModels(List<DimModelRequest> dimModelRequests) {
+    private void updateDimModels(List<SaveDimModelRequest> dimModelRequests) {
         if (CollectionUtils.isEmpty(dimModelRequests)) {
             return;
         }
@@ -284,7 +283,7 @@ public class ModelServiceImpl implements ModelService {
      * @param modelRequest
      */
     @Override
-    public void checkModelRequest(ModelRequest modelRequest) {
+    public void checkModelRequest(SaveModelRequest modelRequest) {
         //权限判断
         //参数校验
         String select = ModelUtils.getModelDefinition(modelRequest);

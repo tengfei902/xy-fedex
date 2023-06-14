@@ -3,15 +3,23 @@ package com.xy.fedex.catalog.common.definition.field;
 import com.xy.fedex.catalog.common.enums.MetricType;
 import lombok.Data;
 
-import java.util.List;
+import java.io.Serializable;
 
+/**
+ * @author tengfei
+ */
 @Data
-public class Metric {
-    private Long metricModelId;
+public class Metric implements Serializable {
+    private String tenantId;
+    private String accountId;
+    private Long bizLineId;
     private Long metricId;
     private String metricCode;
+    private String formula;
     private String metricName;
     private String metricComment;
-    private String formula;
+    private Long subjectId;
+    private Integer unit;
+    private Integer metricFormat;
     private MetricType metricType;
 }

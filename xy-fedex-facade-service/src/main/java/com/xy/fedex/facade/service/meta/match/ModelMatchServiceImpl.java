@@ -57,8 +57,9 @@ public class ModelMatchServiceImpl implements ModelMatchService {
             if(CollectionUtils.isEmpty(metricModels)) {
                 throw new NoMetricModelMatchedException(String.format("No metric model matched for metric:%s in query:%s",metricAlias,select.toString()));
             }
-            //获取模型查询
-            List<QueryMatchedModelDTO.MetricModel> matchedMetricModels = getMatchedMetricModels(metricModels, metricAlias, selectFields.getSelectDimMap(), select);
+            //获取指标模型
+            List<QueryMatchedModelDTO.MetricModel> matchedMetricModels = metricModels.stream().map(metricModel -> getMatchedMetricModel(metricModel, metricAlias, selectFields.getSelectDimMap(), select)).collect(Collectors.toList());
+
             queryMatchedModelDTO.addMetricMatchedModels(metric.getMetricCode(), null, matchedMetricModels);
         }
         return queryMatchedModelDTO;
@@ -164,6 +165,7 @@ public class ModelMatchServiceImpl implements ModelMatchService {
                 }
             }
         });
+        return null;
     }
 
     private List<String> getGroupByItems() {

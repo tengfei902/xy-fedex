@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xy.fedex.catalog.dao.DimFamilyDao" >
+  <resultMap id="BaseResultMap" type="com.xy.fedex.catalog.po.DimFamilyPO" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="tenant_id" property="tenantId" jdbcType="VARCHAR" />
+    <result column="biz_line_id" property="bizLineId" jdbcType="BIGINT" />
+    <result column="dim_family_name" property="dimFamilyName" jdbcType="VARCHAR" />
+    <result column="master_dim_id" property="masterDimId" jdbcType="BIGINT" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="creator" property="creator" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, tenant_id, biz_line_id, dim_family_name, master_dim_id, create_time, update_time, 
+    creator
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from dim_family
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from dim_family
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.xy.fedex.catalog.po.DimFamilyPO" >
+    insert into dim_family (id, tenant_id, biz_line_id, 
+      dim_family_name, master_dim_id, create_time, 
+      update_time, creator)
+    values (#{id,jdbcType=BIGINT}, #{tenantId,jdbcType=VARCHAR}, #{bizLineId,jdbcType=BIGINT}, 
+      #{dimFamilyName,jdbcType=VARCHAR}, #{masterDimId,jdbcType=BIGINT}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{creator,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.xy.fedex.catalog.po.DimFamilyPO" >
+    insert into dim_family
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="tenantId != null" >
+        tenant_id,
+      </if>
+      <if test="bizLineId != null" >
+        biz_line_id,
+      </if>
+      <if test="dimFamilyName != null" >
+        dim_family_name,
+      </if>
+      <if test="masterDimId != null" >
+        master_dim_id,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="creator != null" >
+        creator,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="tenantId != null" >
+        #{tenantId,jdbcType=VARCHAR},
+      </if>
+      <if test="bizLineId != null" >
+        #{bizLineId,jdbcType=BIGINT},
+      </if>
+      <if test="dimFamilyName != null" >
+        #{dimFamilyName,jdbcType=VARCHAR},
+      </if>
+      <if test="masterDimId != null" >
+        #{masterDimId,jdbcType=BIGINT},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="creator != null" >
+        #{creator,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.xy.fedex.catalog.po.DimFamilyPO" >
+    update dim_family
+    <set >
+      <if test="tenantId != null" >
+        tenant_id = #{tenantId,jdbcType=VARCHAR},
+      </if>
+      <if test="bizLineId != null" >
+        biz_line_id = #{bizLineId,jdbcType=BIGINT},
+      </if>
+      <if test="dimFamilyName != null" >
+        dim_family_name = #{dimFamilyName,jdbcType=VARCHAR},
+      </if>
+      <if test="masterDimId != null" >
+        master_dim_id = #{masterDimId,jdbcType=BIGINT},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="creator != null" >
+        creator = #{creator,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.xy.fedex.catalog.po.DimFamilyPO" >
+    update dim_family
+    set tenant_id = #{tenantId,jdbcType=VARCHAR},
+      biz_line_id = #{bizLineId,jdbcType=BIGINT},
+      dim_family_name = #{dimFamilyName,jdbcType=VARCHAR},
+      master_dim_id = #{masterDimId,jdbcType=BIGINT},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      creator = #{creator,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+  <update id="updateMasterDim">
+    update dim_family set master_dim_id = #{masterDimId,jdbcType=BIGINT} where id = #{dimFamilyId,jdbcType=BIGINT}
+  </update>
+
+  <update id="removeMasterDim">
+    update dim_family set master_dim_id = case when master_dim_id = #{masterDimId,jdbcType=BIGINT} then 0 else master_dim_id end where id = #{dimFamilyId,jdbcType=BIGINT}
+  </update>
+</mapper>

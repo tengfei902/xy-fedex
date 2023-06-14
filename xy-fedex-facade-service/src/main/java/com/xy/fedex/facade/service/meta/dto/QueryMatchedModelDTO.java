@@ -1,14 +1,8 @@
 package com.xy.fedex.facade.service.meta.dto;
 
 import com.alibaba.druid.sql.ast.SQLExpr;
-import com.alibaba.druid.sql.ast.statement.SQLSelect;
-import com.alibaba.druid.sql.ast.statement.SQLTableSource;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlSelectQueryBlock;
-import com.xy.fedex.catalog.common.definition.field.Metric;
 import com.xy.fedex.catalog.common.definition.field.SecondaryCalculate;
-import com.xy.fedex.catalog.common.definition.field.impl.DimModel;
-import com.xy.fedex.catalog.common.definition.field.impl.MetricModel;
-import com.xy.fedex.dsl.sql.from.TableSource;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -24,7 +18,7 @@ public class QueryMatchedModelDTO {
         this.logicalSelect = logicalSelect;
     }
 
-    public void addMetricMatchedModels(String metricCode, Metric metric, List<MetricModel> metricModels) {
+    public void addMetricMatchedModels(String metricCode, com.xy.fedex.catalog.common.definition.field.MetricModel metric, List<MetricModel> metricModels) {
         MetricMatchedModelDTO metricMatchedModelDTO = new MetricMatchedModelDTO(metricCode,metric,metricModels);
         metricMatchedModelList.add(metricMatchedModelDTO);
     }
@@ -33,7 +27,7 @@ public class QueryMatchedModelDTO {
     @Data
     public static class MetricMatchedModelDTO {
         private String metricName;
-        private Metric metric;
+        private com.xy.fedex.catalog.common.definition.field.MetricModel metric;
         private List<MetricModel> metricModels;
     }
 

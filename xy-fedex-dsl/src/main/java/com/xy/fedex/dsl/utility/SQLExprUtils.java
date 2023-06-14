@@ -6,6 +6,7 @@ import com.alibaba.druid.sql.ast.SQLExpr;
 import com.alibaba.druid.sql.ast.SQLStatement;
 import com.alibaba.druid.sql.ast.expr.*;
 import com.alibaba.druid.sql.ast.statement.*;
+import com.alibaba.druid.sql.dialect.hive.stmt.HiveCreateTableStatement;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlCreateTableStatement;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlSelectQueryBlock;
 import com.alibaba.druid.sql.parser.SQLParserUtils;
@@ -61,9 +62,9 @@ public class SQLExprUtils {
         return allFields.stream().distinct().collect(Collectors.toList());
     }
 
-    public static void parseCreateTable(String sql) {
-        SQLStatement sqlStatement = SQLUtils.parseSingleStatement(sql,DbType.mysql);
-        MySqlCreateTableStatement createTableStatement = (MySqlCreateTableStatement) sqlStatement;
+    public static HiveCreateTableStatement parseCreateTable(String sql) {
+        SQLStatement sqlStatement = SQLUtils.parseSingleStatement(sql,DbType.hive);
+        return (HiveCreateTableStatement) sqlStatement;
     }
 
     public static List<String> getMetrics(SQLSelect select) {

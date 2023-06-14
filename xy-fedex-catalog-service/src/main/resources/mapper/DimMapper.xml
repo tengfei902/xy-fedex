@@ -7,6 +7,7 @@
     <result column="dim_name" property="dimName" jdbcType="VARCHAR" />
     <result column="dim_type" property="dimType" jdbcType="INTEGER" />
     <result column="biz_line_id" property="bizLineId" jdbcType="BIGINT" />
+    <result column="tenant_id" property="tenantId" jdbcType="VARCHAR" />
     <result column="dim_comment" property="dimComment" jdbcType="VARCHAR" />
     <result column="status" property="status" jdbcType="INTEGER" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
@@ -14,7 +15,7 @@
     <result column="creator" property="creator" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, dim_code, dim_name, dim_type,biz_line_id, dim_comment, status, create_time, update_time,
+    id, dim_code, dim_name, dim_type,biz_line_id,tenant_id, dim_comment, status, create_time, update_time,
     creator
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
@@ -55,6 +56,9 @@
       <if test="bizLineId != null" >
         biz_line_id,
       </if>
+      <if test="tenantId != null" >
+        tenant_id,
+      </if>
       <if test="dimComment != null" >
         dim_comment,
       </if>
@@ -86,6 +90,9 @@
       </if>
       <if test="bizLineId != null" >
         #{bizLineId,jdbcType=BIGINT},
+      </if>
+      <if test="tenantId != null" >
+        #{tenantId,jdbcType=VARCHAR},
       </if>
       <if test="dimComment != null" >
         #{dimComment,jdbcType=VARCHAR},

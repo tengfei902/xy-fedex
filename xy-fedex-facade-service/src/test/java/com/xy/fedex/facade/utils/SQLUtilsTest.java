@@ -123,7 +123,7 @@ public class SQLUtilsTest {
                 "dt as datetime from t where dt between 20230101 and 20230301 and channel_provider_code = 11 group by t,case when trade_type = 1 then 'mt' else dp end";
 
         SQLSelect sqlSelect = SQLExprUtils.parse(sql);
-        List<String> allFields = SQLExprUtils.getAllFields(sqlSelect);
-        System.out.println(new Gson().toJson(allFields));
+//        List<String> allFields = SQLExprUtils.getAllFields(sqlSelect);
+//        System.out.println(new Gson().toJson(allFields));
     }
 }

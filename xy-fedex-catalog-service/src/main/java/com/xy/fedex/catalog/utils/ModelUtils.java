@@ -4,6 +4,9 @@ import com.google.common.base.Joiner;
 import com.xy.fedex.catalog.api.dto.DimModelRequest;
 import com.xy.fedex.catalog.api.dto.MetricModelRequest;
 import com.xy.fedex.catalog.api.dto.ModelRequest;
+import com.xy.fedex.catalog.api.dto.request.save.SaveModelRequest;
+import com.xy.fedex.catalog.api.dto.request.save.field.dim.SaveDimModelRequest;
+import com.xy.fedex.catalog.api.dto.request.save.field.metric.SaveMetricModelRequest;
 import com.xy.fedex.catalog.dto.DimDTO;
 import com.xy.fedex.catalog.dto.MetricDTO;
 import com.xy.fedex.catalog.exception.ModelDefException;
@@ -22,8 +25,8 @@ public class ModelUtils {
         metaService = SpringContextUtils.getBean(MetaService.class);
     }
 
-    public static String getModelDefinition(ModelRequest modelRequest) {
-        List<MetricModelRequest> metricModels = modelRequest.getMetricModels();
+    public static String getModelDefinition(SaveModelRequest modelRequest) {
+        List<SaveMetricModelRequest> metricModels = modelRequest.getMetricModels();
         List<String> metrics = new ArrayList<>();
         if(!CollectionUtils.isEmpty(metricModels)) {
             metricModels.forEach(metricModel -> {
@@ -31,7 +34,7 @@ public class ModelUtils {
                 metrics.add(String.format("%s as %s",metricModel.getFormula(),metric.getMetricCode()));
             });
         }
-        List<DimModelRequest> dimModels = modelRequest.getDimModels();
+        List<SaveDimModelRequest> dimModels = modelRequest.getDimModels();
         List<String> dims = new ArrayList<>();
         List<String> dimAliasList = new ArrayList<>();
         if(!CollectionUtils.isEmpty(dimModels)) {

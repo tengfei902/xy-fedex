@@ -16,6 +16,7 @@ public interface MetaService {
 
     DimDTO getDim(Long dimId);
 
+    DimDTO getDim(Long bizLineId,String dimCode);
     List<DimDTO> getDims(Long bizLineId);
 
     Long saveMetric(MetricDTO metric);

@@ -26,8 +26,8 @@ public class ModelQueryServiceImpl implements ModelQueryService {
     private void getMetricMergedQuery(MySqlSelectQueryBlock logicalSelect,List<QueryMatchedModelDTO.MetricModel> metricModels) {
         QueryMetricContainer queryMetricContainer = new QueryMetricContainer();
         for(QueryMatchedModelDTO.MetricModel metricModel:metricModels) {
-            MySqlSelectQueryBlock metricSelect = metricModel.getMetricSelect();
-            queryMetricContainer.addMetricSelect(metricSelect);
+//            MySqlSelectQueryBlock metricSelect = metricModel.getMetricSelect();
+//            queryMetricContainer.addMetricSelect(metricSelect);
         }
     }
 
@@ -57,6 +57,7 @@ public class ModelQueryServiceImpl implements ModelQueryService {
                     queryBlockMap.put(tableSourceSignature,metricSelect.clone());
                 }
             }
+            return null;
         }
 
         private String getTableSourceSignature(MySqlSelectQueryBlock metricSelect) {

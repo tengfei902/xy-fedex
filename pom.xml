@@ -23,6 +23,7 @@
       <module>xy-fedex-catalog-common</module>
       <module>xy-fedex-catalog-service</module>
       <module>xy-fedex-def</module>
+      <module>xy-fedex-rpc-context</module>
   </modules>
 
   <properties>
@@ -34,6 +35,7 @@
     <xy-fedex-admin-api-version>0.0.1-SNAPSHOT</xy-fedex-admin-api-version>
     <xy-fedex-catalog-common-version>0.0.1-SNAPSHOT</xy-fedex-catalog-common-version>
     <xy-fedex-catalog-api-version>0.0.1-SNAPSHOT</xy-fedex-catalog-api-version>
+    <xy-fedex-rpc-context-version>0.0.1-SNAPSHOT</xy-fedex-rpc-context-version>
   </properties>
 
   <dependencyManagement>

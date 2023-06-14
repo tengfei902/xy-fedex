@@ -1,4 +1,9 @@
 package com.xy.fedex.catalog.common.definition.field;
 
-public class Dim {
+import java.io.Serializable;
+
+/**
+ * @author tengfei
+ */
+public class Dim implements Serializable {
 }

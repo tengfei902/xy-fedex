@@ -11,6 +11,8 @@ public class MetricPO implements Serializable {
 
     private Long bizLineId;
 
+    private String tenant;
+
     private Long subjectId;
 
     private String metricCode;

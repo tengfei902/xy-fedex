@@ -16,6 +16,7 @@ public class ModelDefinition implements Serializable {
     private String modelDesc;
     private String tableSource;
     private String condition;
+    private String version;
     private Map<String,String> modelProp;
     private List<Metric> metrics;
     private List<Dim> dims;

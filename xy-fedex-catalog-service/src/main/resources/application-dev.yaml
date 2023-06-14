@@ -30,3 +30,25 @@ mybatis:
   type-aliases-package: com.xy.fedex.catalog.po
 
 dubbo.server.version: 1.0.0
+
+#jetcache:
+#  statIntervalMinutes: 15
+#  areaInCacheName: false
+#  local:
+#    default:
+#      type: caffeine
+#      keyConvertor: fastjson2
+#      limit: 100
+#  remote:
+#    default:
+#      type: redis
+#      keyConvertor: fastjson2
+#      broadcastChannel: projectA
+#      valueEncoder: java
+#      valueDecoder: java
+#      poolConfig:
+#        minIdle: 5
+#        maxIdle: 20
+#        maxTotal: 50
+#      host: ${redis.host}
+#      port: ${redis.port}

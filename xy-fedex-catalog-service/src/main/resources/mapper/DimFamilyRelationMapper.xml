@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xy.fedex.catalog.dao.DimFamilyRelationDao" >
+  <resultMap id="BaseResultMap" type="com.xy.fedex.catalog.po.DimFamilyRelationPO" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="dim_family_id" property="dimFamilyId" jdbcType="BIGINT" />
+    <result column="dim_id" property="dimId" jdbcType="BIGINT" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, dim_family_id, dim_id, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from dim_family_relation
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from dim_family_relation
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.xy.fedex.catalog.po.DimFamilyRelationPO" >
+    insert into dim_family_relation (id, dim_family_id, dim_id, 
+      create_time, update_time)
+    values (#{id,jdbcType=BIGINT}, #{dimFamilyId,jdbcType=BIGINT}, #{dimId,jdbcType=BIGINT}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.xy.fedex.catalog.po.DimFamilyRelationPO" >
+    insert into dim_family_relation
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="dimFamilyId != null" >
+        dim_family_id,
+      </if>
+      <if test="dimId != null" >
+        dim_id,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="dimFamilyId != null" >
+        #{dimFamilyId,jdbcType=BIGINT},
+      </if>
+      <if test="dimId != null" >
+        #{dimId,jdbcType=BIGINT},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.xy.fedex.catalog.po.DimFamilyRelationPO" >
+    update dim_family_relation
+    <set >
+      <if test="dimFamilyId != null" >
+        dim_family_id = #{dimFamilyId,jdbcType=BIGINT},
+      </if>
+      <if test="dimId != null" >
+        dim_id = #{dimId,jdbcType=BIGINT},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.xy.fedex.catalog.po.DimFamilyRelationPO" >
+    update dim_family_relation
+    set dim_family_id = #{dimFamilyId,jdbcType=BIGINT},
+      dim_id = #{dimId,jdbcType=BIGINT},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+  <delete id="deleteByDimId">
+    delete from dim_family_relation where dim_id = #{dimId,jdbcType=BIGINT}
+  </delete>
+</mapper>

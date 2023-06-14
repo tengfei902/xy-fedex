@@ -3,6 +3,7 @@
 <mapper namespace="com.xy.fedex.catalog.dao.MetricDao" >
   <resultMap id="BaseResultMap" type="com.xy.fedex.catalog.po.MetricPO" >
     <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="tenant" property="tenant" jdbcType="VARCHAR" />
     <result column="biz_line_id" property="bizLineId" jdbcType="BIGINT" />
     <result column="subject_id" property="subjectId" jdbcType="BIGINT" />
     <result column="metric_code" property="metricCode" jdbcType="VARCHAR" />
@@ -18,7 +19,7 @@
     <result column="creator" property="creator" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, biz_line_id, subject_id, metric_code, formula,metric_type, metric_name, metric_comment, unit, metric_format,
+    id, tenant, biz_line_id, subject_id, metric_code, formula,metric_type, metric_name, metric_comment, unit, metric_format,
     status, create_time, update_time, creator
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
@@ -50,6 +51,9 @@
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
         id,
+      </if>
+      <if test="tenant != null" >
+        tenant,
       </if>
       <if test="bizLineId != null" >
         biz_line_id,
@@ -95,6 +99,9 @@
       <if test="id != null" >
         #{id,jdbcType=BIGINT},
       </if>
+      <if test="tenant != null" >
+        #{tenant,jdbcType=VARCHAR},
+      </if>
       <if test="bizLineId != null" >
         #{bizLineId,jdbcType=BIGINT},
       </if>
@@ -139,14 +146,11 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.xy.fedex.catalog.po.MetricPO" >
     update metric
     <set >
-      <if test="bizLineId != null" >
-        biz_line_id = #{bizLineId,jdbcType=BIGINT},
+      <if test="metricCode != null" >
+        metric_code = #{metricCode,jdbcType=VARCHAR},
       </if>
       <if test="subjectId != null" >
         subject_id = #{subjectId,jdbcType=BIGINT},
-      </if>
-      <if test="metricCode != null" >
-        metric_code = #{metricCode,jdbcType=VARCHAR},
       </if>
       <if test="formula != null" >
         formula = #{formula,jdbcType=VARCHAR},
@@ -168,12 +172,6 @@
       </if>
       <if test="status != null" >
         status = #{status,jdbcType=INTEGER},
-      </if>
-      <if test="createTime != null" >
-        create_time = #{createTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="updateTime != null" >
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="creator != null" >
         creator = #{creator,jdbcType=VARCHAR},

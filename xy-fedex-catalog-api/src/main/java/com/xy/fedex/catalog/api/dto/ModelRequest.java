@@ -13,6 +13,7 @@ public class ModelRequest implements Serializable {
     private String modelComment;
     private Long bizLineId;
     private Long dsnId;
+    private String creator;
     private Map<String,String> modelProp;
     private List<MetricModelRequest> metricModels;
     private List<DimModelRequest> dimModels;

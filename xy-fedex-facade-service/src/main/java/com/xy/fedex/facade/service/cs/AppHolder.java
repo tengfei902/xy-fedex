@@ -1,7 +1,5 @@
 package com.xy.fedex.facade.service.cs;
 
-import com.xy.fedex.catalog.api.CatalogAppFacade;
-import com.xy.fedex.catalog.api.CatalogMetaFacade;
 import com.xy.fedex.catalog.api.dto.request.GetAppRequest;
 import com.xy.fedex.catalog.api.dto.request.GetDimModelRequest;
 import com.xy.fedex.catalog.api.dto.request.GetMetricModelRequest;
@@ -24,18 +22,19 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class AppHolder {
-    private static final CatalogAppFacade catalogAppFacade;
-    private static final CatalogMetaFacade catalogMetaFacade;
+//    private static final CatalogAppFacade catalogAppFacade;
+//    private static final CatalogMetaFacade catalogMetaFacade;
 
     static {
-        catalogAppFacade = ApplicationContextUtils.getBean(CatalogAppFacade.class);
-        catalogMetaFacade = ApplicationContextUtils.getBean(CatalogMetaFacade.class);
+//        catalogAppFacade = ApplicationContextUtils.getBean(CatalogAppFacade.class);
+//        catalogMetaFacade = ApplicationContextUtils.getBean(CatalogMetaFacade.class);
     }
 
     public static App getApp(Long appId) {
-        AppDefinition appDefinition = catalogAppFacade.getApp(GetAppRequest.builder().appId(appId).build());
-        App app = new App(appDefinition);
-        return app;
+//        AppDefinition appDefinition = catalogAppFacade.getApp(GetAppRequest.builder().appId(appId).build());
+//        App app = new App(appDefinition);
+//        return app;
+        return null;
     }
 
     public static App getApp(String appId) {
@@ -114,13 +113,15 @@ public class AppHolder {
         private String metricComment;
 
         public List<MetricModel> getMetricModels() {
-            Response<List<MetricModel>> response = catalogMetaFacade.getMetricModels(GetMetricModelRequest.builder().appId(this.appId).metricId(this.metricId).build());
-            return response.getData();
+//            Response<List<MetricModel>> response = catalogMetaFacade.getMetricModels(GetMetricModelRequest.builder().appId(this.appId).metricId(this.metricId).build());
+//            return response.getData();
+            return null;
         }
 
         public MetricModel getMetricModel(Long modelId) {
-            Response<MetricModel> response = catalogMetaFacade.getMetricModel(GetMetricModelRequest.builder().appId(this.appId).modelId(modelId).metricId(this.metricId).build());
-            return response.getData();
+//            Response<MetricModel> response = catalogMetaFacade.getMetricModel(GetMetricModelRequest.builder().appId(this.appId).modelId(modelId).metricId(this.metricId).build());
+//            return response.getData();
+            return null;
         }
     }
 
@@ -133,13 +134,15 @@ public class AppHolder {
         private DimType dimType;
 
         public List<DimModel> getDimModels() {
-            Response<List<DimModel>> response = catalogMetaFacade.getDimModels(GetDimModelRequest.builder().appId(this.appId).dimId(this.dimId).build());
-            return response.getData();
+//            Response<List<DimModel>> response = catalogMetaFacade.getDimModels(GetDimModelRequest.builder().appId(this.appId).dimId(this.dimId).build());
+//            return response.getData();
+            return null;
         }
 
         public DimModel getDimModel(Long modelId) {
-            DimModel dimModel = catalogMetaFacade.getDimModel(GetDimModelRequest.builder().appId(this.appId).modelId(modelId).dimId(this.dimId).build());
-            return dimModel;
+//            DimModel dimModel = catalogMetaFacade.getDimModel(GetDimModelRequest.builder().appId(this.appId).modelId(modelId).dimId(this.dimId).build());
+//            return dimModel;
+            return null;
         }
     }
 }
