@@ -3,9 +3,21 @@ package com.xy.fedex.catalog.service.meta;
 import com.xy.fedex.catalog.api.dto.request.SaveAppRequest;
 import com.xy.fedex.catalog.common.definition.AppDefinition;
 
+/**
+ * @author tengfei
+ */
 public interface AppService {
-
+    /**
+     * 保存应用
+     * @param saveAppRequest
+     * @return
+     */
     Long saveApp(SaveAppRequest saveAppRequest);
 
-    AppDefinition getApp(Long bizLineId, Long appId);
+    /**
+     * 获取应用
+     * @param appId
+     * @return
+     */
+    AppDefinition getApp(Long appId);
 }

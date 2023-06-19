@@ -13,9 +13,7 @@ import com.alibaba.druid.sql.parser.SQLParserUtils;
 import com.xy.fedex.dsl.exceptions.SQLExprNotSupportException;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class SQLExprUtils {
@@ -275,5 +273,15 @@ public class SQLExprUtils {
 
     public interface SQLExprFunction {
         void doCallBack(SQLExpr expr);
+    }
+
+    public static Map<String,String> getTblPropertyValue(List<SQLAssignItem> items) {
+        Map<String,String> map = new HashMap<>();
+        for(SQLAssignItem item:items) {
+            String key = ((SQLIdentifierExpr)item.getTarget()).getName();
+            String value = ((SQLCharExpr)item.getValue()).getText();
+            map.put(key,value);
+        }
+        return map;
     }
 }

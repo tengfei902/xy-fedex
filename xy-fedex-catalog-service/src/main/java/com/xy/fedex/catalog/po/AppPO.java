@@ -9,11 +9,13 @@ import java.util.Date;
 public class AppPO implements Serializable {
     private Long id;
 
+    private String tenantId;
+
     private Long bizLineId;
 
     private String appName;
 
-    private String appDesc;
+    private String appComment;
 
     private Integer status;
 

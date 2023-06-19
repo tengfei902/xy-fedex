@@ -1,10 +1,17 @@
 package com.xy.fedex.catalog.api;
 
+import com.alibaba.druid.DbType;
+import com.alibaba.druid.sql.SQLUtils;
+import com.alibaba.druid.sql.ast.SQLDataType;
 import com.alibaba.druid.sql.ast.SQLExpr;
+import com.alibaba.druid.sql.ast.SQLName;
+import com.alibaba.druid.sql.ast.SQLStatement;
 import com.alibaba.druid.sql.ast.expr.SQLCharExpr;
 import com.alibaba.druid.sql.ast.expr.SQLIdentifierExpr;
 import com.alibaba.druid.sql.ast.statement.*;
 import com.alibaba.druid.sql.dialect.hive.stmt.HiveCreateTableStatement;
+import com.alibaba.druid.sql.parser.SQLCreateTableParser;
+import com.xy.fedex.catalog.api.dto.request.SaveAppRequest;
 import com.xy.fedex.catalog.api.dto.request.list.ListMetricRequest;
 import com.xy.fedex.catalog.api.dto.request.save.SaveModelRequest;
 import com.xy.fedex.catalog.api.dto.request.save.field.dim.SaveDimModelRequest;
@@ -13,17 +20,24 @@ import com.xy.fedex.catalog.api.dto.request.save.field.metric.SaveMetricRequest;
 import com.xy.fedex.catalog.api.dto.request.save.field.metric.SavePrimaryMetricModelRequest;
 import com.xy.fedex.catalog.api.dto.response.list.ListResult;
 import com.xy.fedex.catalog.common.constants.RpcConstants;
+import com.xy.fedex.catalog.common.definition.AppDefinition;
 import com.xy.fedex.catalog.common.definition.ModelDefinition;
-import com.xy.fedex.catalog.common.definition.field.DimModel;
 import com.xy.fedex.catalog.common.definition.field.Metric;
-import com.xy.fedex.catalog.common.definition.field.MetricModel;
+import com.xy.fedex.catalog.constants.Constants;
 import com.xy.fedex.catalog.dto.DimDTO;
 import com.xy.fedex.catalog.dto.MetricDTO;
+import com.xy.fedex.catalog.dto.SchemaDTO;
+import com.xy.fedex.catalog.exception.MetaNotFoundException;
 import com.xy.fedex.catalog.service.containers.MetricHolder;
+import com.xy.fedex.catalog.service.meta.AppService;
 import com.xy.fedex.catalog.service.meta.MetaService;
 import com.xy.fedex.catalog.service.meta.ModelService;
+import com.xy.fedex.catalog.utils.CatalogUtils;
+import com.xy.fedex.def.Response;
+import com.xy.fedex.dsl.exceptions.SQLExprNotSupportException;
 import com.xy.fedex.dsl.utility.SQLExprUtils;
 import com.xy.fedex.rpc.context.Tracer;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.dubbo.rpc.RpcContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,9 +58,109 @@ public class CatalogFacadeImpl implements CatalogFacade {
     private MetaService metaService;
     @Autowired
     private MetricHolder metricHolder;
+    @Autowired
+    private AppService appService;
+
+    @Override
+    public Response<Long> execute(String sql) {
+        List<SQLStatement> statements = SQLUtils.parseStatements(sql,DbType.hive);
+        for(SQLStatement statement:statements) {
+            if(statement.toString().toLowerCase().startsWith("create")) {
+                HiveCreateTableStatement hiveCreateTableStatement = (HiveCreateTableStatement) statement;
+                String schema = hiveCreateTableStatement.getSchema();
+
+                SchemaDTO schemaDTO = CatalogUtils.getMetaObjectType(schema);
+                switch (schemaDTO.getMetaObjectType()) {
+                    case APP:
+                        Long appId = saveApp(hiveCreateTableStatement);
+                        return Response.success(appId);
+                    case MODEL:
+                        Long modelId = saveModel(hiveCreateTableStatement);
+                        return Response.success(modelId);
+                }
+
+            }
+            throw new SQLExprNotSupportException("sql not support:"+sql);
+        }
+        return null;
+    }
+
+    @Override
+    public Long saveApp(String appDDL) {
+        SQLStatement statement = SQLUtils.parseSingleStatement(appDDL, DbType.hive);
+        HiveCreateTableStatement hiveCreateTableStatement = (HiveCreateTableStatement) statement;
+        return saveApp(hiveCreateTableStatement);
+    }
+
+    private Long saveApp(HiveCreateTableStatement statement) {
+        SaveAppRequest saveAppRequest = new SaveAppRequest();
+        saveAppRequest.setAppName(statement.getTableName());
+
+        String tenantId = RpcContext.getContext().getAttachment(RpcConstants.TENANT_ID);
+        saveAppRequest.setTenantId(tenantId);
+
+        String accountId = RpcContext.getContext().getAttachment(RpcConstants.ACCOUNT_ID);
+        saveAppRequest.setCreator(accountId);
+
+        SchemaDTO schemaDTO = CatalogUtils.getMetaObjectType(statement.getSchema());
+        saveAppRequest.setBizLineId(schemaDTO.getBizLineId());
+
+        Map<String,String> tblPropertyMap = SQLExprUtils.getTblPropertyValue(statement.getTblProperties());
+        String relateModelIds = tblPropertyMap.get(Constants.RELATE_MODEL_IDS);
+        if(!StringUtils.isEmpty(relateModelIds)) {
+            saveAppRequest.setRelateModelIds(Arrays.asList(relateModelIds.split(",")).stream().map(s -> Long.parseLong(s)).collect(Collectors.toList()));
+        }
+        List<SQLTableElement> tableElements = statement.getTableElementList();
+        for(SQLTableElement tableElement:tableElements) {
+            SQLColumnDefinition sqlColumnDefinition = (SQLColumnDefinition) tableElement;
+            String columnName = sqlColumnDefinition.getName().getSimpleName();
+            String columnComment = ((SQLCharExpr)sqlColumnDefinition.getComment()).getText();
+            String sqlDataType = sqlColumnDefinition.getDataType().getName();
+            DimDTO dim = metaService.getDim(saveAppRequest.getBizLineId(),columnName);
+            if(!Objects.isNull(dim)) {
+                SaveAppRequest.Dim appDim = new SaveAppRequest.Dim();
+                appDim.setDimId(dim.getDimId());
+                appDim.setDimCode(columnName);
+//                appDim.setDimName();
+                appDim.setDimComment(columnComment);
+                appDim.setDimFormat(sqlDataType);
+                if(Objects.isNull(saveAppRequest.getDims())) {
+                    saveAppRequest.setDims(new ArrayList<>());
+                }
+                saveAppRequest.getDims().add(appDim);
+                continue;
+            }
+            MetricDTO metric = metaService.getMetric(saveAppRequest.getBizLineId(),columnName);
+            if(!Objects.isNull(metric)) {
+                SaveAppRequest.Metric appMetric = new SaveAppRequest.Metric();
+                appMetric.setMetricId(metric.getMetricId());
+                appMetric.setMetricCode(columnName);
+                appMetric.setMetricComment(columnComment);
+                appMetric.setMetricFormat(sqlDataType);
+                if(Objects.isNull(saveAppRequest.getMetrics())) {
+                    saveAppRequest.setMetrics(new ArrayList<>());
+                }
+                saveAppRequest.getMetrics().add(appMetric);
+                continue;
+            }
+            throw new MetaNotFoundException(String.format("metric or dim not found,biz_line_id:%s,code:%s",saveAppRequest.getBizLineId(),columnName));
+        }
+        return appService.saveApp(saveAppRequest);
+    }
+
+    @Override
+    public Response<AppDefinition> getApp(Long appId) {
+        appService.getApp()
+        return null;
+    }
+
     @Override
     public Long saveModel(String modelDefinition) {
         HiveCreateTableStatement createTableStatement = SQLExprUtils.parseCreateTable(modelDefinition);
+        return saveModel(createTableStatement);
+    }
+
+    private Long saveModel(HiveCreateTableStatement createTableStatement) {
         //dsn
         String schema = createTableStatement.getSchema();
         //table
@@ -73,7 +187,6 @@ public class CatalogFacadeImpl implements CatalogFacade {
 
         return modelService.saveModel(modelRequest);
     }
-
     private Map<String,String> getTableProps(List<SQLAssignItem> tblProperties) {
         Map<String,String> params = new HashMap<>();
         for(SQLAssignItem item:tblProperties) {

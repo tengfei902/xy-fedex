@@ -22,9 +22,9 @@ public class AppServiceTest extends BaseTest {
     public void testSaveApp() {
         SaveAppRequest saveAppRequest = new SaveAppRequest();
         saveAppRequest.setAppName("hf");
-        saveAppRequest.setAppDesc("hf");
+        saveAppRequest.setAppComment("hf");
         saveAppRequest.setBizLineId(0L);
-        saveAppRequest.setRelatedModelIds(Arrays.asList(10L,11L));
+        saveAppRequest.setRelateModelIds(Arrays.asList(10L,11L));
         Long appId = appService.saveApp(saveAppRequest);
 
         AppDefinition appDefinition = appService.getApp(0L,appId);

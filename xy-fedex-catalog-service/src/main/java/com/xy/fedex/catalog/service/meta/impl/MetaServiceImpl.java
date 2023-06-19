@@ -67,7 +67,7 @@ public class MetaServiceImpl implements MetaService {
     public MetricDTO getMetric(Long bizLineId, String metricCode) {
         MetricPO metric = metricDao.selectByMetricCode(bizLineId, metricCode);
         if (Objects.isNull(metric)) {
-            throw new MetricNotFoundException(String.format("metric not found, bizLineId:%s,metricCode:%s", bizLineId, metricCode));
+            return null;
         }
         return convert(metric);
     }
@@ -108,7 +108,7 @@ public class MetaServiceImpl implements MetaService {
     public DimDTO getDim(Long bizLineId, String dimCode) {
         DimPO dim = dimDao.selectByDimCode(bizLineId, dimCode);
         if (Objects.isNull(dim)) {
-            throw new DimNotFoundException(String.format("dim not found,bizLineId:%s,dimCode:%s",bizLineId,dimCode));
+            return null;
         }
         return DimDTO.builder().dimId(dim.getId()).dimCode(dim.getDimCode()).dimComment(dim.getDimComment()).dimName(dim.getDimName()).dimType(dim.getDimType()).build();
     }
@@ -322,17 +322,18 @@ public class MetaServiceImpl implements MetaService {
 
     private AdvanceCalculate getAdvanceCalculate(Long modelId, String advanceCalculate) {
         ModelDefinition model = modelService.getModel(modelId);
-        if (StringUtils.isEmpty(advanceCalculate)) {
-            AdvanceCalculate result = new AdvanceCalculate();
-            result.setAllowDims(model.getDims().stream().map(ModelDefinition.Dim::getDimCode).collect(Collectors.toList()));
-            return result;
-        } else {
-            AdvanceCalculate result = new Gson().fromJson(advanceCalculate, AdvanceCalculate.class);
-            if (CollectionUtils.isEmpty(result.getAllowDims())) {
-                result.setAllowDims(model.getDims().stream().map(ModelDefinition.Dim::getDimCode).collect(Collectors.toList()));
-            }
-            return result;
-        }
+//        if (StringUtils.isEmpty(advanceCalculate)) {
+//            AdvanceCalculate result = new AdvanceCalculate();
+//            result.setAllowDims(model.getDims().stream().map(DimModel::getCode).collect(Collectors.toList()));
+//            return result;
+//        } else {
+//            AdvanceCalculate result = new Gson().fromJson(advanceCalculate, AdvanceCalculate.class);
+//            if (CollectionUtils.isEmpty(result.getAllowDims())) {
+//                result.setAllowDims(model.getDims().stream().map(DimModel::getCode).collect(Collectors.toList()));
+//            }
+//            return result;
+//        }
+        return null;
     }
 
     @Override

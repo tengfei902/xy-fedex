@@ -8,6 +8,7 @@ import com.xy.fedex.catalog.api.dto.request.save.SaveRequests;
 import com.xy.fedex.catalog.api.dto.request.save.field.metric.SaveDimRequest;
 import com.xy.fedex.catalog.api.dto.request.save.field.metric.SaveMetricRequest;
 import com.xy.fedex.catalog.api.dto.response.PrepareModelResponse;
+import com.xy.fedex.catalog.utils.SqlReader;
 import com.xy.fedex.def.Response;
 import lombok.Data;
 import org.junit.jupiter.api.Test;
@@ -104,29 +105,15 @@ public class CatalogFacadeTest extends BaseTest {
 
     }
 
-    private List<SaveAppRequest.Model> getModels() {
-        SaveAppRequest.Model model = new SaveAppRequest.Model();
-        return null;
-    }
-
     @Rollback(value = false)
     @Test
     public void testSaveMetric() {
         Long bizLineId = 0L;
-        SaveMetricRequest saleAmtRequest = SaveRequests.newSaveMetricRequest(bizLineId,"sale_amt").build();
-        catalogFacade.saveMetric(saleAmtRequest);
-
-        SaveMetricRequest saleCntRequest = SaveRequests.newSaveMetricRequest(bizLineId,"sale_cnt").build();
-        catalogFacade.saveMetric(saleCntRequest);
-
-        SaveMetricRequest refundAmtRequest = SaveRequests.newSaveMetricRequest(bizLineId,"refund_amt").build();
-        catalogFacade.saveMetric(refundAmtRequest);
-
-        SaveMetricRequest refundCntRequest = SaveRequests.newSaveMetricRequest(bizLineId,"refund_cnt").build();
-        catalogFacade.saveMetric(refundCntRequest);
-
-        SaveMetricRequest feeRequest = SaveRequests.newSaveMetricRequest(bizLineId,"fee").build();
-        catalogFacade.saveMetric(feeRequest);
+        String metrics = "expose_pv,expose_uv,click_pv,click_uv,view_pv,view_uv,visit_buy_rate";
+        for(String metric:metrics.split(",")) {
+            SaveMetricRequest metricRequest = SaveRequests.newSaveMetricRequest(bizLineId,metric).build();
+            catalogFacade.saveMetric(metricRequest);
+        }
     }
 
     @Rollback(value = false)
@@ -138,5 +125,12 @@ public class CatalogFacadeTest extends BaseTest {
             SaveDimRequest saveDimRequest = SaveRequests.newSaveDimRequest(bizLineId,dimCode).build();
             catalogFacade.saveDim(saveDimRequest);
         }
+    }
+
+    @Test
+    public void testCreateApp() {
+        String sql = SqlReader.read("ddl/app_ecs.sql");
+        Response<Long> response = catalogFacade.execute(sql);
+        catalogFacade.getMetrics()
     }
 }

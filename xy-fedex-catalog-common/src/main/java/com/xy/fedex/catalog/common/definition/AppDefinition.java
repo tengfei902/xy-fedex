@@ -11,7 +11,7 @@ import java.util.List;
 public class AppDefinition implements Serializable {
     private Long appId;
     private String appName;
-    private String appDesc;
+    private String appComment;
     private List<Long> modelIds;
     private List<Metric> metrics;
     private List<Dim> dims;

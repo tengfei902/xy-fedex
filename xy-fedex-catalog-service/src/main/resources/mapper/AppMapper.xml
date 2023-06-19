@@ -5,14 +5,14 @@
     <id column="id" property="id" jdbcType="BIGINT" />
     <result column="biz_line_id" property="bizLineId" jdbcType="BIGINT" />
     <result column="app_name" property="appName" jdbcType="VARCHAR" />
-    <result column="app_desc" property="appDesc" jdbcType="VARCHAR" />
+    <result column="app_comment" property="appComment" jdbcType="VARCHAR" />
     <result column="status" property="status" jdbcType="INTEGER" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
     <result column="creator" property="creator" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, biz_line_id, app_name, app_desc, status, create_time, update_time,
+    id, biz_line_id, app_name, app_comment, status, create_time, update_time,
     creator
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
@@ -27,11 +27,11 @@
   </delete>
   <insert id="insert" parameterType="com.xy.fedex.catalog.po.AppPO" >
     insert into app (id, biz_line_id,
-      app_name, app_desc, status, 
+      app_name, app_comment, status,
       create_time, update_time, creator
       )
     values (#{id,jdbcType=BIGINT}, #{bizLineId,jdbcType=BIGINT},
-      #{appName,jdbcType=VARCHAR}, #{appDesc,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, 
+      #{appName,jdbcType=VARCHAR}, #{appComment,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER},
       #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{creator,jdbcType=VARCHAR}
       )
   </insert>
@@ -47,8 +47,8 @@
       <if test="appName != null" >
         app_name,
       </if>
-      <if test="appDesc != null" >
-        app_desc,
+      <if test="appComment != null" >
+        app_comment,
       </if>
       <if test="status != null" >
         status,
@@ -73,8 +73,8 @@
       <if test="appName != null" >
         #{appName,jdbcType=VARCHAR},
       </if>
-      <if test="appDesc != null" >
-        #{appDesc,jdbcType=VARCHAR},
+      <if test="appComment != null" >
+        #{appComment,jdbcType=VARCHAR},
       </if>
       <if test="status != null" >
         #{status,jdbcType=INTEGER},
@@ -102,8 +102,8 @@
       <if test="appName != null" >
         app_name = #{appName,jdbcType=VARCHAR},
       </if>
-      <if test="appDesc != null" >
-        app_desc = #{appDesc,jdbcType=VARCHAR},
+      <if test="appComment != null" >
+        app_comment = #{appComment,jdbcType=VARCHAR},
       </if>
       <if test="status != null" >
         status = #{status,jdbcType=INTEGER},
@@ -124,11 +124,18 @@
     update app
     set biz_line_id = #{bizLineId,jdbcType=BIGINT},
       app_name = #{appName,jdbcType=VARCHAR},
-      app_desc = #{appDesc,jdbcType=VARCHAR},
+      app_comment = #{appComment,jdbcType=VARCHAR},
       status = #{status,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
       creator = #{creator,jdbcType=VARCHAR}
     where id = #{id,jdbcType=BIGINT}
   </update>
+
+  <select id="selectByName" resultMap="BaseResultMap" >
+    select
+    <include refid="Base_Column_List" />
+    from app
+    where biz_line_id = #{bizLineId,jdbcType=BIGINT} and app_name = #{appName,jdbcType=VARCHAR}
+  </select>
 </mapper>

@@ -46,7 +46,7 @@
         </javaClientGenerator>
 
         <!-- 要生成哪些表  orders是我的表名，Orders是生成的类名，比如我的映射类为Order，映射接口OrderMapper, 映射文件为OrderMapper.xml，可以添加多个表，里面的几个配置大概意思就是是否允许生成example文件和支持selectByExample。用过Mybatis的应该知道selectByExample，对于一些简单查询用这个还是比较方便的。哈哈、话有点多，记得删除 -->
-        <table tableName="dim_family_relation" domainObjectName="DimFamilyRelation"
+        <table tableName="app_column" domainObjectName="AppColumn"
                enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="false"
                selectByExampleQueryId="false"></table>
