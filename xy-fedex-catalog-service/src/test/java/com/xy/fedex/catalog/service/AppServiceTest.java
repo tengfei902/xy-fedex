@@ -27,7 +27,7 @@ public class AppServiceTest extends BaseTest {
         saveAppRequest.setRelateModelIds(Arrays.asList(10L,11L));
         Long appId = appService.saveApp(saveAppRequest);
 
-        AppDefinition appDefinition = appService.getApp(0L,appId);
+        AppDefinition appDefinition = appService.getApp(appId);
         System.out.println(new Gson().toJson(appDefinition));
     }
 }

@@ -2,11 +2,14 @@ package com.xy.fedex.catalog.po;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
 
 public class AppColumnPO implements Serializable {
     private Long id;
 
     private Long appId;
+
+    private String columnCode;
 
     private String columnName;
 
@@ -96,62 +99,40 @@ public class AppColumnPO implements Serializable {
         this.updateTime = updateTime;
     }
 
+    public String getColumnCode() {
+        return columnCode;
+    }
+
+    public void setColumnCode(String columnCode) {
+        this.columnCode = columnCode;
+    }
+
     @Override
-    public boolean equals(Object that) {
-        if (this == that) {
-            return true;
-        }
-        if (that == null) {
-            return false;
-        }
-        if (getClass() != that.getClass()) {
-            return false;
-        }
-        AppColumnPO other = (AppColumnPO) that;
-        return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
-            && (this.getAppId() == null ? other.getAppId() == null : this.getAppId().equals(other.getAppId()))
-            && (this.getColumnName() == null ? other.getColumnName() == null : this.getColumnName().equals(other.getColumnName()))
-            && (this.getColumnType() == null ? other.getColumnType() == null : this.getColumnType().equals(other.getColumnType()))
-            && (this.getColumnId() == null ? other.getColumnId() == null : this.getColumnId().equals(other.getColumnId()))
-            && (this.getColumnFormat() == null ? other.getColumnFormat() == null : this.getColumnFormat().equals(other.getColumnFormat()))
-            && (this.getStatus() == null ? other.getStatus() == null : this.getStatus().equals(other.getStatus()))
-            && (this.getCreateTime() == null ? other.getCreateTime() == null : this.getCreateTime().equals(other.getCreateTime()))
-            && (this.getUpdateTime() == null ? other.getUpdateTime() == null : this.getUpdateTime().equals(other.getUpdateTime()));
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AppColumnPO that = (AppColumnPO) o;
+        return Objects.equals(id, that.id) && Objects.equals(appId, that.appId) && Objects.equals(columnCode, that.columnCode) && Objects.equals(columnName, that.columnName) && Objects.equals(columnType, that.columnType) && Objects.equals(columnId, that.columnId) && Objects.equals(columnFormat, that.columnFormat) && Objects.equals(status, that.status) && Objects.equals(createTime, that.createTime) && Objects.equals(updateTime, that.updateTime);
     }
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
-        result = prime * result + ((getAppId() == null) ? 0 : getAppId().hashCode());
-        result = prime * result + ((getColumnName() == null) ? 0 : getColumnName().hashCode());
-        result = prime * result + ((getColumnType() == null) ? 0 : getColumnType().hashCode());
-        result = prime * result + ((getColumnId() == null) ? 0 : getColumnId().hashCode());
-        result = prime * result + ((getColumnFormat() == null) ? 0 : getColumnFormat().hashCode());
-        result = prime * result + ((getStatus() == null) ? 0 : getStatus().hashCode());
-        result = prime * result + ((getCreateTime() == null) ? 0 : getCreateTime().hashCode());
-        result = prime * result + ((getUpdateTime() == null) ? 0 : getUpdateTime().hashCode());
-        return result;
+        return Objects.hash(id, appId, columnCode, columnName, columnType, columnId, columnFormat, status, createTime, updateTime);
     }
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(getClass().getSimpleName());
-        sb.append(" [");
-        sb.append("Hash = ").append(hashCode());
-        sb.append(", id=").append(id);
-        sb.append(", appId=").append(appId);
-        sb.append(", columnName=").append(columnName);
-        sb.append(", columnType=").append(columnType);
-        sb.append(", columnId=").append(columnId);
-        sb.append(", columnFormat=").append(columnFormat);
-        sb.append(", status=").append(status);
-        sb.append(", createTime=").append(createTime);
-        sb.append(", updateTime=").append(updateTime);
-        sb.append(", serialVersionUID=").append(serialVersionUID);
-        sb.append("]");
-        return sb.toString();
+        return "AppColumnPO{" +
+                "id=" + id +
+                ", appId=" + appId +
+                ", columnCode='" + columnCode + '\'' +
+                ", columnName='" + columnName + '\'' +
+                ", columnType=" + columnType +
+                ", columnId=" + columnId +
+                ", columnFormat='" + columnFormat + '\'' +
+                ", status=" + status +
+                ", createTime=" + createTime +
+                ", updateTime=" + updateTime +
+                '}';
     }
 }

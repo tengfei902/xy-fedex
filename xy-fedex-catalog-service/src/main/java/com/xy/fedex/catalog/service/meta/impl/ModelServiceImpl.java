@@ -299,7 +299,7 @@ public class ModelServiceImpl implements ModelService {
         }
         ModelDefinition modelDefinition = new ModelDefinition();
         modelDefinition.setModelId(modelId);
-        modelDefinition.setModelDesc(model.getModelDesc());
+        modelDefinition.setModelComment(model.getModelDesc());
         modelDefinition.setModelName(model.getModelName());
         modelDefinition.setTableSource(model.getTableSource());
         modelDefinition.setCondition(model.getCondition());

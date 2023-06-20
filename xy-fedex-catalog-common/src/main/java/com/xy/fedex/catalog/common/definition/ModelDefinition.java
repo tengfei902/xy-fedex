@@ -14,7 +14,7 @@ import java.util.Map;
 public class ModelDefinition implements Serializable {
     private Long modelId;
     private String modelName;
-    private String modelDesc;
+    private String modelComment;
     private String tableSource;
     private String condition;
     private String version;

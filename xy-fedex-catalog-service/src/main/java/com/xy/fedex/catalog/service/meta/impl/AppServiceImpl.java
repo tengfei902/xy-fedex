@@ -98,7 +98,8 @@ public class AppServiceImpl implements AppService {
             AppColumnPO appColumnPO = new AppColumnPO();
             appColumnPO.setAppId(appId);
             appColumnPO.setColumnId(metric.getMetricId());
-            appColumnPO.setColumnName(metric.getMetricCode());
+            appColumnPO.setColumnCode(metric.getMetricCode());
+            appColumnPO.setColumnName(metric.getMetricName());
             appColumnPO.setColumnType(FieldType.METRIC.getFieldType());
             appColumnPO.setColumnFormat(metric.getMetricFormat());
             return appColumnPO;
@@ -108,7 +109,8 @@ public class AppServiceImpl implements AppService {
             AppColumnPO appColumnPO = new AppColumnPO();
             appColumnPO.setAppId(appId);
             appColumnPO.setColumnId(dim.getDimId());
-            appColumnPO.setColumnName(dim.getDimCode());
+            appColumnPO.setColumnCode(dim.getDimCode());
+            appColumnPO.setColumnName(dim.getDimName());
             appColumnPO.setColumnType(FieldType.DIM.getFieldType());
             appColumnPO.setColumnFormat(dim.getDimFormat());
             return appColumnPO;
@@ -149,8 +151,32 @@ public class AppServiceImpl implements AppService {
         if(!CollectionUtils.isEmpty(appModelRelations)) {
             appDefinition.setModelIds(appModelRelations.stream().map(AppModelRelationPO::getModelId).collect(Collectors.toList()));
         }
-        appDefinition.setDims(getDims(appDefinition.getModelIds()));
-        appDefinition.setMetrics(getMetrics(appId));
+
+        appDefinition.setDims(new ArrayList<>());
+        appDefinition.setMetrics(new ArrayList<>());
+
+        List<AppColumnPO> appColumns = appColumnDao.selectByAppId(appPO.getId());
+        for(AppColumnPO column:appColumns) {
+            if(column.getColumnType() == FieldType.DIM.getFieldType()) {
+                Dim dim = new Dim();
+                dim.setDimId(column.getColumnId());
+                dim.setDimCode(column.getColumnCode());
+                dim.setDimName(column.getColumnName());
+                dim.setDimComment(column.getColumnName());
+                dim.setDimFormat(column.getColumnFormat());
+                appDefinition.getDims().add(dim);
+            }
+            if(column.getColumnType() == FieldType.METRIC.getFieldType()) {
+                Metric metric = new Metric();
+                metric.setMetricId(column.getColumnId());
+                metric.setMetricCode(column.getColumnCode());
+                metric.setMetricName(column.getColumnName());
+                metric.setMetricComment(column.getColumnName());
+                metric.setMetricFormat(column.getColumnFormat());
+                appDefinition.getMetrics().add(metric);
+            }
+        }
+
         return appDefinition;
     }
 

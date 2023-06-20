@@ -1,4 +1,4 @@
-create table t10000_xy_mysql.trade_shop_dt
+create table xy_mysql#biz_line_0.trade_shop_dt
 comment '门店交易数据'
 as
 select
@@ -28,7 +28,7 @@ select
     t4.week_of_year as week_of_year,
     t4.month_of_year as month_of_year,
     t4.year as `year`,
-    t4.holiday as holidy,
+    t4.holiday as holiday,
     sum(t1.sale_amt) as sale_amt,
     sum(t1.sale_cnt) as sale_cnt,
     sum(t1.refund_amt) as refund_amt,

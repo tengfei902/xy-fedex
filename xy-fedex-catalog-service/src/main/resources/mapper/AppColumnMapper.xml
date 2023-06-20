@@ -4,6 +4,7 @@
   <resultMap id="BaseResultMap" type="com.xy.fedex.catalog.po.AppColumnPO" >
     <id column="id" property="id" jdbcType="BIGINT" />
     <result column="app_id" property="appId" jdbcType="BIGINT" />
+    <result column="column_code" property="columnCode" jdbcType="VARCHAR" />
     <result column="column_name" property="columnName" jdbcType="VARCHAR" />
     <result column="column_type" property="columnType" jdbcType="INTEGER" />
     <result column="column_id" property="columnId" jdbcType="BIGINT" />
@@ -13,7 +14,7 @@
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, app_id, column_name, column_type, column_id, column_format, status, create_time, 
+    id, app_id, column_code, column_name, column_type, column_id, column_format, status, create_time,
     update_time
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
@@ -45,6 +46,9 @@
       <if test="appId != null" >
         app_id,
       </if>
+      <if test="columnCode != null" >
+        column_code,
+      </if>
       <if test="columnName != null" >
         column_name,
       </if>
@@ -74,6 +78,9 @@
       <if test="appId != null" >
         #{appId,jdbcType=BIGINT},
       </if>
+      <if test="columnCode != null" >
+        #{columnCode,jdbcType=VARCHAR},
+      </if>
       <if test="columnName != null" >
         #{columnName,jdbcType=VARCHAR},
       </if>
@@ -102,6 +109,9 @@
     <set >
       <if test="appId != null" >
         app_id = #{appId,jdbcType=BIGINT},
+      </if>
+      <if test="columnCode != null" >
+        column_code = #{columnCode,jdbcType=VARCHAR},
       </if>
       <if test="columnName != null" >
         column_name = #{columnName,jdbcType=VARCHAR},
@@ -146,11 +156,12 @@
   </delete>
 
   <insert id="batchInsert" parameterType="java.util.List" >
-    insert into app_column (app_id,column_name,column_type,column_id,column_format)
+    insert into app_column (app_id,column_code,column_name,column_type,column_id,column_format)
     values
     <foreach collection ="list" item="column" index= "index" separator =",">
       (
       #{column.appId},
+      #{column.columnCode},
       #{column.columnName},
       #{column.columnType},
       #{column.columnId},
@@ -158,4 +169,11 @@
       )
     </foreach>
   </insert>
+
+  <select id="selectByAppId" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select
+    <include refid="Base_Column_List" />
+    from app_column
+    where app_id = #{appId,jdbcType=BIGINT}
+  </select>
 </mapper>

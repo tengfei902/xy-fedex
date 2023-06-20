@@ -23,4 +23,6 @@ public interface AppColumnDao {
     int deleteAppColumns(@Param("appId")Long appId);
 
     int batchInsert(List<AppColumnPO> columns);
+
+    List<AppColumnPO> selectByAppId(@Param("appId")Long appId);
 }

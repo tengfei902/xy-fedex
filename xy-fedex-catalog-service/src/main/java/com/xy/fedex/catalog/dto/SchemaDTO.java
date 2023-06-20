@@ -7,5 +7,5 @@ import lombok.Data;
 public class SchemaDTO {
     private Long bizLineId;
     private MetaObjectType metaObjectType;
-    private Long dsnId;
+    private String dsnName;
 }

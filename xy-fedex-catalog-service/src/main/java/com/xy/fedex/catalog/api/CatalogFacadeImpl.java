@@ -27,7 +27,9 @@ import com.xy.fedex.catalog.constants.Constants;
 import com.xy.fedex.catalog.dto.DimDTO;
 import com.xy.fedex.catalog.dto.MetricDTO;
 import com.xy.fedex.catalog.dto.SchemaDTO;
+import com.xy.fedex.catalog.exception.DimNotFoundException;
 import com.xy.fedex.catalog.exception.MetaNotFoundException;
+import com.xy.fedex.catalog.exception.MetricNotFoundException;
 import com.xy.fedex.catalog.service.containers.MetricHolder;
 import com.xy.fedex.catalog.service.meta.AppService;
 import com.xy.fedex.catalog.service.meta.MetaService;
@@ -102,6 +104,8 @@ public class CatalogFacadeImpl implements CatalogFacade {
         String accountId = RpcContext.getContext().getAttachment(RpcConstants.ACCOUNT_ID);
         saveAppRequest.setCreator(accountId);
 
+        saveAppRequest.setAppComment(((SQLCharExpr)statement.getComment()).getText());
+
         SchemaDTO schemaDTO = CatalogUtils.getMetaObjectType(statement.getSchema());
         saveAppRequest.setBizLineId(schemaDTO.getBizLineId());
 
@@ -113,15 +117,16 @@ public class CatalogFacadeImpl implements CatalogFacade {
         List<SQLTableElement> tableElements = statement.getTableElementList();
         for(SQLTableElement tableElement:tableElements) {
             SQLColumnDefinition sqlColumnDefinition = (SQLColumnDefinition) tableElement;
-            String columnName = sqlColumnDefinition.getName().getSimpleName();
+            String columnCode = sqlColumnDefinition.getName().getSimpleName();
+            String columnName = ((SQLCharExpr)sqlColumnDefinition.getComment()).getText();
             String columnComment = ((SQLCharExpr)sqlColumnDefinition.getComment()).getText();
-            String sqlDataType = sqlColumnDefinition.getDataType().getName();
-            DimDTO dim = metaService.getDim(saveAppRequest.getBizLineId(),columnName);
+            String sqlDataType = sqlColumnDefinition.getDataType().toString();
+            DimDTO dim = metaService.getDim(saveAppRequest.getBizLineId(),columnCode);
             if(!Objects.isNull(dim)) {
                 SaveAppRequest.Dim appDim = new SaveAppRequest.Dim();
                 appDim.setDimId(dim.getDimId());
-                appDim.setDimCode(columnName);
-//                appDim.setDimName();
+                appDim.setDimCode(columnCode);
+                appDim.setDimName(columnName);
                 appDim.setDimComment(columnComment);
                 appDim.setDimFormat(sqlDataType);
                 if(Objects.isNull(saveAppRequest.getDims())) {
@@ -130,11 +135,12 @@ public class CatalogFacadeImpl implements CatalogFacade {
                 saveAppRequest.getDims().add(appDim);
                 continue;
             }
-            MetricDTO metric = metaService.getMetric(saveAppRequest.getBizLineId(),columnName);
+            MetricDTO metric = metaService.getMetric(saveAppRequest.getBizLineId(),columnCode);
             if(!Objects.isNull(metric)) {
                 SaveAppRequest.Metric appMetric = new SaveAppRequest.Metric();
                 appMetric.setMetricId(metric.getMetricId());
-                appMetric.setMetricCode(columnName);
+                appMetric.setMetricCode(columnCode);
+                appMetric.setMetricName(columnName);
                 appMetric.setMetricComment(columnComment);
                 appMetric.setMetricFormat(sqlDataType);
                 if(Objects.isNull(saveAppRequest.getMetrics())) {
@@ -150,8 +156,8 @@ public class CatalogFacadeImpl implements CatalogFacade {
 
     @Override
     public Response<AppDefinition> getApp(Long appId) {
-        appService.getApp()
-        return null;
+        AppDefinition app = appService.getApp(appId);
+        return Response.success(app);
     }
 
     @Override
@@ -163,6 +169,7 @@ public class CatalogFacadeImpl implements CatalogFacade {
     private Long saveModel(HiveCreateTableStatement createTableStatement) {
         //dsn
         String schema = createTableStatement.getSchema();
+        SchemaDTO schemaDTO = CatalogUtils.getMetaObjectType(schema);
         //table
         String tableName = createTableStatement.getTableName();
         //comment
@@ -177,12 +184,13 @@ public class CatalogFacadeImpl implements CatalogFacade {
 
         SaveModelRequest modelRequest = new SaveModelRequest();
         modelRequest.setModelName(tableName);
-        modelRequest.setDsnId(1000L);
+        //todo dsn
+        modelRequest.setDsnId(0L);
         if(!Objects.isNull(commentExpr)) {
             modelRequest.setModelComment(((SQLCharExpr)commentExpr).getText());
         }
         modelRequest.setCreator(accountId);
-        modelRequest.setBizLineId(Long.parseLong(schema.replace("biz_line_","")));
+        modelRequest.setBizLineId(schemaDTO.getBizLineId());
         initMetaFields(select.getQueryBlock(),modelRequest);
 
         return modelService.saveModel(modelRequest);
@@ -231,6 +239,9 @@ public class CatalogFacadeImpl implements CatalogFacade {
                 dimModel.setModelId(modelRequest.getModelId());
 
                 DimDTO dim = metaService.getDim(modelRequest.getBizLineId(),code);
+                if(Objects.isNull(dim)) {
+                    throw new DimNotFoundException(String.format("dim not found,bizLineId:%s,dimCode:%s",modelRequest.getBizLineId(),code));
+                }
                 dimModel.setDimId(dim.getDimId());
                 dimModel.setFormula(selectItemExpr.toString());
                 dimModel.setCode(code);
@@ -239,6 +250,9 @@ public class CatalogFacadeImpl implements CatalogFacade {
             } else {
                 SavePrimaryMetricModelRequest metricModel = new SavePrimaryMetricModelRequest();
                 MetricDTO metric = metaService.getMetric(modelRequest.getBizLineId(),code);
+                if(Objects.isNull(metric)) {
+                    throw new MetricNotFoundException(String.format("metric not found,bizLineId:%s,metricCode:%s",modelRequest.getBizLineId(),code));
+                }
 
                 metricModel.setMetricId(metric.getMetricId());
                 metricModel.setCode(code);
@@ -252,8 +266,9 @@ public class CatalogFacadeImpl implements CatalogFacade {
     }
 
     @Override
-    public ModelDefinition getModel(Long modelId) {
-        return null;
+    public Response<ModelDefinition> getModel(Long modelId) {
+        ModelDefinition modelDefinition = modelService.getModel(modelId);
+        return Response.success(modelDefinition);
     }
 
     @Override

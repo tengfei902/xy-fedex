@@ -1,5 +1,6 @@
 package com.xy.fedex.catalog.api;
 
+import com.google.gson.Gson;
 import com.xy.fedex.catalog.BaseTest;
 import com.xy.fedex.catalog.api.dto.ModelRequest;
 import com.xy.fedex.catalog.api.dto.request.PrepareModelRequest;
@@ -8,6 +9,8 @@ import com.xy.fedex.catalog.api.dto.request.save.SaveRequests;
 import com.xy.fedex.catalog.api.dto.request.save.field.metric.SaveDimRequest;
 import com.xy.fedex.catalog.api.dto.request.save.field.metric.SaveMetricRequest;
 import com.xy.fedex.catalog.api.dto.response.PrepareModelResponse;
+import com.xy.fedex.catalog.common.definition.AppDefinition;
+import com.xy.fedex.catalog.common.definition.ModelDefinition;
 import com.xy.fedex.catalog.utils.SqlReader;
 import com.xy.fedex.def.Response;
 import lombok.Data;
@@ -131,6 +134,15 @@ public class CatalogFacadeTest extends BaseTest {
     public void testCreateApp() {
         String sql = SqlReader.read("ddl/app_ecs.sql");
         Response<Long> response = catalogFacade.execute(sql);
-        catalogFacade.getMetrics()
+        Response<AppDefinition> appResponse = catalogFacade.getApp(response.getData());
+        System.out.println(new Gson().toJson(appResponse.getData()));
+    }
+
+    @Test
+    public void testCreateModel() {
+        String sql = SqlReader.read("ddl/model_trade_shop_sku_dt.sql");
+        Response<Long> response = catalogFacade.execute(sql);
+        Response<ModelDefinition> model = catalogFacade.getModel(response.getData());
+        System.out.println(new Gson().toJson(model.getData()));
     }
 }

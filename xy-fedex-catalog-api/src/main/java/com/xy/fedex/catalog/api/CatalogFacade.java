@@ -43,7 +43,7 @@ public interface CatalogFacade {
      * @param modelId
      * @return
      */
-    ModelDefinition getModel(Long modelId);
+    Response<ModelDefinition> getModel(Long modelId);
 
     /**
      * 保存原子指标
