@@ -3,24 +3,31 @@
 <mapper namespace="com.xy.fedex.catalog.dao.MetricModelDao" >
   <resultMap id="BaseResultMap" type="com.xy.fedex.catalog.po.MetricModelPO" >
     <id column="id" property="id" jdbcType="BIGINT" />
-    <result column="model_id" property="modelId" jdbcType="BIGINT" />
+    <result column="model_id" property="modelId" jdbcType="VARCHAR" />
     <result column="metric_id" property="metricId" jdbcType="BIGINT" />
     <result column="metric_type" property="metricType" jdbcType="INTEGER" />
     <result column="formula" property="formula" jdbcType="VARCHAR" />
     <result column="advance_calculate" property="advanceCalculate" jdbcType="VARCHAR" />
-    <result column="relate_metrics" property="relateMetrics" jdbcType="VARCHAR" />
     <result column="status" property="status" jdbcType="INTEGER" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
     <result column="creator" property="creator" jdbcType="VARCHAR" />
   </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.xy.fedex.catalog.po.MetricModelPO" extends="BaseResultMap" >
+    <result column="model_id_array" property="modelIdArray" jdbcType="LONGVARCHAR" />
+  </resultMap>
   <sql id="Base_Column_List" >
-    id, model_id, metric_id, metric_type, formula, advance_calculate,relate_metrics,
-    status, create_time, update_time, creator
+    id, model_id, metric_id, metric_type, formula, advance_calculate, status, create_time, 
+    update_time, creator
   </sql>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+  <sql id="Blob_Column_List" >
+    model_id_array
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Long" >
     select 
     <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
     from metric_model
     where id = #{id,jdbcType=BIGINT}
   </select>
@@ -29,15 +36,16 @@
     where id = #{id,jdbcType=BIGINT}
   </delete>
   <insert id="insert" parameterType="com.xy.fedex.catalog.po.MetricModelPO" >
-    insert into metric_model (id, model_id, metric_id,
-      formula, advance_calculate,relate_metrics, status, create_time, update_time,
-      creator)
-    values (#{id,jdbcType=BIGINT}, #{modelId,jdbcType=BIGINT}, #{metricId,jdbcType=BIGINT}, 
-      #{formula,jdbcType=VARCHAR}, #{advanceCalculate,jdbcType=VARCHAR},#{relateMetrics,jdbcType=VARCHAR},
-      #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP},
-      #{creator,jdbcType=VARCHAR})
+    insert into metric_model (id, model_id, metric_id, 
+      metric_type, formula, advance_calculate, 
+      status, create_time, update_time, 
+      creator, model_id_array)
+    values (#{id,jdbcType=BIGINT}, #{modelId,jdbcType=VARCHAR}, #{metricId,jdbcType=BIGINT}, 
+      #{metricType,jdbcType=INTEGER}, #{formula,jdbcType=VARCHAR}, #{advanceCalculate,jdbcType=VARCHAR}, 
+      #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{creator,jdbcType=VARCHAR}, #{modelIdArray,jdbcType=LONGVARCHAR})
   </insert>
-  <insert id="insertSelective" parameterType="com.xy.fedex.catalog.po.MetricModelPO" >
+  <insert id="insertSelective" keyProperty="id" useGeneratedKeys="true" parameterType="com.xy.fedex.catalog.po.MetricModelPO" >
     insert into metric_model
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -58,9 +66,6 @@
       <if test="advanceCalculate != null" >
         advance_calculate,
       </if>
-      <if test="relateMetrics != null" >
-        relate_metrics,
-      </if>
       <if test="status != null" >
         status,
       </if>
@@ -73,13 +78,16 @@
       <if test="creator != null" >
         creator,
       </if>
+      <if test="modelIdArray != null" >
+        model_id_array,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
         #{id,jdbcType=BIGINT},
       </if>
       <if test="modelId != null" >
-        #{modelId,jdbcType=BIGINT},
+        #{modelId,jdbcType=VARCHAR},
       </if>
       <if test="metricId != null" >
         #{metricId,jdbcType=BIGINT},
@@ -93,9 +101,6 @@
       <if test="advanceCalculate != null" >
         #{advanceCalculate,jdbcType=VARCHAR},
       </if>
-      <if test="relateMetrics != null" >
-        #{relateMetrics,jdbcType=VARCHAR},
-      </if>
       <if test="status != null" >
         #{status,jdbcType=INTEGER},
       </if>
@@ -108,13 +113,16 @@
       <if test="creator != null" >
         #{creator,jdbcType=VARCHAR},
       </if>
+      <if test="modelIdArray != null" >
+        #{modelIdArray,jdbcType=LONGVARCHAR},
+      </if>
     </trim>
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.xy.fedex.catalog.po.MetricModelPO" >
     update metric_model
     <set >
       <if test="modelId != null" >
-        model_id = #{modelId,jdbcType=BIGINT},
+        model_id = #{modelId,jdbcType=VARCHAR},
       </if>
       <if test="metricId != null" >
         metric_id = #{metricId,jdbcType=BIGINT},
@@ -128,9 +136,6 @@
       <if test="advanceCalculate != null" >
         advance_calculate = #{advanceCalculate,jdbcType=VARCHAR},
       </if>
-      <if test="relateMetrics != null" >
-        relate_metrics = #{advanceCalculate,jdbcType=VARCHAR},
-      </if>
       <if test="status != null" >
         status = #{status,jdbcType=INTEGER},
       </if>
@@ -143,17 +148,33 @@
       <if test="creator != null" >
         creator = #{creator,jdbcType=VARCHAR},
       </if>
+      <if test="modelIdArray != null" >
+        model_id_array = #{modelIdArray,jdbcType=LONGVARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.xy.fedex.catalog.po.MetricModelPO" >
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.xy.fedex.catalog.po.MetricModelPO" >
     update metric_model
-    set model_id = #{modelId,jdbcType=BIGINT},
+    set model_id = #{modelId,jdbcType=VARCHAR},
       metric_id = #{metricId,jdbcType=BIGINT},
       metric_type = #{metricType,jdbcType=INTEGER},
       formula = #{formula,jdbcType=VARCHAR},
       advance_calculate = #{advanceCalculate,jdbcType=VARCHAR},
-      relate_metrics = #{relateMetrics,jdbcType=VARCHAR},
+      status = #{status,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      creator = #{creator,jdbcType=VARCHAR},
+      model_id_array = #{modelIdArray,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.xy.fedex.catalog.po.MetricModelPO" >
+    update metric_model
+    set model_id = #{modelId,jdbcType=VARCHAR},
+      metric_id = #{metricId,jdbcType=BIGINT},
+      metric_type = #{metricType,jdbcType=INTEGER},
+      formula = #{formula,jdbcType=VARCHAR},
+      advance_calculate = #{advanceCalculate,jdbcType=VARCHAR},
       status = #{status,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
@@ -161,65 +182,31 @@
     where id = #{id,jdbcType=BIGINT}
   </update>
 
-  <insert id="batchInsert" parameterType="java.util.List" >
-    insert into metric_model (
-                              model_id,
-                              metric_id,
-                              metric_type,
-                              formula,
-                              advance_calculate,
-                              relate_metrics,
-                              creator)
-    values
-    <foreach collection ="list" item="metricModel" index= "index" separator =",">
-                  (
-                  #{metricModel.modelId},
-                  #{metricModel.metricId},
-                  #{metricModel.metricType},
-                  #{metricModel.formula},
-                  #{metricModel.advanceCalculate},
-                  #{metricModel.relateMetrics},
-                  #{metricModel.creator}
-                  )
-    </foreach>
-  </insert>
-  <select id="selectByModelId" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+  <select id="selectMetricModels" resultMap="ResultMapWithBLOBs" parameterType="com.xy.fedex.catalog.dto.MetricModelRequest" >
     select
     <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
     from metric_model
-    where model_id = #{modelId,jdbcType=BIGINT} and status = 1
+    where json_contains(#{modelIdArray,jdbcType=VARCHAR},model_id_array) and status = 1
+    <if test="metricId != null" >
+        and metric_id = #{metricId,jdbcType=BIGINT}
+    </if>
+    order by id desc
+    <if test="limit != null and offset != null" >
+        limit #{offset,jdbcType=INTEGER},#{limit,jdbcType=INTEGER}
+    </if>
+    <if test="limit != null and offset == null" >
+      limit #{limit,jdbcType=INTEGER}
+    </if>
   </select>
 
-  <select id="selectMetricDetailByModelId" resultType="com.xy.fedex.catalog.po.MetricModelDetailPO" parameterType="java.lang.Long" >
-    select
-        t1.id as metricModelId,
-        t1.model_id as modelId,
-        t1.metric_id as metricId,
-        t1.metric_type as metricType,
-        t1.formula as formula,
-        t1.advance_calculate as advanceCalculate,
-        t1.relate_metrics as relateMetrics,
-        t2.metric_code as metricCode,
-        t2.metric_name as metricName,
-        t2.metric_comment as metricComment
-    from metric_model t1 left join metric t2 on t1.metric_id = t2.id
-    where t1.model_id = #{modelId,jdbcType=BIGINT} and t1.status = 1 and t2.status = 1
+  <select id="getMetricModelCnt" resultMap="ResultMapWithBLOBs" parameterType="com.xy.fedex.catalog.dto.MetricModelRequest" >
+    select count(*) from metric_model
+    where json_contains(#{modelIdArray,jdbcType=VARCHAR},model_id_array) and status = 1
+    <if test="metricId != null" >
+      and metric_id = #{metricId,jdbcType=BIGINT}
+    </if>
   </select>
 
-  <select id="selectByModelIds" resultMap="BaseResultMap" >
-    select
-    <include refid="Base_Column_List" />
-    from metric_model
-    where model_id in
-    <foreach collection="modelIds" item="modelId" open="(" separator="," close=")">
-      #{modelId,jdbcType=BIGINT}
-    </foreach>
-  </select>
-
-  <select id="selectByModelMetric" resultMap="BaseResultMap">
-    select
-    <include refid="Base_Column_List" />
-    from metric_model
-    where model_id = #{modelId,jdbcType=BIGINT} and metric_id = #{metricId,jdbcType=BIGINT} and status = 1
-  </select>
 </mapper>

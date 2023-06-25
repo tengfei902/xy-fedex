@@ -2,7 +2,7 @@ package com.xy.fedex.facade.service.meta.dto;
 
 import com.alibaba.druid.sql.ast.SQLExpr;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlSelectQueryBlock;
-import com.xy.fedex.catalog.common.definition.field.SecondaryCalculate;
+import com.xy.fedex.catalog.common.definition.field.impl.SecondaryCalculate;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

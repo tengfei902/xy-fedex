@@ -20,4 +20,12 @@ public interface AppService {
      * @return
      */
     AppDefinition getApp(Long appId);
+
+    /**
+     * 获取应用
+     * @param bizLineId
+     * @param appName
+     * @return
+     */
+    AppDefinition getApp(Long bizLineId,String appName);
 }

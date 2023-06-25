@@ -3,12 +3,13 @@ package com.xy.fedex.catalog.po;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Data
 public class MetricModelDetailPO implements Serializable {
     private Long metricModelId;
 
-    private Long modelId;
+    private List<Long> modelIds;
 
     private Long metricId;
 

@@ -1,8 +1,9 @@
-package com.xy.fedex.facade.service.cs;
+package com.xy.fedex.facade.catalog;
 
-import com.xy.fedex.catalog.api.dto.request.GetAppRequest;
-import com.xy.fedex.catalog.api.dto.request.GetDimModelRequest;
-import com.xy.fedex.catalog.api.dto.request.GetMetricModelRequest;
+import com.xy.fedex.catalog.api.CatalogFacade;
+import com.xy.fedex.catalog.api.dto.request.list.GetAppRequest;
+import com.xy.fedex.catalog.api.dto.request.list.ListMetricModelRequest;
+import com.xy.fedex.catalog.api.dto.response.list.ListResult;
 import com.xy.fedex.catalog.common.definition.AppDefinition;
 import com.xy.fedex.catalog.common.definition.field.impl.DimModel;
 import com.xy.fedex.catalog.common.definition.field.impl.MetricModel;
@@ -22,19 +23,15 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class AppHolder {
-//    private static final CatalogAppFacade catalogAppFacade;
-//    private static final CatalogMetaFacade catalogMetaFacade;
+    private static final CatalogFacade catalogFacade;
 
     static {
-//        catalogAppFacade = ApplicationContextUtils.getBean(CatalogAppFacade.class);
-//        catalogMetaFacade = ApplicationContextUtils.getBean(CatalogMetaFacade.class);
+        catalogFacade = ApplicationContextUtils.getBean(CatalogFacade.class);
     }
 
     public static App getApp(Long appId) {
-//        AppDefinition appDefinition = catalogAppFacade.getApp(GetAppRequest.builder().appId(appId).build());
-//        App app = new App(appDefinition);
-//        return app;
-        return null;
+        Response<AppDefinition> response = catalogFacade.getApp(GetAppRequest.builder().appId(appId).build());
+        return new App(response.getData());
     }
 
     public static App getApp(String appId) {
@@ -45,7 +42,7 @@ public class AppHolder {
     public static class App implements Serializable {
         private Long appId;
         private String appName;
-        private String appDesc;
+        private String appComment;
         private List<Long> modelIds;
         private List<Metric> metrics;
         private List<Dim> dims;
@@ -57,7 +54,7 @@ public class AppHolder {
         public App(AppDefinition appDefinition) {
             this.appId = appDefinition.getAppId();
             this.appName = appDefinition.getAppName();
-            this.appDesc = appDefinition.getAppDesc();
+            this.appComment = appDefinition.getAppComment();
             this.modelIds = appDefinition.getModelIds();
             if(!CollectionUtils.isEmpty(appDefinition.getMetrics())) {
                 this.metrics = appDefinition.getMetrics().stream().map(metric -> {
@@ -113,15 +110,13 @@ public class AppHolder {
         private String metricComment;
 
         public List<MetricModel> getMetricModels() {
-//            Response<List<MetricModel>> response = catalogMetaFacade.getMetricModels(GetMetricModelRequest.builder().appId(this.appId).metricId(this.metricId).build());
-//            return response.getData();
-            return null;
+            Response<ListResult<MetricModel>> response = catalogFacade.getMetricModels(ListMetricModelRequest.builder().appId(this.appId).metricId(this.metricId).build());
+            return response.getData().getData();
         }
 
         public MetricModel getMetricModel(Long modelId) {
-//            Response<MetricModel> response = catalogMetaFacade.getMetricModel(GetMetricModelRequest.builder().appId(this.appId).modelId(modelId).metricId(this.metricId).build());
-//            return response.getData();
-            return null;
+            Response<ListResult<MetricModel>> response = catalogFacade.getMetricModels(ListMetricModelRequest.builder().appId(this.appId).modelId(modelId).metricId(this.metricId).build());
+            return response.getData().getData().get(0);
         }
     }
 

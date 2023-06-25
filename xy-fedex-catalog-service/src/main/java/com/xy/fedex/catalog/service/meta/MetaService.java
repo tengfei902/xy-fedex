@@ -1,5 +1,6 @@
 package com.xy.fedex.catalog.service.meta;
 
+import com.xy.fedex.catalog.api.dto.request.list.ListMetricModelRequest;
 import com.xy.fedex.catalog.common.definition.column.TableField;
 import com.xy.fedex.catalog.common.definition.field.impl.DimModel;
 import com.xy.fedex.catalog.common.definition.field.impl.MetricModel;
@@ -27,7 +28,7 @@ public interface MetaService {
 
     List<TableField> matchMeta(Long bizLineId,List<TableField> tableFields);
 
-    List<MetricModel> getMetricModels(MetricModelRequest metricModelRequest);
+    List<MetricModel> getMetricModels(ListMetricModelRequest listMetricModelRequest);
 
     MetricModel getMetricModel(MetricModelRequest metricModelRequest);
 

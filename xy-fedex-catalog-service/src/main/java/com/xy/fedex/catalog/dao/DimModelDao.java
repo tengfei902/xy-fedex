@@ -1,5 +1,6 @@
 package com.xy.fedex.catalog.dao;
 
+import com.xy.fedex.catalog.dto.DimModelRequest;
 import com.xy.fedex.catalog.po.DimModelDetailPO;
 import com.xy.fedex.catalog.po.DimModelPO;
 import com.xy.fedex.catalog.po.DimPO;
@@ -30,4 +31,6 @@ public interface DimModelDao {
     List<DimModelDetailPO> selectDimDetailByModelId(@Param("modelId") Long modelId);
 
     List<DimModelDetailPO> selectByAppDimId(@Param("appId")Long appId,@Param("dimId")Long dimId);
+
+    List<DimModelPO> selectDimModels(DimModelRequest dimModelRequest);
 }

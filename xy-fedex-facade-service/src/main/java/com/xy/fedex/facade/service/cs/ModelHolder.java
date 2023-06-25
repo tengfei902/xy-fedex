@@ -1,9 +1,6 @@
 package com.xy.fedex.facade.service.cs;
 
-import com.xy.fedex.catalog.api.dto.request.GetModelRequest;
 import com.xy.fedex.catalog.common.definition.ModelDefinition;
-import com.xy.fedex.def.Response;
-import com.xy.fedex.facade.utils.ApplicationContextUtils;
 
 public class ModelHolder {
 

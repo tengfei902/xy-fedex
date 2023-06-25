@@ -10,9 +10,8 @@ import com.xy.fedex.catalog.api.dto.request.save.SaveModelRequest;
 import com.xy.fedex.catalog.api.dto.request.save.field.dim.SaveDimModelRequest;
 import com.xy.fedex.catalog.api.dto.request.save.field.metric.SaveMetricModelRequest;
 import com.xy.fedex.catalog.common.definition.ModelDefinition;
-import com.xy.fedex.catalog.common.definition.field.AdvanceCalculate;
-import com.xy.fedex.catalog.common.definition.field.DimModel;
-import com.xy.fedex.catalog.common.definition.field.MetricModel;
+import com.xy.fedex.catalog.common.definition.field.impl.DimModel;
+import com.xy.fedex.catalog.common.definition.field.impl.MetricModel;
 import com.xy.fedex.catalog.common.enums.MetricType;
 import com.xy.fedex.catalog.dao.*;
 import com.xy.fedex.catalog.exception.DimNotFoundException;
@@ -192,7 +191,7 @@ public class ModelServiceImpl implements ModelService {
         }
         List<MetricModelPO> metricModelPOS = metricModels.stream().map(metricModelRequest -> {
             MetricModelPO metricModelPO = new MetricModelPO();
-            metricModelPO.setModelId(modelId);
+//            metricModelPO.setModelId(modelId);
             metricModelPO.setMetricId(metricModelRequest.getMetricId());
             metricModelPO.setFormula(metricModelRequest.getFormula());
             metricModelPO.setMetricType(MetricType.PRIMARY.getMetricType());
@@ -201,7 +200,7 @@ public class ModelServiceImpl implements ModelService {
 //            }
             return metricModelPO;
         }).collect(Collectors.toList());
-        metricModelDao.batchInsert(metricModelPOS);
+//        metricModelDao.batchInsert(metricModelPOS);
     }
 
     private void updateMetricModels(List<SaveMetricModelRequest> metricModels) {
@@ -314,33 +313,35 @@ public class ModelServiceImpl implements ModelService {
     }
 
     private List<MetricModel> getModelMetrics(Long modelId) {
-        List<MetricModelDetailPO> details = metricModelDao.selectMetricDetailByModelId(modelId);
-
-        return details.stream().map(metricModelDetail -> {
-            MetricModel metric = new MetricModel();
-            metric.setId(metricModelDetail.getMetricId());
-            metric.setMetricModelId(metricModelDetail.getMetricModelId());
-            metric.setCode(metricModelDetail.getMetricCode());
-//            metric.set(metricModelDetail.getMetricName());
-            metric.setComment(metricModelDetail.getMetricComment());
-            metric.setFormula(metricModelDetail.getFormula());
-//            metric.set(new Gson().fromJson(metricModelDetail.getAdvanceCalculate(), AdvanceCalculate.class));
-            return metric;
-        }).collect(Collectors.toList());
+//        List<MetricModelDetailPO> details = metricModelDao.selectMetricDetailByModelId(modelId);
+//
+//        return details.stream().map(metricModelDetail -> {
+//            MetricModel metric = new MetricModel();
+//            metric.setId(metricModelDetail.getMetricId());
+//            metric.setMetricModelId(metricModelDetail.getMetricModelId());
+//            metric.setCode(metricModelDetail.getMetricCode());
+////            metric.set(metricModelDetail.getMetricName());
+//            metric.setComment(metricModelDetail.getMetricComment());
+//            metric.setFormula(metricModelDetail.getFormula());
+////            metric.set(new Gson().fromJson(metricModelDetail.getAdvanceCalculate(), AdvanceCalculate.class));
+//            return metric;
+//        }).collect(Collectors.toList());
+        return null;
     }
 
     private List<DimModel> getModelDims(Long modelId) {
-        List<DimModelDetailPO> dimModelDetails = dimModelDao.selectDimDetailByModelId(modelId);
-        return dimModelDetails.stream().map(dimModelDetail -> {
-            DimModel dim = new DimModel();
-            dim.setId(dimModelDetail.getDimId());
-            dim.setCode(dimModelDetail.getDimCode());
-            dim.setDimModelId(dimModelDetail.getDimModelId());
-//            dim.set(dimModelDetail.getDimName());
-            dim.setComment(dimModelDetail.getDimComment());
-            dim.setFormula(dimModelDetail.getFormula());
-            return dim;
-        }).collect(Collectors.toList());
+//        List<DimModelDetailPO> dimModelDetails = dimModelDao.selectDimDetailByModelId(modelId);
+//        return dimModelDetails.stream().map(dimModelDetail -> {
+//            DimModel dim = new DimModel();
+//            dim.setId(dimModelDetail.getDimId());
+//            dim.setCode(dimModelDetail.getDimCode());
+//            dim.setDimModelId(dimModelDetail.getDimModelId());
+////            dim.set(dimModelDetail.getDimName());
+//            dim.setComment(dimModelDetail.getDimComment());
+//            dim.setFormula(dimModelDetail.getFormula());
+//            return dim;
+//        }).collect(Collectors.toList());
+        return null;
     }
 
 

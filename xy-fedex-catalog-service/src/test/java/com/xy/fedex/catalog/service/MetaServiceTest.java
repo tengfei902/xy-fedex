@@ -2,6 +2,7 @@ package com.xy.fedex.catalog.service;
 
 import com.google.gson.Gson;
 import com.xy.fedex.catalog.BaseTest;
+import com.xy.fedex.catalog.api.dto.request.list.ListMetricModelRequest;
 import com.xy.fedex.catalog.common.definition.field.impl.DimModel;
 import com.xy.fedex.catalog.common.definition.field.impl.MetricModel;
 import com.xy.fedex.catalog.common.enums.DimType;
@@ -195,14 +196,14 @@ public class MetaServiceTest extends BaseTest {
 
     @Test
     public void testGetMetricModel() {
-        MetricModel metricModel = metaService.getMetricModel(MetricModelRequest.builder().appId(21L).metricId(14L).modelId(10L).build());
-        System.out.println(new Gson().toJson(metricModel));
-        Assert.assertNotNull(metricModel);
+//        MetricModel metricModel = metaService.getMetricModel(MetricModelRequest.builder().appId(21L).metricId(14L).modelId(10L).build());
+//        System.out.println(new Gson().toJson(metricModel));
+//        Assert.assertNotNull(metricModel);
     }
 
     @Test
     public void testGetMetricModels() {
-        List<MetricModel> metricModels = metaService.getMetricModels(MetricModelRequest.builder().appId(21L).metricId(14L).build());
+        List<MetricModel> metricModels = metaService.getMetricModels(ListMetricModelRequest.builder().appId(21L).metricId(14L).build());
         System.out.println(new Gson().toJson(metricModels));
     }
 

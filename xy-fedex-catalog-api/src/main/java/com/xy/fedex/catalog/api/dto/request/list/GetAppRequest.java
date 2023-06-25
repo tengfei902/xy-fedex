@@ -1,4 +1,4 @@
-package com.xy.fedex.catalog.api.dto.request;
+package com.xy.fedex.catalog.api.dto.request.list;
 
 import lombok.Builder;
 import lombok.Data;
@@ -8,7 +8,6 @@ import java.io.Serializable;
 @Builder
 @Data
 public class GetAppRequest implements Serializable {
-//    @NotNull
     private Long bizLineId;
     private Long appId;
     private String appName;

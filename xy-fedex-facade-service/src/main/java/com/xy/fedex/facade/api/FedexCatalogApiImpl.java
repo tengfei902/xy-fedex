@@ -1,11 +1,9 @@
 package com.xy.fedex.facade.api;
 
 
-import com.xy.fedex.catalog.common.definition.field.DimModel;
-import com.xy.fedex.catalog.common.definition.field.MetricModel;
 import com.xy.fedex.facade.api.request.OrthogonalRequest;
 import com.xy.fedex.facade.api.response.OrthogonalMatrix;
-import com.xy.fedex.facade.service.cs.AppHolder;
+import com.xy.fedex.facade.catalog.AppHolder;
 import org.apache.dubbo.config.annotation.DubboService;
 
 import java.util.ArrayList;

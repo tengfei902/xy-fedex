@@ -192,4 +192,18 @@
     where t2.status = 1 and t1.status = 1 and t3.status = 1 and t2.app_id = #{appId,jdbcType=BIGINT}
       and t1.dim_id = #{dimId,jdbcType=BIGINT}
   </select>
+
+  <select id="selectDimModels" resultMap="BaseResultMap" parameterType="com.xy.fedex.catalog.dto.DimModelRequest" >
+    select
+    <include refid="Base_Column_List" />
+    from dim_model
+    where model_id in
+    <foreach collection="modelIds" item="modelId" open="(" close=")" separator=",">
+      #{modelId}
+    </foreach>
+    and status = 1
+    <if test="dimId != null" >
+      and dim_id = #{dimId,jdbcType=BIGINT}
+    </if>
+  </select>
 </mapper>

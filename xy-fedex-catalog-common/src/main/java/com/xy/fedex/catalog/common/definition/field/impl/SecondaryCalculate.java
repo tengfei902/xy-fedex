@@ -1,4 +1,4 @@
-package com.xy.fedex.catalog.common.definition.field;
+package com.xy.fedex.catalog.common.definition.field.impl;
 
 import lombok.Data;
 

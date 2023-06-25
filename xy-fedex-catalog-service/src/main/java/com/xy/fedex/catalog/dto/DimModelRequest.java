@@ -1,12 +1,14 @@
 package com.xy.fedex.catalog.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
-@Builder
+import java.util.List;
+
+@AllArgsConstructor
 @Data
 public class DimModelRequest {
-    private Long appId;
+    private List<Long> modelIds;
     private Long dimId;
-    private Long modelId;
 }

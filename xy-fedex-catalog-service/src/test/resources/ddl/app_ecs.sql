@@ -20,5 +20,7 @@ create table biz_line_0.ecs (
     view_pv bigint comment '浏览pv',
     view_uv bigint comment '浏览uv',
     visit_buy_rate decimal(38,6) comment '访购率'
+) tblproperties(
+  'relate_model_ids' = '23,24,25'
 ) comment '电商demo数据demo';
 

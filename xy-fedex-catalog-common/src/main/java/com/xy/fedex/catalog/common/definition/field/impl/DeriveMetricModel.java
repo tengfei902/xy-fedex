@@ -4,6 +4,9 @@ import lombok.Data;
 
 import java.util.List;
 
+/**
+ * @author tengfei
+ */
 @Data
 public class DeriveMetricModel extends MetricModel {
     private List<MetricModel> relateMetricModels;

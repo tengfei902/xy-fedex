@@ -1,19 +1,15 @@
 package com.xy.fedex.catalog.api;
 
+import com.google.common.base.Joiner;
 import com.google.gson.Gson;
 import com.xy.fedex.catalog.BaseTest;
-import com.xy.fedex.catalog.api.dto.ModelRequest;
-import com.xy.fedex.catalog.api.dto.request.PrepareModelRequest;
-import com.xy.fedex.catalog.api.dto.request.SaveAppRequest;
+import com.xy.fedex.catalog.api.dto.request.list.GetAppRequest;
 import com.xy.fedex.catalog.api.dto.request.save.SaveRequests;
 import com.xy.fedex.catalog.api.dto.request.save.field.metric.SaveDimRequest;
 import com.xy.fedex.catalog.api.dto.request.save.field.metric.SaveMetricRequest;
-import com.xy.fedex.catalog.api.dto.response.PrepareModelResponse;
 import com.xy.fedex.catalog.common.definition.AppDefinition;
-import com.xy.fedex.catalog.common.definition.ModelDefinition;
 import com.xy.fedex.catalog.utils.SqlReader;
 import com.xy.fedex.def.Response;
-import lombok.Data;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Rollback;
@@ -112,7 +108,7 @@ public class CatalogFacadeTest extends BaseTest {
     @Test
     public void testSaveMetric() {
         Long bizLineId = 0L;
-        String metrics = "expose_pv,expose_uv,click_pv,click_uv,view_pv,view_uv,visit_buy_rate";
+        String metrics = "buy_pv,buy_uv,expose_pv,expose_uv,click_pv,click_uv,view_pv,view_uv,visit_buy_rate";
         for(String metric:metrics.split(",")) {
             SaveMetricRequest metricRequest = SaveRequests.newSaveMetricRequest(bizLineId,metric).build();
             catalogFacade.saveMetric(metricRequest);
@@ -123,26 +119,33 @@ public class CatalogFacadeTest extends BaseTest {
     @Test
     public void testSaveDim() {
         Long bizLineId = 0L;
-        List<String> dimCodes = Arrays.asList("dt,shop_id,shop_name,shop_full_name,tenant_id,tenant_name,brand_id,brand_name,ditrict_code,business_district_id,latitude,longitude,district_name,city_code,city_name,province_code,province_name,country_code,country_name,day_of_week,day_of_month,day_of_year,week_of_month,week_of_year,month_of_year,year,holiday,sku_id,sku_name,spu_id,spu_name,catagory1_id,catagory1_name,catagory2_id,catagory2_name,catagory3_id,catagory3_name,catagory4_id,catagory4_name,catagory5_id,catagory5_name,weight,volume,specifications,manufacturer".split(","));
+        List<String> dimCodes = Arrays.asList("district_code,dt,shop_id,shop_name,shop_full_name,tenant_id,tenant_name,brand_id,brand_name,ditrict_code,business_district_id,latitude,longitude,district_name,city_code,city_name,province_code,province_name,country_code,country_name,day_of_week,day_of_month,day_of_year,week_of_month,week_of_year,month_of_year,year,holiday,sku_id,sku_name,spu_id,spu_name,catagory1_id,catagory1_name,catagory2_id,catagory2_name,catagory3_id,catagory3_name,catagory4_id,catagory4_name,catagory5_id,catagory5_name,weight,volume,specifications,manufacturer".split(","));
         for(String dimCode:dimCodes) {
             SaveDimRequest saveDimRequest = SaveRequests.newSaveDimRequest(bizLineId,dimCode).build();
             catalogFacade.saveDim(saveDimRequest);
         }
     }
 
+    @Rollback(value = false)
     @Test
     public void testCreateApp() {
         String sql = SqlReader.read("ddl/app_ecs.sql");
         Response<Long> response = catalogFacade.execute(sql);
-        Response<AppDefinition> appResponse = catalogFacade.getApp(response.getData());
+        Response<AppDefinition> appResponse = catalogFacade.getApp(GetAppRequest.builder().appId(response.getData()).build());
         System.out.println(new Gson().toJson(appResponse.getData()));
     }
 
+    @Rollback(value = false)
     @Test
     public void testCreateModel() {
-        String sql = SqlReader.read("ddl/model_trade_shop_sku_dt.sql");
-        Response<Long> response = catalogFacade.execute(sql);
-        Response<ModelDefinition> model = catalogFacade.getModel(response.getData());
-        System.out.println(new Gson().toJson(model.getData()));
+        List<Long> modelIds = new ArrayList<>();
+        List<String> models = Arrays.asList("model_flow_shop_sku_dt.sql","model_trade_shop_dt.sql","model_trade_shop_sku_dt.sql");
+        for(String model:models) {
+            String sql = SqlReader.read("ddl/"+model);
+            Response<Long> response = catalogFacade.execute(sql);
+            Long modelId = response.getData();
+            modelIds.add(modelId);
+        }
+        System.out.println(Joiner.on(",").join(modelIds));
     }
 }

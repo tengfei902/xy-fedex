@@ -1,4 +1,4 @@
-package com.xy.fedex.catalog.common.definition.field;
+package com.xy.fedex.catalog.common.definition.field.impl;
 
 import lombok.Data;
 
@@ -10,6 +10,7 @@ import java.util.List;
  */
 @Data
 public class AdvanceCalculate implements Serializable {
+    private Long metricModelId;
     /**
      * 二次计算
      */

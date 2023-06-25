@@ -1,10 +1,10 @@
 package com.xy.fedex.catalog.service.meta.impl;
 
-import com.google.gson.Gson;
 import com.xy.fedex.admin.api.vo.response.TableDetailVO;
+import com.xy.fedex.catalog.api.dto.request.list.ListMetricModelRequest;
 import com.xy.fedex.catalog.common.definition.ModelDefinition;
 import com.xy.fedex.catalog.common.definition.column.TableField;
-import com.xy.fedex.catalog.common.definition.field.AdvanceCalculate;
+import com.xy.fedex.catalog.common.definition.field.impl.AdvanceCalculate;
 import com.xy.fedex.catalog.common.definition.field.MetaField;
 import com.xy.fedex.catalog.common.definition.field.impl.DeriveMetricModel;
 import com.xy.fedex.catalog.common.definition.field.impl.DimModel;
@@ -20,17 +20,12 @@ import com.xy.fedex.catalog.service.meta.MetaMatchService;
 import com.xy.fedex.catalog.service.meta.MetaService;
 import com.xy.fedex.catalog.service.meta.ModelService;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -53,6 +48,8 @@ public class MetaServiceImpl implements MetaService {
     private DimFamilyRelationDao dimFamilyRelationDao;
     @Autowired
     private DimFamilyDao dimFamilyDao;
+    @Autowired
+    private AppModelRelationDao appModelRelationDao;
 
     @Override
     public MetricDTO getMetric(Long metricId) {
@@ -225,26 +222,36 @@ public class MetaServiceImpl implements MetaService {
 
     /**
      * metric model列表查询
-     * @param metricModelRequest
+     * @param listMetricModelRequest
      * @return
      */
     @Override
-    public List<MetricModel> getMetricModels(MetricModelRequest metricModelRequest) {
-        List<MetricModelDetailPO> metricModelDetails = appMetricModelRelationDao.selectAppMetricModels(metricModelRequest.getAppId(),metricModelRequest.getMetricId());
-        if(CollectionUtils.isEmpty(metricModelDetails)) {
-            return Collections.EMPTY_LIST;
-        }
-        List<MetricModel> metricModels = metricModelDetails.stream().map(metricModelDetailPO -> {
-            MetricType metricType = MetricType.parse(metricModelDetailPO.getMetricType());
-            switch (metricType) {
-                case PRIMARY:
-                    return getPrimaryMetricModel(metricModelDetailPO);
-                case DERIVE:
-                    return getDeriveMetricModel(metricModelRequest.getAppId(), metricModelDetailPO);
+    public List<MetricModel> getMetricModels(ListMetricModelRequest listMetricModelRequest) {
+        List<AppModelRelationPO> appModelRelations = appModelRelationDao.selectByAppId(listMetricModelRequest.getAppId());
+        List<Long> modelIds = appModelRelations.stream().map(AppModelRelationPO::getModelId).collect(Collectors.toList());
+        if(!Objects.isNull(listMetricModelRequest.getModelId())) {
+            if(!modelIds.contains(listMetricModelRequest.getModelId())) {
+                throw new ModelNotFoundException(String.format("model:%s not related in app:%s",listMetricModelRequest.getModelId(),listMetricModelRequest.getAppId()));
             }
-            throw new MetricTypeNotSupportException("metric type not support:"+metricType.name());
-        }).collect(Collectors.toList());
-        return metricModels;
+            modelIds = Arrays.asList(listMetricModelRequest.getModelId());
+        }
+
+//        List<MetricModelDetailPO> metricModelDetails = appMetricModelRelationDao.selectAppMetricModels(metricModelRequest.getAppId(),metricModelRequest.getMetricId());
+//        if(CollectionUtils.isEmpty(metricModelDetails)) {
+//            return Collections.EMPTY_LIST;
+//        }
+//        List<MetricModel> metricModels = metricModelDetails.stream().map(metricModelDetailPO -> {
+//            MetricType metricType = MetricType.parse(metricModelDetailPO.getMetricType());
+//            switch (metricType) {
+//                case PRIMARY:
+//                    return getPrimaryMetricModel(metricModelDetailPO);
+//                case DERIVE:
+//                    return getDeriveMetricModel(metricModelRequest.getAppId(), metricModelDetailPO);
+//            }
+//            throw new MetricTypeNotSupportException("metric type not support:"+metricType.name());
+//        }).collect(Collectors.toList());
+//        return metricModels;
+        return null;
     }
 
     /**
@@ -254,19 +261,20 @@ public class MetaServiceImpl implements MetaService {
      */
     @Override
     public MetricModel getMetricModel(MetricModelRequest metricModelRequest) {
-        Long modelId = metricModelRequest.getModelId();
-        if (Objects.isNull(modelId)) {
-            throw new IllegalArgumentException("model id cannot be null");
-        }
-        ModelDefinition modelDefinition = modelService.getModel(modelId);
-        if (Objects.isNull(modelDefinition)) {
-            throw new ModelNotFoundException(String.format("model:%s not found", modelId));
-        }
-        MetricModelPO metricModelPO = metricModelDao.selectByModelMetric(metricModelRequest.getModelId(), metricModelRequest.getMetricId());
-        if (Objects.isNull(metricModelPO)) {
-            throw new MetricNotFoundException(String.format("metric:%s not found in model:%s", metricModelRequest.getMetricId(), metricModelRequest.getModelId()));
-        }
-        return getMetricModel(metricModelRequest.getAppId(),metricModelPO.getId());
+//        metricModelRequest.getModelId();
+//        if (Objects.isNull(modelId)) {
+//            throw new IllegalArgumentException("model id cannot be null");
+//        }
+//        ModelDefinition modelDefinition = modelService.getModel(modelId);
+//        if (Objects.isNull(modelDefinition)) {
+//            throw new ModelNotFoundException(String.format("model:%s not found", modelId));
+//        }
+//        MetricModelPO metricModelPO = metricModelDao.selectByModelMetric(metricModelRequest.getModelId(), metricModelRequest.getMetricId());
+//        if (Objects.isNull(metricModelPO)) {
+//            throw new MetricNotFoundException(String.format("metric:%s not found in model:%s", metricModelRequest.getMetricId(), metricModelRequest.getModelId()));
+//        }
+//        return getMetricModel(metricModelRequest.getAppId(),metricModelPO.getId());
+        return null;
     }
 
     private MetricModel getMetricModel(Long appId, Long metricModelId) {
@@ -282,42 +290,44 @@ public class MetaServiceImpl implements MetaService {
     }
 
     private PrimaryMetricModel getPrimaryMetricModel(MetricModelDetailPO metricModelDetailPO) {
-        PrimaryMetricModel metricModel = new PrimaryMetricModel();
-        metricModel.setModelId(metricModelDetailPO.getModelId());
-        metricModel.setCode(metricModelDetailPO.getMetricCode());
-        metricModel.setFormula(metricModelDetailPO.getFormula());
-        metricModel.setComment(metricModelDetailPO.getMetricComment());
-
-        metricModel.setMetricId(metricModelDetailPO.getMetricId());
-        metricModel.setMetricModelId(metricModelDetailPO.getMetricModelId());
-        metricModel.setAdvanceCalculate(getAdvanceCalculate(metricModelDetailPO.getModelId(), metricModelDetailPO.getAdvanceCalculate()));
-        return metricModel;
+//        PrimaryMetricModel metricModel = new PrimaryMetricModel();
+//        metricModel.setModelId(metricModelDetailPO.getModelId());
+//        metricModel.setCode(metricModelDetailPO.getMetricCode());
+//        metricModel.setFormula(metricModelDetailPO.getFormula());
+//        metricModel.setComment(metricModelDetailPO.getMetricComment());
+//
+//        metricModel.setMetricId(metricModelDetailPO.getMetricId());
+//        metricModel.setMetricModelId(metricModelDetailPO.getMetricModelId());
+//        metricModel.setAdvanceCalculate(getAdvanceCalculate(metricModelDetailPO.getModelId(), metricModelDetailPO.getAdvanceCalculate()));
+//        return metricModel;
+        return null;
     }
 
     private DeriveMetricModel getDeriveMetricModel(Long appId, MetricModelDetailPO metricModelDetailPO) {
-        DeriveMetricModel deriveMetricModel = new DeriveMetricModel();
-        deriveMetricModel.setCode(metricModelDetailPO.getMetricCode());
-        deriveMetricModel.setFormula(metricModelDetailPO.getFormula());
-        deriveMetricModel.setComment(metricModelDetailPO.getMetricComment());
-
-        deriveMetricModel.setMetricId(metricModelDetailPO.getMetricId());
-        deriveMetricModel.setMetricModelId(metricModelDetailPO.getMetricModelId());
-        deriveMetricModel.setAdvanceCalculate(getAdvanceCalculate(metricModelDetailPO.getModelId(), metricModelDetailPO.getAdvanceCalculate()));
-
-        String formula = metricModelDetailPO.getFormula();
-
-        List<MetricModel> relateMetricModels = new ArrayList<>();
-
-        Matcher matcher = Constants.DERIVE_FORMULA_PATTERN.matcher(formula);
-        while (matcher.find()) {
-            String group = matcher.group();
-            Long relateMetricModelId = Long.valueOf(group.replace("${", "").replace("}", ""));
-            MetricModel relateMetricModel = getMetricModel(appId, relateMetricModelId);
-            relateMetricModels.add(relateMetricModel);
-        }
-
-        deriveMetricModel.setRelateMetricModels(relateMetricModels);
-        return deriveMetricModel;
+//        DeriveMetricModel deriveMetricModel = new DeriveMetricModel();
+//        deriveMetricModel.setCode(metricModelDetailPO.getMetricCode());
+//        deriveMetricModel.setFormula(metricModelDetailPO.getFormula());
+//        deriveMetricModel.setComment(metricModelDetailPO.getMetricComment());
+//
+//        deriveMetricModel.setMetricId(metricModelDetailPO.getMetricId());
+//        deriveMetricModel.setMetricModelId(metricModelDetailPO.getMetricModelId());
+//        deriveMetricModel.setAdvanceCalculate(getAdvanceCalculate(metricModelDetailPO.getModelId(), metricModelDetailPO.getAdvanceCalculate()));
+//
+//        String formula = metricModelDetailPO.getFormula();
+//
+//        List<MetricModel> relateMetricModels = new ArrayList<>();
+//
+//        Matcher matcher = Constants.DERIVE_FORMULA_PATTERN.matcher(formula);
+//        while (matcher.find()) {
+//            String group = matcher.group();
+//            Long relateMetricModelId = Long.valueOf(group.replace("${", "").replace("}", ""));
+//            MetricModel relateMetricModel = getMetricModel(appId, relateMetricModelId);
+//            relateMetricModels.add(relateMetricModel);
+//        }
+//
+//        deriveMetricModel.setRelateMetricModels(relateMetricModels);
+//        return deriveMetricModel;
+        return null;
     }
 
     private AdvanceCalculate getAdvanceCalculate(Long modelId, String advanceCalculate) {
@@ -338,22 +348,13 @@ public class MetaServiceImpl implements MetaService {
 
     @Override
     public List<DimModel> getDimModels(DimModelRequest dimModelRequest) {
-        Long appId = dimModelRequest.getAppId();
-        Long dimId = dimModelRequest.getDimId();
-
-        List<DimModelDetailPO> dimModelDetails = dimModelDao.selectByAppDimId(appId,dimId);
-        if(CollectionUtils.isEmpty(dimModelDetails)) {
-            return Collections.EMPTY_LIST;
-        }
-
-        return dimModelDetails.stream().map(dimModelDetail -> {
+        List<DimModelPO> dimModels = dimModelDao.selectDimModels(dimModelRequest);
+        return dimModels.stream().map(dimModelPO -> {
             DimModel dimModel = new DimModel();
-            dimModel.setDimId(dimModelDetail.getDimId());
-            dimModel.setDimModelId(dimModelDetail.getDimModelId());
-            dimModel.setCode(dimModelDetail.getDimCode());
-            dimModel.setFormula(dimModelDetail.getFormula());
-            dimModel.setComment(dimModelDetail.getDimComment());
-            dimModel.setModelId(dimModelDetail.getModelId());
+            dimModel.setDimModelId(dimModelPO.getId());
+            dimModel.setModelId(dimModelPO.getModelId());
+            dimModel.setDimCode(null);
+            dimModel.setFormula(dimModelPO.getFormula());
             return dimModel;
         }).collect(Collectors.toList());
     }

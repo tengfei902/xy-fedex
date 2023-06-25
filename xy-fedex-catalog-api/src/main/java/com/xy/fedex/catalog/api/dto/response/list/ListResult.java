@@ -14,4 +14,13 @@ public class ListResult<T> implements Serializable {
     private Integer offset;
     private Integer limit;
     private List<T> data;
+
+    public static <T> ListResult<T> newPage(Integer totalSize,Integer offset,Integer limit,List<T> data) {
+        ListResult<T> listResult = new ListResult<>();
+        listResult.setTotalSize(totalSize);
+        listResult.setOffset(offset);
+        listResult.setLimit(limit);
+        listResult.setData(data);
+        return listResult;
+    }
 }

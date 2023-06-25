@@ -2,16 +2,16 @@ package com.xy.fedex.catalog.api;
 
 import com.alibaba.druid.DbType;
 import com.alibaba.druid.sql.SQLUtils;
-import com.alibaba.druid.sql.ast.SQLDataType;
 import com.alibaba.druid.sql.ast.SQLExpr;
-import com.alibaba.druid.sql.ast.SQLName;
 import com.alibaba.druid.sql.ast.SQLStatement;
 import com.alibaba.druid.sql.ast.expr.SQLCharExpr;
 import com.alibaba.druid.sql.ast.expr.SQLIdentifierExpr;
 import com.alibaba.druid.sql.ast.statement.*;
 import com.alibaba.druid.sql.dialect.hive.stmt.HiveCreateTableStatement;
-import com.alibaba.druid.sql.parser.SQLCreateTableParser;
+import com.xy.fedex.catalog.api.dto.request.list.GetAppRequest;
 import com.xy.fedex.catalog.api.dto.request.SaveAppRequest;
+import com.xy.fedex.catalog.api.dto.request.list.ListDimModelRequest;
+import com.xy.fedex.catalog.api.dto.request.list.ListMetricModelRequest;
 import com.xy.fedex.catalog.api.dto.request.list.ListMetricRequest;
 import com.xy.fedex.catalog.api.dto.request.save.SaveModelRequest;
 import com.xy.fedex.catalog.api.dto.request.save.field.dim.SaveDimModelRequest;
@@ -23,16 +23,17 @@ import com.xy.fedex.catalog.common.constants.RpcConstants;
 import com.xy.fedex.catalog.common.definition.AppDefinition;
 import com.xy.fedex.catalog.common.definition.ModelDefinition;
 import com.xy.fedex.catalog.common.definition.field.Metric;
+import com.xy.fedex.catalog.common.definition.field.impl.DimModel;
+import com.xy.fedex.catalog.common.definition.field.impl.MetricModel;
 import com.xy.fedex.catalog.constants.Constants;
-import com.xy.fedex.catalog.dto.DimDTO;
-import com.xy.fedex.catalog.dto.MetricDTO;
-import com.xy.fedex.catalog.dto.SchemaDTO;
+import com.xy.fedex.catalog.dto.*;
 import com.xy.fedex.catalog.exception.DimNotFoundException;
 import com.xy.fedex.catalog.exception.MetaNotFoundException;
 import com.xy.fedex.catalog.exception.MetricNotFoundException;
 import com.xy.fedex.catalog.service.containers.MetricHolder;
 import com.xy.fedex.catalog.service.meta.AppService;
 import com.xy.fedex.catalog.service.meta.MetaService;
+import com.xy.fedex.catalog.service.meta.MetricModelService;
 import com.xy.fedex.catalog.service.meta.ModelService;
 import com.xy.fedex.catalog.utils.CatalogUtils;
 import com.xy.fedex.def.Response;
@@ -62,6 +63,8 @@ public class CatalogFacadeImpl implements CatalogFacade {
     private MetricHolder metricHolder;
     @Autowired
     private AppService appService;
+    @Autowired
+    private MetricModelService metricModelService;
 
     @Override
     public Response<Long> execute(String sql) {
@@ -155,9 +158,14 @@ public class CatalogFacadeImpl implements CatalogFacade {
     }
 
     @Override
-    public Response<AppDefinition> getApp(Long appId) {
-        AppDefinition app = appService.getApp(appId);
-        return Response.success(app);
+    public Response<AppDefinition> getApp(GetAppRequest request) {
+        if(!Objects.isNull(request.getAppId())) {
+            AppDefinition app = appService.getApp(request.getAppId());
+            return Response.success(app);
+        } else {
+            AppDefinition app = appService.getApp(request.getBizLineId(),request.getAppName());
+            return Response.success(app);
+        }
     }
 
     @Override
@@ -306,6 +314,42 @@ public class CatalogFacadeImpl implements CatalogFacade {
 
     @Override
     public ListResult<Metric> getMetrics(ListMetricRequest listMetricRequest) {
+        return null;
+    }
+
+    @Override
+    public Response<ListResult<MetricModel>> getMetricModels(ListMetricModelRequest listMetricModelRequest) {
+        List<Long> modelIds = getModelIds(listMetricModelRequest.getAppId(), listMetricModelRequest.getModelId());
+        MetricModelRequest metricModelRequest = MetricModelRequest.builder().modelIds(modelIds).metricId(listMetricModelRequest.getMetricId()).build();
+        List<MetricModel> metricModels = metricModelService.getMetricModels(metricModelRequest);
+        Integer totalCnt = metricModelService.getMetricModelCnt(metricModelRequest);
+        return Response.success(ListResult.newPage(totalCnt,listMetricModelRequest.getOffset(),listMetricModelRequest.getLimit(),metricModels));
+    }
+
+    private List<Long> getModelIds(Long appId,Long modelId) {
+        if(Objects.isNull(appId) && Objects.isNull(modelId)) {
+            throw new IllegalArgumentException("appId and modelId cannot neither be null");
+        }
+        if(Objects.isNull(appId)) {
+            return Arrays.asList(modelId);
+        }
+        AppDefinition app = appService.getApp(appId);
+        if(Objects.isNull(modelId)) {
+            return app.getModelIds();
+        }
+
+        if(app.getModelIds().contains(modelId)) {
+            return Arrays.asList(modelId);
+        }
+
+        throw new IllegalArgumentException(String.format("modelId:%s not related to app:%s",modelId,appId));
+    }
+
+    @Override
+    public Response<ListResult<DimModel>> getDimModels(ListDimModelRequest listDimModelRequest) {
+        List<Long> modelIds = getModelIds(listDimModelRequest.getAppId(), listDimModelRequest.getModelId());
+        DimModelRequest dimModelRequest = new DimModelRequest(modelIds, listDimModelRequest.getDimId());
+        metaService.getDimModels(dimModelRequest);
         return null;
     }
 }

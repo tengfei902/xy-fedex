@@ -57,7 +57,7 @@ public class ModelServiceTest extends BaseTest {
         Assert.assertEquals(modelPO.getTableSource(),modelRequest.getTableSource());
         Assert.assertEquals(modelPO.getCondition(),modelRequest.getCondition());
         //Assert.assertEquals(modelPO.getModelProp(),modelRequest.getModelProp());
-        List<MetricModelPO> metricModels = metricModelDao.selectByModelId(modelId);
+        List<MetricModelPO> metricModels = metricModelDao.selectMetricModels(null);
         Assert.assertTrue(metricModels.size() == 5);
         for(MetricModelPO metricModel:metricModels) {
             Assert.assertEquals(metricModel.getModelId(),modelId);

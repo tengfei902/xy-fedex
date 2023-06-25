@@ -123,31 +123,31 @@ public class AppServiceImpl implements AppService {
         appColumnDao.batchInsert(columns);
     }
 
-    private void saveAppMetricModelRelation(Long appId,List<Long> modelIds) {
-        appMetricModelRelationDao.deleteByAppId(appId);
-
-        List<MetricModelPO> metricModels = metricModelDao.selectByModelIds(modelIds);
-        List<AppMetricModelRelationPO> list = metricModels.stream().map(metricModelPO -> {
-            AppMetricModelRelationPO appMetricModelRelationPO = new AppMetricModelRelationPO();
-            appMetricModelRelationPO.setAppId(appId);
-            appMetricModelRelationPO.setMetricModelId(metricModelPO.getId());
-            return appMetricModelRelationPO;
-        }).collect(Collectors.toList());
-        appMetricModelRelationDao.batchInsert(list);
-    }
-
     @Override
     public AppDefinition getApp(Long appId) {
         AppPO appPO = appDao.selectByPrimaryKey(appId);
         if(Objects.isNull(appPO)) {
             throw new AppNotFoundException("app not found:"+appId);
         }
+        return getAppDefinition(appPO);
+    }
+
+    @Override
+    public AppDefinition getApp(Long bizLineId, String appName) {
+        AppPO appPO = appDao.selectByName(bizLineId,appName);
+        if(Objects.isNull(appPO)) {
+            throw new AppNotFoundException(String.format("app not found, bizLineId:%s,appName:%s",bizLineId,appName));
+        }
+        return getAppDefinition(appPO);
+    }
+
+    private AppDefinition getAppDefinition(AppPO appPO) {
         AppDefinition appDefinition = new AppDefinition();
         appDefinition.setAppId(appPO.getId());
         appDefinition.setAppName(appPO.getAppName());
         appDefinition.setAppComment(appPO.getAppComment());
 
-        List<AppModelRelationPO> appModelRelations = appModelRelationDao.selectByAppId(appId);
+        List<AppModelRelationPO> appModelRelations = appModelRelationDao.selectByAppId(appPO.getId());
         if(!CollectionUtils.isEmpty(appModelRelations)) {
             appDefinition.setModelIds(appModelRelations.stream().map(AppModelRelationPO::getModelId).collect(Collectors.toList()));
         }

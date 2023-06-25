@@ -1,11 +1,11 @@
 package com.xy.fedex.catalog.dao;
 
-import com.xy.fedex.catalog.po.MetricModelDetailPO;
+import com.xy.fedex.catalog.dto.MetricModelRequest;
 import com.xy.fedex.catalog.po.MetricModelPO;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+
 @Mapper
 public interface MetricModelDao {
     int deleteByPrimaryKey(Long id);
@@ -18,15 +18,11 @@ public interface MetricModelDao {
 
     int updateByPrimaryKeySelective(MetricModelPO record);
 
+    int updateByPrimaryKeyWithBLOBs(MetricModelPO record);
+
     int updateByPrimaryKey(MetricModelPO record);
 
-    int batchInsert(List<MetricModelPO> metricModels);
+    List<MetricModelPO> selectMetricModels(MetricModelRequest metricModelRequest);
 
-    List<MetricModelPO> selectByModelId(@Param("modelId") Long modelId);
-
-    List<MetricModelPO> selectByModelIds(@Param("modelIds") List<Long> modelIds);
-
-    List<MetricModelDetailPO> selectMetricDetailByModelId(@Param("modelId") Long modelId);
-
-    MetricModelPO selectByModelMetric(@Param("modelId") Long modelId,@Param("metricId")Long metricId);
+    Integer getMetricModelCnt(MetricModelRequest metricModelRequest);
 }

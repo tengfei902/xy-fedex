@@ -9,8 +9,4 @@ import java.io.Serializable;
  */
 @Data
 public class MetaField implements Serializable {
-    private Long id;
-    private String code;
-    private String formula;
-    private String comment;
 }

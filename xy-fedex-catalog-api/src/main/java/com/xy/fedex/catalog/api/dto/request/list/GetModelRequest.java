@@ -1,4 +1,4 @@
-package com.xy.fedex.catalog.api.dto.request;
+package com.xy.fedex.catalog.api.dto.request.list;
 
 import lombok.Builder;
 import lombok.Data;
