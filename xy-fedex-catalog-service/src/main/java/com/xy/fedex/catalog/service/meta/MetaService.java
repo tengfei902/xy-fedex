@@ -24,13 +24,5 @@ public interface MetaService {
 
     Long saveDim(DimDTO dim);
 
-    void matchMetricAndDim(List<TableAliasDTO> tableAliasList);
-
-    List<TableField> matchMeta(Long bizLineId,List<TableField> tableFields);
-
-    List<MetricModel> getMetricModels(ListMetricModelRequest listMetricModelRequest);
-
-    MetricModel getMetricModel(MetricModelRequest metricModelRequest);
-
     List<DimModel> getDimModels(DimModelRequest dimModelRequest);
 }

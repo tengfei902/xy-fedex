@@ -348,7 +348,7 @@ public class CatalogFacadeImpl implements CatalogFacade {
     @Override
     public Response<ListResult<DimModel>> getDimModels(ListDimModelRequest listDimModelRequest) {
         List<Long> modelIds = getModelIds(listDimModelRequest.getAppId(), listDimModelRequest.getModelId());
-        DimModelRequest dimModelRequest = new DimModelRequest(modelIds, listDimModelRequest.getDimId());
+        DimModelRequest dimModelRequest = DimModelRequest.builder().modelIds(modelIds).dimId(listDimModelRequest.getDimId()).build();
         metaService.getDimModels(dimModelRequest);
         return null;
     }

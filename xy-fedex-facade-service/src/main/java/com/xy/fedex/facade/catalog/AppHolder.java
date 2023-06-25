@@ -2,6 +2,7 @@ package com.xy.fedex.facade.catalog;
 
 import com.xy.fedex.catalog.api.CatalogFacade;
 import com.xy.fedex.catalog.api.dto.request.list.GetAppRequest;
+import com.xy.fedex.catalog.api.dto.request.list.ListDimModelRequest;
 import com.xy.fedex.catalog.api.dto.request.list.ListMetricModelRequest;
 import com.xy.fedex.catalog.api.dto.response.list.ListResult;
 import com.xy.fedex.catalog.common.definition.AppDefinition;
@@ -129,15 +130,13 @@ public class AppHolder {
         private DimType dimType;
 
         public List<DimModel> getDimModels() {
-//            Response<List<DimModel>> response = catalogMetaFacade.getDimModels(GetDimModelRequest.builder().appId(this.appId).dimId(this.dimId).build());
-//            return response.getData();
-            return null;
+            Response<ListResult<DimModel>> response = catalogFacade.getDimModels(ListDimModelRequest.builder().appId(this.appId).dimId(this.dimId).build());
+            return response.getData().getData();
         }
 
         public DimModel getDimModel(Long modelId) {
-//            DimModel dimModel = catalogMetaFacade.getDimModel(GetDimModelRequest.builder().appId(this.appId).modelId(modelId).dimId(this.dimId).build());
-//            return dimModel;
-            return null;
+            Response<ListResult<DimModel>> response = catalogFacade.getDimModels(ListDimModelRequest.builder().appId(this.appId).modelId(modelId).dimId(this.dimId).build());
+            return response.getData().getData().get(0);
         }
     }
 }

@@ -1,17 +1,10 @@
 package com.xy.fedex.catalog.service.meta.impl;
 
 import com.xy.fedex.admin.api.vo.response.TableDetailVO;
-import com.xy.fedex.catalog.api.dto.request.list.ListMetricModelRequest;
-import com.xy.fedex.catalog.common.definition.ModelDefinition;
 import com.xy.fedex.catalog.common.definition.column.TableField;
-import com.xy.fedex.catalog.common.definition.field.impl.AdvanceCalculate;
 import com.xy.fedex.catalog.common.definition.field.MetaField;
-import com.xy.fedex.catalog.common.definition.field.impl.DeriveMetricModel;
 import com.xy.fedex.catalog.common.definition.field.impl.DimModel;
-import com.xy.fedex.catalog.common.definition.field.impl.MetricModel;
-import com.xy.fedex.catalog.common.definition.field.impl.PrimaryMetricModel;
 import com.xy.fedex.catalog.common.enums.MetricType;
-import com.xy.fedex.catalog.constants.Constants;
 import com.xy.fedex.catalog.dao.*;
 import com.xy.fedex.catalog.dto.*;
 import com.xy.fedex.catalog.exception.*;
@@ -37,19 +30,11 @@ public class MetaServiceImpl implements MetaService {
     @Autowired
     private MetaMatchService metaMatchService;
     @Autowired
-    private AppMetricModelRelationDao appMetricModelRelationDao;
-    @Autowired
-    private MetricModelDao metricModelDao;
-    @Autowired
-    private ModelService modelService;
-    @Autowired
     private DimModelDao dimModelDao;
     @Autowired
     private DimFamilyRelationDao dimFamilyRelationDao;
     @Autowired
     private DimFamilyDao dimFamilyDao;
-    @Autowired
-    private AppModelRelationDao appModelRelationDao;
 
     @Override
     public MetricDTO getMetric(Long metricId) {
@@ -196,154 +181,6 @@ public class MetaServiceImpl implements MetaService {
         dimFamilyRelationPO.setDimFamilyId(dimFamilyId);
         dimFamilyRelationPO.setDimId(dimId);
         dimFamilyRelationDao.insertSelective(dimFamilyRelationPO);
-    }
-
-    @Override
-    public void matchMetricAndDim(List<TableAliasDTO> tableAliasList) {
-        for (TableAliasDTO tableAliasDTO : tableAliasList) {
-            String alias = tableAliasDTO.getAlias();
-            TableDetailVO table = tableAliasDTO.getTable();
-            for (TableDetailVO.Column column : table.getColumns()) {
-                String fieldName = column.getColumnName();
-
-            }
-        }
-    }
-
-    @Override
-    public List<TableField> matchMeta(Long bizLineId, List<TableField> tableFields) {
-        for (TableField tableField : tableFields) {
-            String columnName = tableField.getColumnName();
-            MetaField relateMetaField = metaMatchService.getRelateMetaField(bizLineId, columnName);
-            tableField.setRelateField(relateMetaField);
-        }
-        return tableFields;
-    }
-
-    /**
-     * metric model列表查询
-     * @param listMetricModelRequest
-     * @return
-     */
-    @Override
-    public List<MetricModel> getMetricModels(ListMetricModelRequest listMetricModelRequest) {
-        List<AppModelRelationPO> appModelRelations = appModelRelationDao.selectByAppId(listMetricModelRequest.getAppId());
-        List<Long> modelIds = appModelRelations.stream().map(AppModelRelationPO::getModelId).collect(Collectors.toList());
-        if(!Objects.isNull(listMetricModelRequest.getModelId())) {
-            if(!modelIds.contains(listMetricModelRequest.getModelId())) {
-                throw new ModelNotFoundException(String.format("model:%s not related in app:%s",listMetricModelRequest.getModelId(),listMetricModelRequest.getAppId()));
-            }
-            modelIds = Arrays.asList(listMetricModelRequest.getModelId());
-        }
-
-//        List<MetricModelDetailPO> metricModelDetails = appMetricModelRelationDao.selectAppMetricModels(metricModelRequest.getAppId(),metricModelRequest.getMetricId());
-//        if(CollectionUtils.isEmpty(metricModelDetails)) {
-//            return Collections.EMPTY_LIST;
-//        }
-//        List<MetricModel> metricModels = metricModelDetails.stream().map(metricModelDetailPO -> {
-//            MetricType metricType = MetricType.parse(metricModelDetailPO.getMetricType());
-//            switch (metricType) {
-//                case PRIMARY:
-//                    return getPrimaryMetricModel(metricModelDetailPO);
-//                case DERIVE:
-//                    return getDeriveMetricModel(metricModelRequest.getAppId(), metricModelDetailPO);
-//            }
-//            throw new MetricTypeNotSupportException("metric type not support:"+metricType.name());
-//        }).collect(Collectors.toList());
-//        return metricModels;
-        return null;
-    }
-
-    /**
-     * 获取metric model
-     * @param metricModelRequest
-     * @return
-     */
-    @Override
-    public MetricModel getMetricModel(MetricModelRequest metricModelRequest) {
-//        metricModelRequest.getModelId();
-//        if (Objects.isNull(modelId)) {
-//            throw new IllegalArgumentException("model id cannot be null");
-//        }
-//        ModelDefinition modelDefinition = modelService.getModel(modelId);
-//        if (Objects.isNull(modelDefinition)) {
-//            throw new ModelNotFoundException(String.format("model:%s not found", modelId));
-//        }
-//        MetricModelPO metricModelPO = metricModelDao.selectByModelMetric(metricModelRequest.getModelId(), metricModelRequest.getMetricId());
-//        if (Objects.isNull(metricModelPO)) {
-//            throw new MetricNotFoundException(String.format("metric:%s not found in model:%s", metricModelRequest.getMetricId(), metricModelRequest.getModelId()));
-//        }
-//        return getMetricModel(metricModelRequest.getAppId(),metricModelPO.getId());
-        return null;
-    }
-
-    private MetricModel getMetricModel(Long appId, Long metricModelId) {
-        MetricModelDetailPO metricModelDetailPO = appMetricModelRelationDao.selectAppMetricModel(appId, metricModelId);
-        MetricType metricType = MetricType.parse(metricModelDetailPO.getMetricType());
-        switch (metricType) {
-            case PRIMARY:
-                return getPrimaryMetricModel(metricModelDetailPO);
-            case DERIVE:
-                return getDeriveMetricModel(appId, metricModelDetailPO);
-        }
-        throw new MetricTypeNotSupportException("metric type not support:"+metricType.name());
-    }
-
-    private PrimaryMetricModel getPrimaryMetricModel(MetricModelDetailPO metricModelDetailPO) {
-//        PrimaryMetricModel metricModel = new PrimaryMetricModel();
-//        metricModel.setModelId(metricModelDetailPO.getModelId());
-//        metricModel.setCode(metricModelDetailPO.getMetricCode());
-//        metricModel.setFormula(metricModelDetailPO.getFormula());
-//        metricModel.setComment(metricModelDetailPO.getMetricComment());
-//
-//        metricModel.setMetricId(metricModelDetailPO.getMetricId());
-//        metricModel.setMetricModelId(metricModelDetailPO.getMetricModelId());
-//        metricModel.setAdvanceCalculate(getAdvanceCalculate(metricModelDetailPO.getModelId(), metricModelDetailPO.getAdvanceCalculate()));
-//        return metricModel;
-        return null;
-    }
-
-    private DeriveMetricModel getDeriveMetricModel(Long appId, MetricModelDetailPO metricModelDetailPO) {
-//        DeriveMetricModel deriveMetricModel = new DeriveMetricModel();
-//        deriveMetricModel.setCode(metricModelDetailPO.getMetricCode());
-//        deriveMetricModel.setFormula(metricModelDetailPO.getFormula());
-//        deriveMetricModel.setComment(metricModelDetailPO.getMetricComment());
-//
-//        deriveMetricModel.setMetricId(metricModelDetailPO.getMetricId());
-//        deriveMetricModel.setMetricModelId(metricModelDetailPO.getMetricModelId());
-//        deriveMetricModel.setAdvanceCalculate(getAdvanceCalculate(metricModelDetailPO.getModelId(), metricModelDetailPO.getAdvanceCalculate()));
-//
-//        String formula = metricModelDetailPO.getFormula();
-//
-//        List<MetricModel> relateMetricModels = new ArrayList<>();
-//
-//        Matcher matcher = Constants.DERIVE_FORMULA_PATTERN.matcher(formula);
-//        while (matcher.find()) {
-//            String group = matcher.group();
-//            Long relateMetricModelId = Long.valueOf(group.replace("${", "").replace("}", ""));
-//            MetricModel relateMetricModel = getMetricModel(appId, relateMetricModelId);
-//            relateMetricModels.add(relateMetricModel);
-//        }
-//
-//        deriveMetricModel.setRelateMetricModels(relateMetricModels);
-//        return deriveMetricModel;
-        return null;
-    }
-
-    private AdvanceCalculate getAdvanceCalculate(Long modelId, String advanceCalculate) {
-        ModelDefinition model = modelService.getModel(modelId);
-//        if (StringUtils.isEmpty(advanceCalculate)) {
-//            AdvanceCalculate result = new AdvanceCalculate();
-//            result.setAllowDims(model.getDims().stream().map(DimModel::getCode).collect(Collectors.toList()));
-//            return result;
-//        } else {
-//            AdvanceCalculate result = new Gson().fromJson(advanceCalculate, AdvanceCalculate.class);
-//            if (CollectionUtils.isEmpty(result.getAllowDims())) {
-//                result.setAllowDims(model.getDims().stream().map(DimModel::getCode).collect(Collectors.toList()));
-//            }
-//            return result;
-//        }
-        return null;
     }
 
     @Override
