@@ -2,6 +2,7 @@ package com.xy.fedex.catalog.dao;
 
 import com.xy.fedex.catalog.po.ModelPO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface ModelDao {
@@ -12,6 +13,8 @@ public interface ModelDao {
     int insertSelective(ModelPO record);
 
     ModelPO selectByPrimaryKey(Long id);
+
+    ModelPO selectByName(@Param("bizLineId")Long bizLineId,@Param("modelName")String modelName);
 
     int updateByPrimaryKeySelective(ModelPO record);
 }

@@ -4,6 +4,7 @@ import com.google.common.base.Joiner;
 import com.google.gson.Gson;
 import com.xy.fedex.catalog.BaseTest;
 import com.xy.fedex.catalog.api.dto.request.list.GetAppRequest;
+import com.xy.fedex.catalog.api.dto.request.list.ListMetricModelRequest;
 import com.xy.fedex.catalog.api.dto.request.save.SaveRequests;
 import com.xy.fedex.catalog.api.dto.request.save.field.metric.SaveDimRequest;
 import com.xy.fedex.catalog.api.dto.request.save.field.metric.SaveMetricRequest;
@@ -147,5 +148,10 @@ public class CatalogFacadeTest extends BaseTest {
             modelIds.add(modelId);
         }
         System.out.println(Joiner.on(",").join(modelIds));
+    }
+
+    @Test
+    public void testGetMetricModels() {
+        catalogFacade.getMetricModels(ListMetricModelRequest.builder().appId(33L).metricId(55L).build());
     }
 }

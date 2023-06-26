@@ -33,4 +33,6 @@ public interface DimModelDao {
     List<DimModelDetailPO> selectByAppDimId(@Param("appId")Long appId,@Param("dimId")Long dimId);
 
     List<DimModelPO> selectDimModels(DimModelRequest dimModelRequest);
+
+    int deleteByModelId(@Param("modelId")Long modelId);
 }

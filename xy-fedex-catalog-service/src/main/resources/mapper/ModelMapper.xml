@@ -177,4 +177,11 @@
       model_prop = #{modelProp,jdbcType=LONGVARCHAR}
     where id = #{id,jdbcType=BIGINT}
   </update>
+
+  <select id="selectByName" resultMap="BaseResultMap" >
+    select
+    <include refid="Base_Column_List" />
+    from model
+    where biz_line_id = #{bizLineId,jdbcType=BIGINT} and model_name = #{modelName,jdbcType=VARCHAR}
+  </select>
 </mapper>

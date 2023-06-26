@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -72,15 +73,16 @@ public class ModelServiceImpl implements ModelService {
         //save metric model
         saveOrUpdateMetricModels(model.getId(), modelRequest);
         //save dim model
-        saveOrUpdateDimModels(model.getId(), modelRequest);
+        saveDimModels(modelRequest.getBizLineId(), model.getId(), modelRequest.getDimModels());
         //save model table relation
         saveModelTableRelation(model.getId(), modelRequest);
         return model.getId();
     }
 
     private ModelPO saveOrUpdateModel(SaveModelRequest modelRequest) {
-        Long modelId = modelRequest.getModelId();
-        if (!Objects.isNull(modelId)) {
+        ModelPO model = modelDao.selectByName(modelRequest.getBizLineId(),modelRequest.getModelName());
+        if (!Objects.isNull(model)) {
+            modelRequest.setModelId(model.getId());
             return updateModel(modelRequest);
         } else {
             return createModel(modelRequest);
@@ -191,10 +193,11 @@ public class ModelServiceImpl implements ModelService {
         }
         List<MetricModelPO> metricModelPOS = metricModels.stream().map(metricModelRequest -> {
             MetricModelPO metricModelPO = new MetricModelPO();
-//            metricModelPO.setModelId(modelId);
+            metricModelPO.setModelIdArray(new Gson().toJson(Arrays.asList(modelId)));
             metricModelPO.setMetricId(metricModelRequest.getMetricId());
             metricModelPO.setFormula(metricModelRequest.getFormula());
             metricModelPO.setMetricType(MetricType.PRIMARY.getMetricType());
+//            metricModelPO.setAdvanceCalculate(Arrays.asList(metricModelRequest.get));
 //            if (!Objects.isNull(metricModelRequest.getAdvanceCalculate())) {
 //                metricModelPO.setAdvanceCalculate(new Gson().toJson(metricModelRequest.getAdvanceCalculate()));
 //            }
@@ -223,21 +226,11 @@ public class ModelServiceImpl implements ModelService {
         });
     }
 
-    private void saveOrUpdateDimModels(Long modelId, SaveModelRequest modelRequest) {
-        if (CollectionUtils.isEmpty(modelRequest.getDimModels())) {
-            return;
-        }
-        List<SaveDimModelRequest> newDimModelRequests = modelRequest.getDimModels().stream().filter(dimModelRequest -> Objects.isNull(dimModelRequest.getDimModelId())).collect(Collectors.toList());
-        List<SaveDimModelRequest> updateDimModelRequests = modelRequest.getDimModels().stream().filter(dimModelRequest -> !Objects.isNull(dimModelRequest.getDimModelId())).collect(Collectors.toList());
-
-        saveDimModels(modelRequest.getBizLineId(),modelId, newDimModelRequests);
-        updateDimModels(updateDimModelRequests);
-    }
-
     private void saveDimModels(Long bizLineId,Long modelId, List<SaveDimModelRequest> dimModelRequests) {
         if (CollectionUtils.isEmpty(dimModelRequests)) {
             return;
         }
+        dimModelDao.deleteByModelId(modelId);
         dimModelRequests.forEach(dimModelRequest -> fillDimId(bizLineId,dimModelRequest));
         List<DimModelPO> dimModelPOs = dimModelRequests.stream().map(dimModelRequest -> {
             DimModelPO dimModel = new DimModelPO();

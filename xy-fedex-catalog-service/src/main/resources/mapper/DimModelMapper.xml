@@ -206,4 +206,9 @@
       and dim_id = #{dimId,jdbcType=BIGINT}
     </if>
   </select>
+
+  <delete id="deleteByModelId" parameterType="java.lang.Long" >
+    delete from dim_model
+    where model_id = #{modelId,jdbcType=BIGINT}
+  </delete>
 </mapper>

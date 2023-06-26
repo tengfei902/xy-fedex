@@ -18,7 +18,7 @@ public class QueryMatchedModelDTO {
         this.logicalSelect = logicalSelect;
     }
 
-    public void addMetricMatchedModels(String metricCode, com.xy.fedex.catalog.common.definition.field.MetricModel metric, List<MetricModel> metricModels) {
+    public void addMetricMatchedModels(String metricCode, MetricModel metric, List<MetricModel> metricModels) {
         MetricMatchedModelDTO metricMatchedModelDTO = new MetricMatchedModelDTO(metricCode,metric,metricModels);
         metricMatchedModelList.add(metricMatchedModelDTO);
     }
@@ -27,7 +27,7 @@ public class QueryMatchedModelDTO {
     @Data
     public static class MetricMatchedModelDTO {
         private String metricName;
-        private com.xy.fedex.catalog.common.definition.field.MetricModel metric;
+        private MetricModel metric;
         private List<MetricModel> metricModels;
     }
 

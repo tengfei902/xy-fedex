@@ -10,11 +10,7 @@ import com.alibaba.druid.sql.ast.statement.*;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlSelectQueryBlock;
 import com.google.common.base.Joiner;
 import com.xy.fedex.catalog.common.definition.ModelDefinition;
-import com.xy.fedex.catalog.common.definition.field.impl.AdvanceCalculate;
-import com.xy.fedex.catalog.common.definition.field.impl.SecondaryCalculate;
-import com.xy.fedex.catalog.common.definition.field.impl.DeriveMetricModel;
-import com.xy.fedex.catalog.common.definition.field.impl.MetricModel;
-import com.xy.fedex.catalog.common.definition.field.impl.PrimaryMetricModel;
+import com.xy.fedex.catalog.common.definition.field.impl.*;
 import com.xy.fedex.dsl.utility.SQLExprUtils;
 import com.xy.fedex.facade.exceptions.NoMetricModelMatchedException;
 import com.xy.fedex.facade.catalog.AppHolder;
@@ -128,7 +124,7 @@ public class ModelMatchServiceImpl implements ModelMatchService {
             QueryMatchedModelDTO.DeriveMetricModel selectMetric = new QueryMatchedModelDTO.DeriveMetricModel();
             selectMetric.setMetricId(deriveMetricModel.getMetricId());
             selectMetric.setMetricModelId(deriveMetricModel.getMetricModelId());
-            selectMetric.setMetricCode(deriveMetricModel.getCode());
+            selectMetric.setMetricCode(deriveMetricModel.getMetricCode());
             selectMetric.setAlias(alias);
             selectMetric.setFormula(deriveMetricModel.getFormula());
             selectMetric.setRelateMetricModels(relateSelectMetrics);
@@ -152,7 +148,7 @@ public class ModelMatchServiceImpl implements ModelMatchService {
 
     private SQLExpr getMetricWhere(ModelDefinition model, SQLExpr logicalWhere) {
         SQLExpr metricWhere = logicalWhere.clone();
-        List<String> dims = model.getDims().stream().map(ModelDefinition.Dim::getDimCode).collect(Collectors.toList());
+        List<String> dims = model.getDims().stream().map(DimModel::getDimCode).collect(Collectors.toList());
         SQLExprUtils.getSqlConditionFieldExpr(metricWhere, new SQLExprUtils.SQLExprFunction() {
             @Override
             public void doCallBack(SQLExpr expr) {
@@ -184,7 +180,7 @@ public class ModelMatchServiceImpl implements ModelMatchService {
 
             for (int i = 0; i < deriveMetricModel.getRelateMetricModels().size(); i++) {
                 MetricModel relateMetricModel = deriveMetricModel.getRelateMetricModels().get(i);
-                String metricCode = relateMetricModel.getCode();
+                String metricCode = relateMetricModel.getMetricCode();
                 String metricAlias = metricCode + "_" + i;
                 MySqlSelectQueryBlock relateMetricSelect = getMetricSelect(relateMetricModel, metricAlias, dims, logicalSelect);
 
@@ -362,7 +358,7 @@ public class ModelMatchServiceImpl implements ModelMatchService {
         metricSelect.setGroupBy(groupByClause);
         for (Pair<String, String> dimPair : dims) {
             String dimAlias = dimPair.getLeft();
-            ModelDefinition.Dim dim = model.getDim(dimPair.getRight());
+            DimModel dim = null;//model.getDims(dimPair.getRight());
 
             SQLExpr expr = SQLUtils.toSQLExpr(dim.getFormula(), DbType.mysql);
             SQLSelectItem selectItem = new SQLSelectItem(expr, dimAlias);
@@ -395,8 +391,8 @@ public class ModelMatchServiceImpl implements ModelMatchService {
             if (expr instanceof SQLIdentifierExpr) {
                 SQLIdentifierExpr sqlIdentifierExpr = (SQLIdentifierExpr) expr;
                 String name = sqlIdentifierExpr.getName();
-                ModelDefinition.Dim dim = modelDefinition.getDim(name);
-                sqlIdentifierExpr.setName(dim.getFormula());
+//                ModelDefinition.Dim dim = modelDefinition.getDim(name);
+//                sqlIdentifierExpr.setName(dim.getFormula());
             }
         }
     }
