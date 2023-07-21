@@ -23,4 +23,13 @@ public class ListResult<T> implements Serializable {
         listResult.setData(data);
         return listResult;
     }
+
+    public static <T> ListResult<T> newPage(List<T> data) {
+        ListResult<T> listResult = new ListResult<>();
+        listResult.setTotalSize(data.size());
+        listResult.setOffset(0);
+        listResult.setLimit(data.size());
+        listResult.setData(data);
+        return listResult;
+    }
 }

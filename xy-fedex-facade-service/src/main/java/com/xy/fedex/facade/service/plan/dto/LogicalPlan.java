@@ -39,16 +39,16 @@ public class LogicalPlan {
 
     @Data
     public static class Node {
-        private MySqlSelectQueryBlock sql;
+        private SQLSelect sql;
         private String alias;
         private Node left;
         private Node right;
 
-        public Node(MySqlSelectQueryBlock sql) {
+        public Node(SQLSelect sql) {
             this.sql = sql;
         }
 
-        public Node(MySqlSelectQueryBlock sql, String alias) {
+        public Node(SQLSelect sql, String alias) {
             this.sql = sql;
             this.alias = alias;
         }
@@ -57,7 +57,7 @@ public class LogicalPlan {
             return null;
         }
 
-        public static Node newNode(MySqlSelectQueryBlock sql, String alias) {
+        public static Node newNode(SQLSelect sql, String alias) {
             return new Node(sql,alias);
         }
 

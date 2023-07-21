@@ -21,20 +21,20 @@ public class QueryPlanServiceImpl implements QueryPlanService {
     public LogicalPlan getLogicalPlan(SQLSelect logicalSelect) {
         LogicalPlan logicalPlan = new LogicalPlan(logicalSelect);
         MySqlSelectQueryBlock mySqlSelectQueryBlock = (MySqlSelectQueryBlock) logicalSelect.getQueryBlock();
-        logicalPlan.add(getQueryPlanNode(mySqlSelectQueryBlock));
+        logicalPlan.add(getQueryPlanNode(logicalSelect));
         return logicalPlan;
     }
 
-    private LogicalPlan.Node getQueryPlanNode(MySqlSelectQueryBlock mySqlSelectQueryBlock) {
-        return getQueryPlanNode(mySqlSelectQueryBlock,null);
+    private LogicalPlan.Node getQueryPlanNode(SQLSelect select) {
+        return getQueryPlanNode(select,null);
     }
 
-    private LogicalPlan.Node getQueryPlanNode(MySqlSelectQueryBlock mySqlSelectQueryBlock,String alias) {
-        SQLTableSource tableSource = mySqlSelectQueryBlock.getFrom();
-        return getQueryPlanNode(mySqlSelectQueryBlock,tableSource,alias);
+    private LogicalPlan.Node getQueryPlanNode(SQLSelect select,String alias) {
+        SQLTableSource tableSource = select.getQueryBlock().getFrom();
+        return getQueryPlanNode(select,tableSource,alias);
     }
 
-    private LogicalPlan.Node getQueryPlanNode(MySqlSelectQueryBlock parent, SQLTableSource tableSource,String alias) {
+    private LogicalPlan.Node getQueryPlanNode(SQLSelect parent, SQLTableSource tableSource,String alias) {
         if(tableSource instanceof SQLExprTableSource) {
             return LogicalPlan.Node.newNode(parent,alias);
         }
@@ -47,7 +47,7 @@ public class QueryPlanServiceImpl implements QueryPlanService {
             SQLTableSource right = joinTableSource.getRight();
             LogicalPlan.Node rightNode = getQueryPlanNode(parent,right,right.getAlias());
 
-            MySqlSelectQueryBlock replacedSelect = getReplacedSelect(parent);
+            SQLSelect replacedSelect = getReplacedSelect(parent);
             LogicalPlan.Node x = LogicalPlan.Node.newNode(replacedSelect,getTableAlias());
             x.add(leftNode);
             x.add(rightNode);
@@ -57,16 +57,15 @@ public class QueryPlanServiceImpl implements QueryPlanService {
         if(tableSource instanceof SQLSubqueryTableSource) {
             SQLSubqueryTableSource subQueryTableSource = (SQLSubqueryTableSource) tableSource;
             SQLSelect subQuerySelect = subQueryTableSource.getSelect();
-            MySqlSelectQueryBlock subQueryBlock = (MySqlSelectQueryBlock) subQuerySelect.getQueryBlock();
-            return getQueryPlanNode(subQueryBlock,subQueryTableSource.getAlias());
+            return getQueryPlanNode(subQuerySelect,subQueryTableSource.getAlias());
         }
 
         throw new IllegalArgumentException();
     }
 
-    private MySqlSelectQueryBlock getReplacedSelect(MySqlSelectQueryBlock originSelect) {
-        MySqlSelectQueryBlock newSelect = originSelect.clone();
-        SQLTableSource originTableSource = originSelect.getFrom();
+    private SQLSelect getReplacedSelect(SQLSelect originSelect) {
+        SQLSelect newSelect = originSelect.clone();
+        SQLTableSource originTableSource = originSelect.getQueryBlock().getFrom();
         if(originTableSource instanceof SQLJoinTableSource) {
             SQLJoinTableSource originJoinTableSource = (SQLJoinTableSource)originTableSource;
 
@@ -74,7 +73,7 @@ public class QueryPlanServiceImpl implements QueryPlanService {
             joinTableSource.setLeft(originJoinTableSource.getLeft().getAlias(),null);
             joinTableSource.setRight(originJoinTableSource.getRight().getAlias(),null);
 
-            newSelect.setFrom(joinTableSource);
+            newSelect.getQueryBlock().setFrom(joinTableSource);
 
             return newSelect;
         }
@@ -82,7 +81,7 @@ public class QueryPlanServiceImpl implements QueryPlanService {
             SubQueryTableSource originSubQueryTableSource = (SubQueryTableSource)originTableSource;
             SQLExprTableSource newTableSource = new SQLExprTableSource(originSubQueryTableSource.getAlias());
 
-            newSelect.setFrom(newTableSource);
+            newSelect.getQueryBlock().setFrom(newTableSource);
             return newSelect;
         }
         throw new IllegalArgumentException();

@@ -32,6 +32,8 @@ public class MetricModelPO implements Serializable {
 
     private String modelIdArray;
 
+    private String metricCode;
+
     private static final long serialVersionUID = 1L;
 
     public Long getId() {
@@ -128,6 +130,14 @@ public class MetricModelPO implements Serializable {
 
     public void setModelIdArray(String modelIdArray) {
         this.modelIdArray = modelIdArray == null ? null : modelIdArray.trim();
+    }
+
+    public String getMetricCode() {
+        return metricCode;
+    }
+
+    public void setMetricCode(String metricCode) {
+        this.metricCode = metricCode;
     }
 
     @Override

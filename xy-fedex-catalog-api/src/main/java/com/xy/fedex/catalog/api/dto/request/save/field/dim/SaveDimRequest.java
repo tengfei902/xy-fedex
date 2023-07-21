@@ -1,4 +1,4 @@
-package com.xy.fedex.catalog.api.dto.request.save.field.metric;
+package com.xy.fedex.catalog.api.dto.request.save.field.dim;
 
 import lombok.Data;
 

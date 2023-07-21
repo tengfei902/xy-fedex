@@ -1,7 +1,6 @@
 package com.xy.fedex.facade.catalog;
 
 import com.google.gson.Gson;
-import com.xy.fedex.catalog.common.definition.field.impl.MetricModel;
 import com.xy.fedex.facade.BaseTest;
 import org.junit.jupiter.api.Test;
 
@@ -17,10 +16,17 @@ public class AppHolderTest extends BaseTest {
         List<AppHolder.Metric> metrics = app.getMetrics();
         for(AppHolder.Metric metric:metrics) {
             System.out.println(new Gson().toJson(metric));
-            List<MetricModel> metricModels = metric.getMetricModels();
-            for(MetricModel metricModel:metricModels) {
-                System.out.println(new Gson().toJson(metricModel));
+            List<AppHolder.MetricModel> metricModels = metric.getMetricModels();
+            for(AppHolder.MetricModel metricModel:metricModels) {
+                System.out.println(metricModel.toString());
             }
         }
+
+        List<Long> modelIds = app.getModelIds();
+        for(Long modelId:modelIds) {
+            AppHolder.Model modelDefinition = AppHolder.getModel(modelId);
+            System.out.println(modelDefinition.toString());
+        }
+
     }
 }

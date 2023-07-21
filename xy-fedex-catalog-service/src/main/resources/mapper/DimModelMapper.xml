@@ -5,6 +5,7 @@
     <id column="id" property="id" jdbcType="BIGINT" />
     <result column="model_id" property="modelId" jdbcType="BIGINT" />
     <result column="dim_id" property="dimId" jdbcType="BIGINT" />
+    <result column="dim_code" property="dimCode" jdbcType="VARCHAR" />
     <result column="formula" property="formula" jdbcType="VARCHAR" />
     <result column="status" property="status" jdbcType="INTEGER" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
@@ -195,15 +196,15 @@
 
   <select id="selectDimModels" resultMap="BaseResultMap" parameterType="com.xy.fedex.catalog.dto.DimModelRequest" >
     select
-    <include refid="Base_Column_List" />
-    from dim_model
-    where model_id in
+    t1.id, t1.model_id, t1.dim_id, t1.formula, t1.status, t1.create_time, t1.update_time, t1.creator,t2.dim_code
+    from dim_model t1 left join dim t2 on t1.dim_id = t2.id
+    where t1.model_id in
     <foreach collection="modelIds" item="modelId" open="(" close=")" separator=",">
       #{modelId}
     </foreach>
-    and status = 1
+    and t1.status = 1
     <if test="dimId != null" >
-      and dim_id = #{dimId,jdbcType=BIGINT}
+      and t1.dim_id = #{dimId,jdbcType=BIGINT}
     </if>
   </select>
 

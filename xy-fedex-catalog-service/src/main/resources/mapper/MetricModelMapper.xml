@@ -23,13 +23,22 @@
   <sql id="Blob_Column_List" >
     model_id_array
   </sql>
-  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Long" >
-    select 
-    <include refid="Base_Column_List" />
-    ,
-    <include refid="Blob_Column_List" />
-    from metric_model
-    where id = #{id,jdbcType=BIGINT}
+  <select id="selectByPrimaryKey" resultType="com.xy.fedex.catalog.po.MetricModelPO" parameterType="java.lang.Long" >
+    select
+      t1.id,
+      t1.model_id as modelId,
+      t1.metric_id as metricId,
+      t1.metric_type as metricType,
+      t1.formula,
+      t1.advance_calculate as advanceCalculate,
+      t1.status,
+      t1.create_time as createTime,
+      t1.update_time as updateTime,
+      t1.creator,
+      t1.model_id_array as modelIdArray,
+      t2.metric_code as metricCode
+    from metric_model t1 left join metric t2 on t1.metric_id = t2.id
+    where t1.id = #{id,jdbcType=BIGINT}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
     delete from metric_model
@@ -182,17 +191,27 @@
     where id = #{id,jdbcType=BIGINT}
   </update>
 
-  <select id="selectMetricModels" resultMap="ResultMapWithBLOBs" parameterType="com.xy.fedex.catalog.dto.MetricModelRequest" >
+  <select id="selectMetricModels" resultType="com.xy.fedex.catalog.po.MetricModelPO" parameterType="com.xy.fedex.catalog.dto.MetricModelRequest" >
     select
-    <include refid="Base_Column_List" />
-    ,
-    <include refid="Blob_Column_List" />
-    from metric_model
-    where json_contains(#{modelIdArray,jdbcType=VARCHAR},model_id_array) and status = 1
+      t1.id,
+      t1.model_id as modelId,
+      t1.metric_id as metricId,
+      t1.metric_type as metricType,
+      t1.formula,
+      t1.advance_calculate as advanceCalculate,
+      t1.status,
+      t1.metric_type as metricType,
+      t1.create_time as createTime,
+      t1.update_time as updateTime,
+      t1.creator,
+      t1.model_id_array as modelIdArray,
+      t2.metric_code as metricCode
+    from metric_model t1 left join metric t2 on t1.metric_id = t2.id
+    where json_contains(#{modelIdArray,jdbcType=VARCHAR},t1.model_id_array) and t1.status = 1
     <if test="metricId != null" >
-        and metric_id = #{metricId,jdbcType=BIGINT}
+        and t1.metric_id = #{metricId,jdbcType=BIGINT}
     </if>
-    order by id desc
+    order by t1.id desc
     <if test="limit != null and offset != null" >
         limit #{offset,jdbcType=INTEGER},#{limit,jdbcType=INTEGER}
     </if>
@@ -208,5 +227,25 @@
       and metric_id = #{metricId,jdbcType=BIGINT}
     </if>
   </select>
+
+  <insert id="batchInsert" parameterType="java.util.List" >
+    insert into metric_model (model_id_array, metric_id,metric_type, formula, advance_calculate,creator)
+    values
+    <foreach collection ="list" item="metric" index= "index" separator =",">
+      (
+      #{metric.modelIdArray},
+      #{metric.metricId},
+      #{metric.metricType},
+      #{metric.formula},
+      #{metric.advanceCalculate},
+      #{metric.creator}
+      )
+    </foreach>
+  </insert>
+
+  <delete id="deleteByModelId" parameterType="java.lang.String" >
+    delete from metric_model
+    where model_id = #{modelId,jdbcType=VARCHAR}
+  </delete>
 
 </mapper>

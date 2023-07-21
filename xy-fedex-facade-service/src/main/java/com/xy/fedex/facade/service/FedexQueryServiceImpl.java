@@ -32,7 +32,7 @@ public class FedexQueryServiceImpl implements FedexQueryService {
 
         List<LogicalPlan.Node> logicalNodes = logicalPlan.lrd();
         for(LogicalPlan.Node logicalNode : logicalNodes) {
-            MySqlSelectQueryBlock select = logicalNode.getSql();
+            SQLSelect select = logicalNode.getSql();
             QueryMatchedModelDTO queryMatchedModelDTO = modelMatchService.getMetricMatchedModels(select);
         }
         return null;

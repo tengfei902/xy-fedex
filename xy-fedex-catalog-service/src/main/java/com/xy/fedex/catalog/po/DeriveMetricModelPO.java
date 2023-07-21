@@ -3,16 +3,16 @@ package com.xy.fedex.catalog.po;
 import java.io.Serializable;
 import java.util.Date;
 
-public class DimModelPO implements Serializable {
+public class DeriveMetricModelPO implements Serializable {
     private Long id;
 
-    private Long modelId;
+    private Long metricId;
 
-    private Long dimId;
-
-    private String dimCode;
+    private Long appId;
 
     private String formula;
+
+    private String advanceCalculate;
 
     private Integer status;
 
@@ -32,20 +32,20 @@ public class DimModelPO implements Serializable {
         this.id = id;
     }
 
-    public Long getModelId() {
-        return modelId;
+    public Long getMetricId() {
+        return metricId;
     }
 
-    public void setModelId(Long modelId) {
-        this.modelId = modelId;
+    public void setMetricId(Long metricId) {
+        this.metricId = metricId;
     }
 
-    public Long getDimId() {
-        return dimId;
+    public Long getAppId() {
+        return appId;
     }
 
-    public void setDimId(Long dimId) {
-        this.dimId = dimId;
+    public void setAppId(Long appId) {
+        this.appId = appId;
     }
 
     public String getFormula() {
@@ -54,6 +54,14 @@ public class DimModelPO implements Serializable {
 
     public void setFormula(String formula) {
         this.formula = formula == null ? null : formula.trim();
+    }
+
+    public String getAdvanceCalculate() {
+        return advanceCalculate;
+    }
+
+    public void setAdvanceCalculate(String advanceCalculate) {
+        this.advanceCalculate = advanceCalculate == null ? null : advanceCalculate.trim();
     }
 
     public Integer getStatus() {
@@ -88,14 +96,6 @@ public class DimModelPO implements Serializable {
         this.creator = creator == null ? null : creator.trim();
     }
 
-    public String getDimCode() {
-        return dimCode;
-    }
-
-    public void setDimCode(String dimCode) {
-        this.dimCode = dimCode;
-    }
-
     @Override
     public boolean equals(Object that) {
         if (this == that) {
@@ -107,11 +107,12 @@ public class DimModelPO implements Serializable {
         if (getClass() != that.getClass()) {
             return false;
         }
-        DimModelPO other = (DimModelPO) that;
+        DeriveMetricModelPO other = (DeriveMetricModelPO) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
-            && (this.getModelId() == null ? other.getModelId() == null : this.getModelId().equals(other.getModelId()))
-            && (this.getDimId() == null ? other.getDimId() == null : this.getDimId().equals(other.getDimId()))
+            && (this.getMetricId() == null ? other.getMetricId() == null : this.getMetricId().equals(other.getMetricId()))
+            && (this.getAppId() == null ? other.getAppId() == null : this.getAppId().equals(other.getAppId()))
             && (this.getFormula() == null ? other.getFormula() == null : this.getFormula().equals(other.getFormula()))
+            && (this.getAdvanceCalculate() == null ? other.getAdvanceCalculate() == null : this.getAdvanceCalculate().equals(other.getAdvanceCalculate()))
             && (this.getStatus() == null ? other.getStatus() == null : this.getStatus().equals(other.getStatus()))
             && (this.getCreateTime() == null ? other.getCreateTime() == null : this.getCreateTime().equals(other.getCreateTime()))
             && (this.getUpdateTime() == null ? other.getUpdateTime() == null : this.getUpdateTime().equals(other.getUpdateTime()))
@@ -123,9 +124,10 @@ public class DimModelPO implements Serializable {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
-        result = prime * result + ((getModelId() == null) ? 0 : getModelId().hashCode());
-        result = prime * result + ((getDimId() == null) ? 0 : getDimId().hashCode());
+        result = prime * result + ((getMetricId() == null) ? 0 : getMetricId().hashCode());
+        result = prime * result + ((getAppId() == null) ? 0 : getAppId().hashCode());
         result = prime * result + ((getFormula() == null) ? 0 : getFormula().hashCode());
+        result = prime * result + ((getAdvanceCalculate() == null) ? 0 : getAdvanceCalculate().hashCode());
         result = prime * result + ((getStatus() == null) ? 0 : getStatus().hashCode());
         result = prime * result + ((getCreateTime() == null) ? 0 : getCreateTime().hashCode());
         result = prime * result + ((getUpdateTime() == null) ? 0 : getUpdateTime().hashCode());
@@ -140,9 +142,10 @@ public class DimModelPO implements Serializable {
         sb.append(" [");
         sb.append("Hash = ").append(hashCode());
         sb.append(", id=").append(id);
-        sb.append(", modelId=").append(modelId);
-        sb.append(", dimId=").append(dimId);
+        sb.append(", metricId=").append(metricId);
+        sb.append(", appId=").append(appId);
         sb.append(", formula=").append(formula);
+        sb.append(", advanceCalculate=").append(advanceCalculate);
         sb.append(", status=").append(status);
         sb.append(", createTime=").append(createTime);
         sb.append(", updateTime=").append(updateTime);

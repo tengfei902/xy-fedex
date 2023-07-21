@@ -15,26 +15,25 @@ import com.xy.fedex.catalog.api.dto.request.list.ListMetricModelRequest;
 import com.xy.fedex.catalog.api.dto.request.list.ListMetricRequest;
 import com.xy.fedex.catalog.api.dto.request.save.SaveModelRequest;
 import com.xy.fedex.catalog.api.dto.request.save.field.dim.SaveDimModelRequest;
-import com.xy.fedex.catalog.api.dto.request.save.field.metric.SaveDimRequest;
+import com.xy.fedex.catalog.api.dto.request.save.field.dim.SaveDimRequest;
+import com.xy.fedex.catalog.api.dto.request.save.field.metric.SaveMetricModelRequest;
 import com.xy.fedex.catalog.api.dto.request.save.field.metric.SaveMetricRequest;
-import com.xy.fedex.catalog.api.dto.request.save.field.metric.SavePrimaryMetricModelRequest;
 import com.xy.fedex.catalog.api.dto.response.list.ListResult;
 import com.xy.fedex.catalog.common.constants.RpcConstants;
 import com.xy.fedex.catalog.common.definition.AppDefinition;
 import com.xy.fedex.catalog.common.definition.ModelDefinition;
 import com.xy.fedex.catalog.common.definition.field.Metric;
+import com.xy.fedex.catalog.common.definition.field.impl.AdvanceCalculate;
 import com.xy.fedex.catalog.common.definition.field.impl.DimModel;
 import com.xy.fedex.catalog.common.definition.field.impl.MetricModel;
+import com.xy.fedex.catalog.common.enums.MetricType;
 import com.xy.fedex.catalog.constants.Constants;
 import com.xy.fedex.catalog.dto.*;
 import com.xy.fedex.catalog.exception.DimNotFoundException;
 import com.xy.fedex.catalog.exception.MetaNotFoundException;
 import com.xy.fedex.catalog.exception.MetricNotFoundException;
 import com.xy.fedex.catalog.service.containers.MetricHolder;
-import com.xy.fedex.catalog.service.meta.AppService;
-import com.xy.fedex.catalog.service.meta.MetaService;
-import com.xy.fedex.catalog.service.meta.MetricModelService;
-import com.xy.fedex.catalog.service.meta.ModelService;
+import com.xy.fedex.catalog.service.meta.*;
 import com.xy.fedex.catalog.utils.CatalogUtils;
 import com.xy.fedex.def.Response;
 import com.xy.fedex.dsl.exceptions.SQLExprNotSupportException;
@@ -65,6 +64,8 @@ public class CatalogFacadeImpl implements CatalogFacade {
     private AppService appService;
     @Autowired
     private MetricModelService metricModelService;
+    @Autowired
+    private DimModelService dimModelService;
 
     @Override
     public Response<Long> execute(String sql) {
@@ -252,21 +253,22 @@ public class CatalogFacadeImpl implements CatalogFacade {
                 }
                 dimModel.setDimId(dim.getDimId());
                 dimModel.setFormula(selectItemExpr.toString());
-                dimModel.setCode(code);
+                dimModel.setDimCode(code);
 
                 modelRequest.getDimModels().add(dimModel);
             } else {
-                SavePrimaryMetricModelRequest metricModel = new SavePrimaryMetricModelRequest();
+                SaveMetricModelRequest metricModel = new SaveMetricModelRequest();
                 MetricDTO metric = metaService.getMetric(modelRequest.getBizLineId(),code);
                 if(Objects.isNull(metric)) {
                     throw new MetricNotFoundException(String.format("metric not found,bizLineId:%s,metricCode:%s",modelRequest.getBizLineId(),code));
                 }
-
+                metricModel.setCreator(modelRequest.getCreator());
+                metricModel.setMetricType(MetricType.PRIMARY);
                 metricModel.setMetricId(metric.getMetricId());
-                metricModel.setCode(code);
+                metricModel.setMetricCode(code);
                 metricModel.setFormula(selectItemExpr.toString());
-                SavePrimaryMetricModelRequest.AdvanceCalculate advanceCalculate = new SavePrimaryMetricModelRequest.AdvanceCalculate();
-                metricModel.setAdvanceCalculate(advanceCalculate);
+                AdvanceCalculate advanceCalculate = new AdvanceCalculate();
+                metricModel.setAdvanceCalculates(Arrays.asList(advanceCalculate));
 
                 modelRequest.getMetricModels().add(metricModel);
             }
@@ -349,7 +351,7 @@ public class CatalogFacadeImpl implements CatalogFacade {
     public Response<ListResult<DimModel>> getDimModels(ListDimModelRequest listDimModelRequest) {
         List<Long> modelIds = getModelIds(listDimModelRequest.getAppId(), listDimModelRequest.getModelId());
         DimModelRequest dimModelRequest = DimModelRequest.builder().modelIds(modelIds).dimId(listDimModelRequest.getDimId()).build();
-        metaService.getDimModels(dimModelRequest);
-        return null;
+        List<DimModel> dimModels = dimModelService.getDimModels(dimModelRequest);
+        return Response.success(ListResult.newPage(dimModels));
     }
 }

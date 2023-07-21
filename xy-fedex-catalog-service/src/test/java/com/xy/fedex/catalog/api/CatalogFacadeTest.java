@@ -6,9 +6,10 @@ import com.xy.fedex.catalog.BaseTest;
 import com.xy.fedex.catalog.api.dto.request.list.GetAppRequest;
 import com.xy.fedex.catalog.api.dto.request.list.ListMetricModelRequest;
 import com.xy.fedex.catalog.api.dto.request.save.SaveRequests;
-import com.xy.fedex.catalog.api.dto.request.save.field.metric.SaveDimRequest;
+import com.xy.fedex.catalog.api.dto.request.save.field.dim.SaveDimRequest;
 import com.xy.fedex.catalog.api.dto.request.save.field.metric.SaveMetricRequest;
 import com.xy.fedex.catalog.common.definition.AppDefinition;
+import com.xy.fedex.catalog.common.definition.ModelDefinition;
 import com.xy.fedex.catalog.utils.SqlReader;
 import com.xy.fedex.def.Response;
 import org.junit.jupiter.api.Test;
@@ -153,5 +154,11 @@ public class CatalogFacadeTest extends BaseTest {
     @Test
     public void testGetMetricModels() {
         catalogFacade.getMetricModels(ListMetricModelRequest.builder().appId(33L).metricId(55L).build());
+    }
+
+    @Test
+    public void testGetModel() {
+        Response<ModelDefinition> response = catalogFacade.getModel(23L);
+        System.out.println(new Gson().toJson(response.getData()));
     }
 }

@@ -2,6 +2,7 @@ package com.xy.fedex.catalog.dao;
 
 import com.xy.fedex.catalog.po.ModelTableRelationPO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface ModelTableRelationDao {
@@ -16,4 +17,6 @@ public interface ModelTableRelationDao {
     int updateByPrimaryKeySelective(ModelTableRelationPO record);
 
     int updateByPrimaryKey(ModelTableRelationPO record);
+
+    int deleteByModelId(@Param("modelId") Long modelId);
 }

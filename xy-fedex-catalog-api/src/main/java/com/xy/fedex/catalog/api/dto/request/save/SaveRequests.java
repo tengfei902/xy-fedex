@@ -1,6 +1,6 @@
 package com.xy.fedex.catalog.api.dto.request.save;
 
-import com.xy.fedex.catalog.api.dto.request.save.field.metric.SaveDimRequest;
+import com.xy.fedex.catalog.api.dto.request.save.field.dim.SaveDimRequest;
 import com.xy.fedex.catalog.api.dto.request.save.field.metric.SaveMetricRequest;
 
 /**

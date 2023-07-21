@@ -4,7 +4,7 @@ import com.xy.fedex.catalog.api.dto.request.list.GetAppRequest;
 import com.xy.fedex.catalog.api.dto.request.list.ListDimModelRequest;
 import com.xy.fedex.catalog.api.dto.request.list.ListMetricModelRequest;
 import com.xy.fedex.catalog.api.dto.request.list.ListMetricRequest;
-import com.xy.fedex.catalog.api.dto.request.save.field.metric.SaveDimRequest;
+import com.xy.fedex.catalog.api.dto.request.save.field.dim.SaveDimRequest;
 import com.xy.fedex.catalog.api.dto.request.save.field.metric.SaveMetricRequest;
 import com.xy.fedex.catalog.api.dto.response.list.ListResult;
 import com.xy.fedex.catalog.common.definition.AppDefinition;

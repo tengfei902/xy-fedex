@@ -12,9 +12,9 @@ import java.util.stream.Collectors;
  */
 @Data
 public class MetricModelRequest {
+    private Long appId;
     private Long metricId;
-    private String modelIdArray;
-    private String modelId;
+    private List<Long> modelIds;
     private Integer offset;
     private Integer limit;
 
@@ -27,6 +27,7 @@ public class MetricModelRequest {
     }
 
     public static class Builder {
+        private Long appId;
         private List<Long> modelIds;
         private Long metricId;
         private Integer offset;
@@ -51,7 +52,7 @@ public class MetricModelRequest {
         public MetricModelRequest build() {
             MetricModelRequest metricModelRequest = new MetricModelRequest();
             metricModelRequest.setMetricId(this.metricId);
-            metricModelRequest.setModelIdArray(new Gson().toJson(this.modelIds.stream().distinct().sorted(Comparator.naturalOrder()).collect(Collectors.toList())));
+            metricModelRequest.setModelIds(this.modelIds);
             metricModelRequest.setLimit(this.limit);
             metricModelRequest.setOffset(this.offset);
             return metricModelRequest;

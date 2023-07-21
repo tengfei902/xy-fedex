@@ -1,8 +1,5 @@
 package com.xy.fedex.catalog.service.meta.impl;
 
-import com.xy.fedex.admin.api.vo.response.TableDetailVO;
-import com.xy.fedex.catalog.common.definition.column.TableField;
-import com.xy.fedex.catalog.common.definition.field.MetaField;
 import com.xy.fedex.catalog.common.definition.field.impl.DimModel;
 import com.xy.fedex.catalog.common.enums.MetricType;
 import com.xy.fedex.catalog.dao.*;
@@ -11,14 +8,12 @@ import com.xy.fedex.catalog.exception.*;
 import com.xy.fedex.catalog.po.*;
 import com.xy.fedex.catalog.service.meta.MetaMatchService;
 import com.xy.fedex.catalog.service.meta.MetaService;
-import com.xy.fedex.catalog.service.meta.ModelService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
 @Service
@@ -181,18 +176,5 @@ public class MetaServiceImpl implements MetaService {
         dimFamilyRelationPO.setDimFamilyId(dimFamilyId);
         dimFamilyRelationPO.setDimId(dimId);
         dimFamilyRelationDao.insertSelective(dimFamilyRelationPO);
-    }
-
-    @Override
-    public List<DimModel> getDimModels(DimModelRequest dimModelRequest) {
-        List<DimModelPO> dimModels = dimModelDao.selectDimModels(dimModelRequest);
-        return dimModels.stream().map(dimModelPO -> {
-            DimModel dimModel = new DimModel();
-            dimModel.setDimModelId(dimModelPO.getId());
-            dimModel.setModelId(dimModelPO.getModelId());
-            dimModel.setDimCode(null);
-            dimModel.setFormula(dimModelPO.getFormula());
-            return dimModel;
-        }).collect(Collectors.toList());
     }
 }

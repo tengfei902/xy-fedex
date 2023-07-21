@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xy.fedex.catalog.dao.DeriveMetricModelDao" >
+  <resultMap id="BaseResultMap" type="com.xy.fedex.catalog.po.DeriveMetricModelPO" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="metric_id" property="metricId" jdbcType="BIGINT" />
+    <result column="app_id" property="appId" jdbcType="BIGINT" />
+    <result column="formula" property="formula" jdbcType="VARCHAR" />
+    <result column="advance_calculate" property="advanceCalculate" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="creator" property="creator" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, metric_id, app_id, formula, advance_calculate, status, create_time, update_time, 
+    creator
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from derive_metric_model
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from derive_metric_model
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.xy.fedex.catalog.po.DeriveMetricModelPO" >
+    insert into derive_metric_model (id, metric_id, app_id, 
+      formula, advance_calculate, status, 
+      create_time, update_time, creator
+      )
+    values (#{id,jdbcType=BIGINT}, #{metricId,jdbcType=BIGINT}, #{appId,jdbcType=BIGINT}, 
+      #{formula,jdbcType=VARCHAR}, #{advanceCalculate,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{creator,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.xy.fedex.catalog.po.DeriveMetricModelPO" >
+    insert into derive_metric_model
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="metricId != null" >
+        metric_id,
+      </if>
+      <if test="appId != null" >
+        app_id,
+      </if>
+      <if test="formula != null" >
+        formula,
+      </if>
+      <if test="advanceCalculate != null" >
+        advance_calculate,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="creator != null" >
+        creator,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="metricId != null" >
+        #{metricId,jdbcType=BIGINT},
+      </if>
+      <if test="appId != null" >
+        #{appId,jdbcType=BIGINT},
+      </if>
+      <if test="formula != null" >
+        #{formula,jdbcType=VARCHAR},
+      </if>
+      <if test="advanceCalculate != null" >
+        #{advanceCalculate,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="creator != null" >
+        #{creator,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.xy.fedex.catalog.po.DeriveMetricModelPO" >
+    update derive_metric_model
+    <set >
+      <if test="metricId != null" >
+        metric_id = #{metricId,jdbcType=BIGINT},
+      </if>
+      <if test="appId != null" >
+        app_id = #{appId,jdbcType=BIGINT},
+      </if>
+      <if test="formula != null" >
+        formula = #{formula,jdbcType=VARCHAR},
+      </if>
+      <if test="advanceCalculate != null" >
+        advance_calculate = #{advanceCalculate,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="creator != null" >
+        creator = #{creator,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.xy.fedex.catalog.po.DeriveMetricModelPO" >
+    update derive_metric_model
+    set metric_id = #{metricId,jdbcType=BIGINT},
+      app_id = #{appId,jdbcType=BIGINT},
+      formula = #{formula,jdbcType=VARCHAR},
+      advance_calculate = #{advanceCalculate,jdbcType=VARCHAR},
+      status = #{status,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      creator = #{creator,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

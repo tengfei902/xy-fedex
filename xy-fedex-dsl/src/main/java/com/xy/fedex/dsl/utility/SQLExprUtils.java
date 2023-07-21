@@ -34,6 +34,22 @@ public class SQLExprUtils {
         return mySqlSelectQueryBlock.getFrom();
     }
 
+    public static SQLExpr getSqlCondition(String condition) {
+        if(StringUtils.isEmpty(condition)) {
+            return null;
+        }
+        SQLSelect select = parse("select * from t where "+condition);
+        return select.getQueryBlock().getWhere();
+    }
+
+    public static SQLSelectItem getSqlSelectItem(String selectItem) {
+        if(StringUtils.isEmpty(selectItem)) {
+            return null;
+        }
+        SQLSelect select = parse("select %s from t");
+        return select.getQueryBlock().getSelectList().get(0);
+    }
+
     public static SQLSelect parse(String sql) {
         SQLStatement sqlStatement = SQLUtils.parseSingleStatement(sql,DbType.mysql);
         SQLSelectStatement sqlSelectStatement = (SQLSelectStatement) sqlStatement;
@@ -41,7 +57,7 @@ public class SQLExprUtils {
         //MySqlSelectQueryBlock mySqlSelectQueryBlock = (MySqlSelectQueryBlock) sqlSelectStatement.getSelect().getQuery();
     }
 
-    public static List<String> getAllFields(MySqlSelectQueryBlock selectQueryBlock) {
+    public static List<String> getAllFields(SQLSelectQueryBlock selectQueryBlock) {
         List<String> allFields = new ArrayList<>();
         SQLExprFunction sqlExprFunction = new SQLExprFunction() {
             @Override
@@ -140,6 +156,30 @@ public class SQLExprUtils {
         if(expr instanceof SQLIdentifierExpr) {
             SQLIdentifierExpr sqlIdentifierExpr = (SQLIdentifierExpr) expr;
             callBackFunc.doCallBack(sqlIdentifierExpr);
+            return;
+        }
+        if(expr instanceof SQLIntegerExpr) {
+            return;
+        }
+        if(expr instanceof SQLDecimalExpr) {
+            return;
+        }
+        if(expr instanceof SQLDoubleExpr) {
+            return;
+        }
+        if(expr instanceof SQLFloatExpr) {
+            return;
+        }
+        if(expr instanceof SQLSmallIntExpr) {
+            return;
+        }
+        if(expr instanceof SQLBigIntExpr) {
+            return;
+        }
+        if(expr instanceof SQLBooleanExpr) {
+            return;
+        }
+        if(expr instanceof SQLCharExpr) {
             return;
         }
         throw new SQLExprNotSupportException("SQL expr type not support:"+expr.getClass().getName());
@@ -283,5 +323,95 @@ public class SQLExprUtils {
             map.put(key,value);
         }
         return map;
+    }
+
+    public static SQLExpr getMatchedCondition(SQLExpr expr, List<String> allowDims) {
+        if(expr instanceof SQLBinaryOpExpr && ((SQLBinaryOpExpr) expr).getOperator().isLogical()) {
+            SQLBinaryOpExpr binaryOpExpr = (SQLBinaryOpExpr) expr;
+            SQLExpr left = binaryOpExpr.getLeft();
+            left = getMatchedCondition(left,allowDims);
+            binaryOpExpr.setLeft(left);
+
+            SQLExpr right = binaryOpExpr.getRight();
+            right = getMatchedCondition(right,allowDims);
+            binaryOpExpr.setRight(right);
+
+            if(binaryOpExpr.getLeft() == null && binaryOpExpr.getRight() == null) {
+                return null;
+            }
+            if(binaryOpExpr.getLeft() == null) {
+                return binaryOpExpr.getRight();
+            }
+            if(binaryOpExpr.getRight() == null) {
+                return binaryOpExpr.getLeft();
+            }
+            return binaryOpExpr;
+        }
+        if(expr instanceof SQLBinaryOpExpr) {
+            SQLBinaryOpExpr binaryOpExpr = (SQLBinaryOpExpr) expr;
+            SQLExpr left = binaryOpExpr.getLeft();
+            left = getMatchedCondition(left,allowDims);
+            if(left == null) {
+                return null;
+            }
+            return expr;
+        }
+        if(expr instanceof SQLBetweenExpr) {
+            SQLBetweenExpr sqlBetweenExpr = (SQLBetweenExpr) expr;
+            SQLExpr left = getMatchedCondition(sqlBetweenExpr.getTestExpr(),allowDims);
+            if(left == null) {
+                return null;
+            }
+            return expr;
+        }
+        if(expr instanceof SQLCaseExpr) {
+            SQLCaseExpr sqlCaseExpr = (SQLCaseExpr) expr;
+            SQLExpr left = getMatchedCondition(sqlCaseExpr,allowDims);
+            if(left == null) {
+                return null;
+            }
+            return expr;
+        }
+        if(expr instanceof SQLInListExpr) {
+            SQLInListExpr sqlInListExpr = (SQLInListExpr) expr;
+            SQLExpr leftExpr = getMatchedCondition(sqlInListExpr.getExpr(),allowDims);
+            if(leftExpr == null) {
+                return null;
+            }
+            return expr;
+        }
+        if(expr instanceof SQLNotExpr) {
+            SQLNotExpr sqlNotExpr = (SQLNotExpr) expr;
+            SQLExpr leftExpr = getMatchedCondition(sqlNotExpr.getExpr(),allowDims);
+            if(leftExpr == null) {
+                return null;
+            }
+            return expr;
+        }
+        if(expr instanceof SQLCastExpr) {
+            SQLCastExpr sqlCastExpr = (SQLCastExpr) expr;
+            SQLExpr left = getMatchedCondition(sqlCastExpr.getExpr(),allowDims);
+            if(left == null) {
+                return null;
+            }
+            return expr;
+        }
+        if(expr instanceof SQLIdentifierExpr) {
+            SQLIdentifierExpr sqlIdentifierExpr = (SQLIdentifierExpr) expr;
+            String name = sqlIdentifierExpr.getName();
+            if(allowDims.contains(name)) {
+                return expr;
+            }
+            return null;
+        }
+        if(expr instanceof SQLPropertyExpr) {
+            SQLPropertyExpr sqlPropertyExpr = (SQLPropertyExpr) expr;
+            String name = sqlPropertyExpr.getName();
+            if(allowDims.contains(name)) {
+                return expr;
+            }
+            return null;
+        }
+        throw new SQLExprNotSupportException(expr.getClass().getName());
     }
 }

@@ -23,6 +23,4 @@ public interface MetaService {
     Long saveMetric(MetricDTO metric);
 
     Long saveDim(DimDTO dim);
-
-    List<DimModel> getDimModels(DimModelRequest dimModelRequest);
 }

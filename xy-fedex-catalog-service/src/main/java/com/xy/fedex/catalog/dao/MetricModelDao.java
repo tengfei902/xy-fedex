@@ -3,6 +3,7 @@ package com.xy.fedex.catalog.dao;
 import com.xy.fedex.catalog.dto.MetricModelRequest;
 import com.xy.fedex.catalog.po.MetricModelPO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -25,4 +26,8 @@ public interface MetricModelDao {
     List<MetricModelPO> selectMetricModels(MetricModelRequest metricModelRequest);
 
     Integer getMetricModelCnt(MetricModelRequest metricModelRequest);
+
+    int batchInsert(List<MetricModelPO> metricModels);
+
+    int deleteByModelId(@Param("modelId") String modelId);
 }

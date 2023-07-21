@@ -19,6 +19,7 @@ import com.xy.fedex.catalog.enums.CatalogStatus;
 import com.xy.fedex.catalog.po.DimModelPO;
 import com.xy.fedex.catalog.po.DimPO;
 import com.xy.fedex.catalog.po.MetricPO;
+import com.xy.fedex.catalog.service.meta.DimModelService;
 import com.xy.fedex.catalog.service.meta.MetaService;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
@@ -39,6 +40,8 @@ public class MetaServiceTest extends BaseTest {
     private DimDao dimDao;
     @Autowired
     private DimModelDao dimModelDao;
+    @Autowired
+    private DimModelService dimModelService;
 
     @Test
     public void testSaveMetric() {
@@ -118,7 +121,7 @@ public class MetaServiceTest extends BaseTest {
         dimModel4.setFormula("shop_id");
         dimModelDao.insertSelective(dimModel4);
 
-        List<DimModel> dimModels = metaService.getDimModels(DimModelRequest.builder().modelIds(Arrays.asList(100L,101L,102L)).dimId(3L).build());
+        List<DimModel> dimModels = dimModelService.getDimModels(DimModelRequest.builder().modelIds(Arrays.asList(100L,101L,102L)).dimId(3L).build());
         System.out.println(new Gson().toJson(dimModels));
     }
 }
