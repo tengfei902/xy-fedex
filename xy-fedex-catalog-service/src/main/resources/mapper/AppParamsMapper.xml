@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xy.fedex.catalog.dao.AppParamsDao" >
+  <resultMap id="BaseResultMap" type="com.xy.fedex.catalog.po.AppParamsPO" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="app_id" property="appId" jdbcType="BIGINT" />
+    <result column="param_key" property="paramKey" jdbcType="VARCHAR" />
+    <result column="param_value" property="paramValue" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="creator" property="creator" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, app_id, param_key, param_value, create_time, update_time, creator
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from app_params
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from app_params
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.xy.fedex.catalog.po.AppParamsPO" >
+    insert into app_params (id, app_id, param_key, 
+      param_value, create_time, update_time, 
+      creator)
+    values (#{id,jdbcType=BIGINT}, #{appId,jdbcType=BIGINT}, #{paramKey,jdbcType=VARCHAR}, 
+      #{paramValue,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{creator,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.xy.fedex.catalog.po.AppParamsPO" >
+    insert into app_params
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="appId != null" >
+        app_id,
+      </if>
+      <if test="paramKey != null" >
+        param_key,
+      </if>
+      <if test="paramValue != null" >
+        param_value,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="creator != null" >
+        creator,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="appId != null" >
+        #{appId,jdbcType=BIGINT},
+      </if>
+      <if test="paramKey != null" >
+        #{paramKey,jdbcType=VARCHAR},
+      </if>
+      <if test="paramValue != null" >
+        #{paramValue,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="creator != null" >
+        #{creator,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.xy.fedex.catalog.po.AppParamsPO" >
+    update app_params
+    <set >
+      <if test="appId != null" >
+        app_id = #{appId,jdbcType=BIGINT},
+      </if>
+      <if test="paramKey != null" >
+        param_key = #{paramKey,jdbcType=VARCHAR},
+      </if>
+      <if test="paramValue != null" >
+        param_value = #{paramValue,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="creator != null" >
+        creator = #{creator,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.xy.fedex.catalog.po.AppParamsPO" >
+    update app_params
+    set app_id = #{appId,jdbcType=BIGINT},
+      param_key = #{paramKey,jdbcType=VARCHAR},
+      param_value = #{paramValue,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      creator = #{creator,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <select id="selectByParamKey" resultMap="BaseResultMap" >
+    select
+    <include refid="Base_Column_List" />
+    from app_params
+    where app_id = #{appId,jdbcType=BIGINT} and param_key = #{paramKey,jdbcType=VARCHAR}
+  </select>
+
+  <select id="selectByAppId" resultMap="BaseResultMap" >
+    select
+    <include refid="Base_Column_List" />
+    from app_params
+    where app_id = #{appId,jdbcType=BIGINT}
+  </select>
+</mapper>

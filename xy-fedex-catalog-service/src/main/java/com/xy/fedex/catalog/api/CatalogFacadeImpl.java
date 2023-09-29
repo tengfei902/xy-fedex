@@ -8,8 +8,7 @@ import com.alibaba.druid.sql.ast.expr.SQLCharExpr;
 import com.alibaba.druid.sql.ast.expr.SQLIdentifierExpr;
 import com.alibaba.druid.sql.ast.statement.*;
 import com.alibaba.druid.sql.dialect.hive.stmt.HiveCreateTableStatement;
-import com.xy.fedex.catalog.api.dto.request.list.GetAppRequest;
-import com.xy.fedex.catalog.api.dto.request.SaveAppRequest;
+import com.xy.fedex.catalog.api.dto.request.GetAppRequest;
 import com.xy.fedex.catalog.api.dto.request.list.ListDimModelRequest;
 import com.xy.fedex.catalog.api.dto.request.list.ListMetricModelRequest;
 import com.xy.fedex.catalog.api.dto.request.list.ListMetricRequest;
@@ -27,11 +26,10 @@ import com.xy.fedex.catalog.common.definition.field.impl.AdvanceCalculate;
 import com.xy.fedex.catalog.common.definition.field.impl.DimModel;
 import com.xy.fedex.catalog.common.definition.field.impl.MetricModel;
 import com.xy.fedex.catalog.common.enums.MetricType;
-import com.xy.fedex.catalog.constants.Constants;
 import com.xy.fedex.catalog.dto.*;
 import com.xy.fedex.catalog.exception.DimNotFoundException;
-import com.xy.fedex.catalog.exception.MetaNotFoundException;
 import com.xy.fedex.catalog.exception.MetricNotFoundException;
+import com.xy.fedex.catalog.service.AppService;
 import com.xy.fedex.catalog.service.containers.MetricHolder;
 import com.xy.fedex.catalog.service.meta.*;
 import com.xy.fedex.catalog.utils.CatalogUtils;
@@ -39,7 +37,6 @@ import com.xy.fedex.def.Response;
 import com.xy.fedex.dsl.exceptions.SQLExprNotSupportException;
 import com.xy.fedex.dsl.utility.SQLExprUtils;
 import com.xy.fedex.rpc.context.Tracer;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.dubbo.rpc.RpcContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +52,7 @@ import java.util.stream.Collectors;
 @DubboService(version = "${dubbo.server.version}")
 public class CatalogFacadeImpl implements CatalogFacade {
     @Autowired
-    private ModelService modelService;
+    private ModelService2 modelService;
     @Autowired
     private MetaService metaService;
     @Autowired
@@ -86,6 +83,9 @@ public class CatalogFacadeImpl implements CatalogFacade {
                 }
 
             }
+            if(statement.toString().toLowerCase().startsWith("select")) {
+
+            }
             throw new SQLExprNotSupportException("sql not support:"+sql);
         }
         return null;
@@ -93,80 +93,83 @@ public class CatalogFacadeImpl implements CatalogFacade {
 
     @Override
     public Long saveApp(String appDDL) {
-        SQLStatement statement = SQLUtils.parseSingleStatement(appDDL, DbType.hive);
-        HiveCreateTableStatement hiveCreateTableStatement = (HiveCreateTableStatement) statement;
-        return saveApp(hiveCreateTableStatement);
+//        SQLStatement statement = SQLUtils.parseSingleStatement(appDDL, DbType.hive);
+//        HiveCreateTableStatement hiveCreateTableStatement = (HiveCreateTableStatement) statement;
+//        return saveApp(hiveCreateTableStatement);
+        return null;
     }
 
     private Long saveApp(HiveCreateTableStatement statement) {
-        SaveAppRequest saveAppRequest = new SaveAppRequest();
-        saveAppRequest.setAppName(statement.getTableName());
-
-        String tenantId = RpcContext.getContext().getAttachment(RpcConstants.TENANT_ID);
-        saveAppRequest.setTenantId(tenantId);
-
-        String accountId = RpcContext.getContext().getAttachment(RpcConstants.ACCOUNT_ID);
-        saveAppRequest.setCreator(accountId);
-
-        saveAppRequest.setAppComment(((SQLCharExpr)statement.getComment()).getText());
-
-        SchemaDTO schemaDTO = CatalogUtils.getMetaObjectType(statement.getSchema());
-        saveAppRequest.setBizLineId(schemaDTO.getBizLineId());
-
-        Map<String,String> tblPropertyMap = SQLExprUtils.getTblPropertyValue(statement.getTblProperties());
-        String relateModelIds = tblPropertyMap.get(Constants.RELATE_MODEL_IDS);
-        if(!StringUtils.isEmpty(relateModelIds)) {
-            saveAppRequest.setRelateModelIds(Arrays.asList(relateModelIds.split(",")).stream().map(s -> Long.parseLong(s)).collect(Collectors.toList()));
-        }
-        List<SQLTableElement> tableElements = statement.getTableElementList();
-        for(SQLTableElement tableElement:tableElements) {
-            SQLColumnDefinition sqlColumnDefinition = (SQLColumnDefinition) tableElement;
-            String columnCode = sqlColumnDefinition.getName().getSimpleName();
-            String columnName = ((SQLCharExpr)sqlColumnDefinition.getComment()).getText();
-            String columnComment = ((SQLCharExpr)sqlColumnDefinition.getComment()).getText();
-            String sqlDataType = sqlColumnDefinition.getDataType().toString();
-            DimDTO dim = metaService.getDim(saveAppRequest.getBizLineId(),columnCode);
-            if(!Objects.isNull(dim)) {
-                SaveAppRequest.Dim appDim = new SaveAppRequest.Dim();
-                appDim.setDimId(dim.getDimId());
-                appDim.setDimCode(columnCode);
-                appDim.setDimName(columnName);
-                appDim.setDimComment(columnComment);
-                appDim.setDimFormat(sqlDataType);
-                if(Objects.isNull(saveAppRequest.getDims())) {
-                    saveAppRequest.setDims(new ArrayList<>());
-                }
-                saveAppRequest.getDims().add(appDim);
-                continue;
-            }
-            MetricDTO metric = metaService.getMetric(saveAppRequest.getBizLineId(),columnCode);
-            if(!Objects.isNull(metric)) {
-                SaveAppRequest.Metric appMetric = new SaveAppRequest.Metric();
-                appMetric.setMetricId(metric.getMetricId());
-                appMetric.setMetricCode(columnCode);
-                appMetric.setMetricName(columnName);
-                appMetric.setMetricComment(columnComment);
-                appMetric.setMetricFormat(sqlDataType);
-                if(Objects.isNull(saveAppRequest.getMetrics())) {
-                    saveAppRequest.setMetrics(new ArrayList<>());
-                }
-                saveAppRequest.getMetrics().add(appMetric);
-                continue;
-            }
-            throw new MetaNotFoundException(String.format("metric or dim not found,biz_line_id:%s,code:%s",saveAppRequest.getBizLineId(),columnName));
-        }
-        return appService.saveApp(saveAppRequest);
+//        SaveAppRequest saveAppRequest = new SaveAppRequest();
+//        saveAppRequest.setAppName(statement.getTableName());
+//
+//        String tenantId = RpcContext.getContext().getAttachment(RpcConstants.TENANT_ID);
+//        saveAppRequest.setTenantId(tenantId);
+//
+//        String accountId = RpcContext.getContext().getAttachment(RpcConstants.ACCOUNT_ID);
+//        saveAppRequest.setCreator(accountId);
+//
+//        saveAppRequest.setAppComment(((SQLCharExpr)statement.getComment()).getText());
+//
+//        SchemaDTO schemaDTO = CatalogUtils.getMetaObjectType(statement.getSchema());
+//        saveAppRequest.setBizLineId(schemaDTO.getBizLineId());
+//
+//        Map<String,String> tblPropertyMap = SQLExprUtils.getTblPropertyValue(statement.getTblProperties());
+//        String relateModelIds = tblPropertyMap.get(Constants.RELATE_MODEL_IDS);
+//        if(!StringUtils.isEmpty(relateModelIds)) {
+//            saveAppRequest.setRelateModelIds(Arrays.asList(relateModelIds.split(",")).stream().map(s -> Long.parseLong(s)).collect(Collectors.toList()));
+//        }
+//        List<SQLTableElement> tableElements = statement.getTableElementList();
+//        for(SQLTableElement tableElement:tableElements) {
+//            SQLColumnDefinition sqlColumnDefinition = (SQLColumnDefinition) tableElement;
+//            String columnCode = sqlColumnDefinition.getName().getSimpleName();
+//            String columnName = ((SQLCharExpr)sqlColumnDefinition.getComment()).getText();
+//            String columnComment = ((SQLCharExpr)sqlColumnDefinition.getComment()).getText();
+//            String sqlDataType = sqlColumnDefinition.getDataType().toString();
+//            DimDTO dim = metaService.getDim(saveAppRequest.getBizLineId(),columnCode);
+//            if(!Objects.isNull(dim)) {
+//                SaveAppRequest.Dim appDim = new SaveAppRequest.Dim();
+//                appDim.setDimId(dim.getDimId());
+//                appDim.setDimCode(columnCode);
+//                appDim.setDimName(columnName);
+//                appDim.setDimComment(columnComment);
+//                appDim.setDimFormat(sqlDataType);
+//                if(Objects.isNull(saveAppRequest.getDims())) {
+//                    saveAppRequest.setDims(new ArrayList<>());
+//                }
+//                saveAppRequest.getDims().add(appDim);
+//                continue;
+//            }
+//            MetricDTO metric = metaService.getMetric(saveAppRequest.getBizLineId(),columnCode);
+//            if(!Objects.isNull(metric)) {
+//                SaveAppRequest.Metric appMetric = new SaveAppRequest.Metric();
+//                appMetric.setMetricId(metric.getMetricId());
+//                appMetric.setMetricCode(columnCode);
+//                appMetric.setMetricName(columnName);
+//                appMetric.setMetricComment(columnComment);
+//                appMetric.setMetricFormat(sqlDataType);
+//                if(Objects.isNull(saveAppRequest.getMetrics())) {
+//                    saveAppRequest.setMetrics(new ArrayList<>());
+//                }
+//                saveAppRequest.getMetrics().add(appMetric);
+//                continue;
+//            }
+//            throw new MetaNotFoundException(String.format("metric or dim not found,biz_line_id:%s,code:%s",saveAppRequest.getBizLineId(),columnName));
+//        }
+//        return appService.saveApp(saveAppRequest);
+        return null;
     }
 
     @Override
     public Response<AppDefinition> getApp(GetAppRequest request) {
-        if(!Objects.isNull(request.getAppId())) {
-            AppDefinition app = appService.getApp(request.getAppId());
-            return Response.success(app);
-        } else {
-            AppDefinition app = appService.getApp(request.getBizLineId(),request.getAppName());
-            return Response.success(app);
-        }
+//        if(!Objects.isNull(request.getAppId())) {
+//            AppDefinition app = appService.getApp(request.getAppId());
+//            return Response.success(app);
+//        } else {
+//            AppDefinition app = appService.getApp(request.getBizLineId(),request.getAppName());
+//            return Response.success(app);
+//        }
+        return null;
     }
 
     @Override
@@ -337,12 +340,13 @@ public class CatalogFacadeImpl implements CatalogFacade {
         }
         AppDefinition app = appService.getApp(appId);
         if(Objects.isNull(modelId)) {
-            return app.getModelIds();
+//            return app.getModelIds();
+            return null;
         }
 
-        if(app.getModelIds().contains(modelId)) {
-            return Arrays.asList(modelId);
-        }
+//        if(app.getModelIds().contains(modelId)) {
+//            return Arrays.asList(modelId);
+//        }
 
         throw new IllegalArgumentException(String.format("modelId:%s not related to app:%s",modelId,appId));
     }

@@ -4,7 +4,6 @@ import com.alibaba.druid.sql.ast.statement.*;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlSelectQueryBlock;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
-import com.xy.fedex.admin.api.FedexDsnFacade;
 import com.xy.fedex.catalog.api.dto.ModelRequest;
 import com.xy.fedex.catalog.api.dto.request.save.SaveModelRequest;
 import com.xy.fedex.catalog.api.dto.request.save.field.dim.SaveDimModelRequest;
@@ -12,18 +11,14 @@ import com.xy.fedex.catalog.api.dto.request.save.field.metric.SaveMetricModelReq
 import com.xy.fedex.catalog.common.definition.ModelDefinition;
 import com.xy.fedex.catalog.common.definition.field.impl.DimModel;
 import com.xy.fedex.catalog.common.definition.field.impl.MetricModel;
-import com.xy.fedex.catalog.common.enums.MetricType;
 import com.xy.fedex.catalog.dao.*;
 import com.xy.fedex.catalog.dto.DimModelRequest;
 import com.xy.fedex.catalog.dto.MetricModelRequest;
-import com.xy.fedex.catalog.exception.DimNotFoundException;
-import com.xy.fedex.catalog.exception.MetricNotFoundException;
 import com.xy.fedex.catalog.exception.ModelNotFoundException;
-import com.xy.fedex.catalog.exception.UpdateFailedException;
 import com.xy.fedex.catalog.po.*;
 import com.xy.fedex.catalog.service.meta.DimModelService;
 import com.xy.fedex.catalog.service.meta.MetricModelService;
-import com.xy.fedex.catalog.service.meta.ModelService;
+import com.xy.fedex.catalog.service.meta.ModelService2;
 import com.xy.fedex.catalog.utils.ModelUtils;
 import com.xy.fedex.dsl.utility.SQLExprUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -39,7 +34,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
-public class ModelServiceImpl implements ModelService {
+public class ModelService2Impl implements ModelService2 {
     @Autowired
     private ModelDao modelDao;
     @Autowired
@@ -85,13 +80,14 @@ public class ModelServiceImpl implements ModelService {
     }
 
     private ModelPO saveOrUpdateModel(SaveModelRequest modelRequest) {
-        ModelPO model = modelDao.selectByName(modelRequest.getBizLineId(),modelRequest.getModelName());
-        if (!Objects.isNull(model)) {
-            modelRequest.setModelId(model.getId());
-            return updateModel(modelRequest);
-        } else {
-            return createModel(modelRequest);
-        }
+//        ModelPO model = modelDao.selectByName(modelRequest.getBizLineId(),modelRequest.getModelName());
+//        if (!Objects.isNull(model)) {
+//            modelRequest.setModelId(model.getId());
+//            return updateModel(modelRequest);
+//        } else {
+//            return createModel(modelRequest);
+//        }
+        return null;
     }
 
     private void saveModelTableRelation(Long modelId, SaveModelRequest modelRequest) {
@@ -138,33 +134,35 @@ public class ModelServiceImpl implements ModelService {
     }
 
     private ModelPO updateModel(SaveModelRequest modelRequest) {
-        ModelPO modelPO = modelDao.selectByPrimaryKey(modelRequest.getModelId());
-        if (Objects.isNull(modelPO)) {
-            throw new ModelNotFoundException("model not found:" + modelRequest.getModelId());
-        }
-        ModelPO updateModel = new ModelPO();
-        updateModel.setId(modelRequest.getModelId());
-        updateModel.setModelName(modelRequest.getModelName());
-        updateModel.setModelDesc(modelRequest.getModelComment());
-        if (!Objects.isNull(modelRequest.getModelProp())) {
-            updateModel.setModelProp(new Gson().toJson(modelRequest.getModelProp()));
-        }
-        modelDao.updateByPrimaryKeySelective(updateModel);
-        return modelDao.selectByPrimaryKey(modelRequest.getModelId());
+//        ModelPO modelPO = modelDao.selectByPrimaryKey(modelRequest.getModelId());
+//        if (Objects.isNull(modelPO)) {
+//            throw new ModelNotFoundException("model not found:" + modelRequest.getModelId());
+//        }
+//        ModelPO updateModel = new ModelPO();
+//        updateModel.setId(modelRequest.getModelId());
+//        updateModel.setModelName(modelRequest.getModelName());
+//        updateModel.setModelDesc(modelRequest.getModelComment());
+//        if (!Objects.isNull(modelRequest.getModelProp())) {
+//            updateModel.setModelProp(new Gson().toJson(modelRequest.getModelProp()));
+//        }
+//        modelDao.updateByPrimaryKeySelective(updateModel);
+//        return modelDao.selectByPrimaryKey(modelRequest.getModelId());
+        return null;
     }
 
     private ModelPO createModel(SaveModelRequest modelRequest) {
-        ModelPO modelPO = new ModelPO();
-        modelPO.setModelName(modelRequest.getModelName());
-        modelPO.setModelDesc(modelRequest.getModelComment());
-        modelPO.setBizLineId(modelRequest.getBizLineId());
-        modelPO.setDsnId(modelRequest.getDsnId());
-        modelPO.setTableSource(modelRequest.getTableSource());
-        modelPO.setCondition(modelRequest.getCondition());
-        modelPO.setModelProp(new Gson().toJson(modelRequest.getModelProp()));
-        modelDao.insertSelective(modelPO);
-
-        return modelDao.selectByPrimaryKey(modelPO.getId());
+//        ModelPO modelPO = new ModelPO();
+//        modelPO.setModelName(modelRequest.getModelName());
+//        modelPO.setModelDesc(modelRequest.getModelComment());
+//        modelPO.setBizLineId(modelRequest.getBizLineId());
+//        modelPO.setDsnId(modelRequest.getDsnId());
+//        modelPO.setTableSource(modelRequest.getTableSource());
+//        modelPO.setCondition(modelRequest.getCondition());
+//        modelPO.setModelProp(new Gson().toJson(modelRequest.getModelProp()));
+//        modelDao.insertSelective(modelPO);
+//
+//        return modelDao.selectByPrimaryKey(modelPO.getId());
+        return null;
     }
 
     private void saveMetricModels(Long modelId, List<SaveMetricModelRequest> metricModels) {
@@ -212,11 +210,11 @@ public class ModelServiceImpl implements ModelService {
         if(StringUtils.isEmpty(dimModelRequest.getDimCode())) {
             throw new IllegalArgumentException("dimId or dimCode should be set in dimModelRequest");
         }
-        DimPO dimPO = dimDao.selectByDimCode(bizLineId,dimModelRequest.getDimCode());
-        if(Objects.isNull(dimPO)) {
-            throw new DimNotFoundException(String.format("dim not found:%s,%s",bizLineId,dimModelRequest.getDimCode()));
-        }
-        dimModelRequest.setDimId(dimPO.getId());
+//        DimPO dimPO = dimDao.selectByDimCode(bizLineId,dimModelRequest.getDimCode());
+//        if(Objects.isNull(dimPO)) {
+//            throw new DimNotFoundException(String.format("dim not found:%s,%s",bizLineId,dimModelRequest.getDimCode()));
+//        }
+//        dimModelRequest.setDimId(dimPO.getId());
     }
 
     private void updateDimModels(List<SaveDimModelRequest> dimModelRequests) {
@@ -247,26 +245,25 @@ public class ModelServiceImpl implements ModelService {
 
     @Override
     public ModelDefinition getModel(Long modelId) {
-        ModelPO model = modelDao.selectByPrimaryKey(modelId);
-        if(Objects.isNull(model)) {
-            throw new ModelNotFoundException(String.format("model not found:%s",modelId));
-        }
-        ModelDefinition modelDefinition = new ModelDefinition();
-        modelDefinition.setModelId(modelId);
-        modelDefinition.setModelComment(model.getModelDesc());
-        modelDefinition.setModelName(model.getModelName());
-        modelDefinition.setTableSource(model.getTableSource());
-        modelDefinition.setCondition(model.getCondition());
-        if(!Objects.isNull(model.getModelProp())) {
-            modelDefinition.setModelProp(new Gson().fromJson(model.getModelProp(),new TypeToken<Map<String,String>>(){}.getType()));
-        }
-
-        List<MetricModel> metricModels = metricModelService.getMetricModels(MetricModelRequest.builder().modelIds(Arrays.asList(modelId)).build());
-        modelDefinition.setMetrics(metricModels);
-        List<DimModel> dimModels = dimModelService.getDimModels(DimModelRequest.builder().modelIds(Arrays.asList(modelId)).build());
-        modelDefinition.setDims(dimModels);
-
-        return modelDefinition;
+//        ModelPO model = modelDao.selectByPrimaryKey(modelId);
+//        if(Objects.isNull(model)) {
+//            throw new ModelNotFoundException(String.format("model not found:%s",modelId));
+//        }
+//        ModelDefinition modelDefinition = new ModelDefinition();
+//        modelDefinition.setModelId(modelId);
+//        modelDefinition.setModelComment(model.getModelDesc());
+//        modelDefinition.setModelName(model.getModelName());
+//        modelDefinition.setTableSource(model.getTableSource());
+//        modelDefinition.setCondition(model.getCondition());
+//        if(!Objects.isNull(model.getModelProp())) {
+//            modelDefinition.setModelProp(new Gson().fromJson(model.getModelProp(),new TypeToken<Map<String,String>>(){}.getType()));
+//        }
+//
+//        List<MetricModel> metricModels = metricModelService.getMetricModels(MetricModelRequest.builder().modelIds(Arrays.asList(modelId)).build());
+//        modelDefinition.setMetrics(metricModels);
+//        List<DimModel> dimModels = dimModelService.getDimModels(DimModelRequest.builder().modelIds(Arrays.asList(modelId)).build());
+//        modelDefinition.setDims(dimModels);
+        return null;
     }
 
     private List<DimModel> getModelDims(Long modelId) {

@@ -1,50 +1,50 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.xy.fedex.catalog.dao.BizLineDao" >
-  <resultMap id="BaseResultMap" type="com.xy.fedex.catalog.po.BizLinePO" >
+<mapper namespace="com.xy.fedex.catalog.dao.PrimaryMetricModelParamsDao" >
+  <resultMap id="BaseResultMap" type="com.xy.fedex.catalog.po.PrimaryMetricModelParamsPO" >
     <id column="id" property="id" jdbcType="BIGINT" />
-    <result column="tenant_id" property="tenantId" jdbcType="BIGINT" />
-    <result column="biz_line_name" property="bizLineName" jdbcType="VARCHAR" />
-    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="metric_model_id" property="metricModelId" jdbcType="BIGINT" />
+    <result column="param_key" property="paramKey" jdbcType="VARCHAR" />
+    <result column="param_value" property="paramValue" jdbcType="VARCHAR" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
     <result column="creator" property="creator" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, tenant_id, biz_line_name, status, create_time, update_time, creator
+    id, metric_model_id, param_key, param_value, create_time, update_time, creator
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select 
     <include refid="Base_Column_List" />
-    from biz_line
+    from primary_metric_model_params
     where id = #{id,jdbcType=BIGINT}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
-    delete from biz_line
+    delete from primary_metric_model_params
     where id = #{id,jdbcType=BIGINT}
   </delete>
-  <insert id="insert" parameterType="com.xy.fedex.catalog.po.BizLinePO" >
-    insert into biz_line (id, tenant_id, biz_line_name, 
-      status, create_time, update_time, 
+  <insert id="insert" parameterType="com.xy.fedex.catalog.po.PrimaryMetricModelParamsPO" >
+    insert into primary_metric_model_params (id, metric_model_id, param_key, 
+      param_value, create_time, update_time, 
       creator)
-    values (#{id,jdbcType=BIGINT}, #{tenantId,jdbcType=BIGINT}, #{bizLineName,jdbcType=VARCHAR}, 
-      #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
+    values (#{id,jdbcType=BIGINT}, #{metricModelId,jdbcType=BIGINT}, #{paramKey,jdbcType=VARCHAR}, 
+      #{paramValue,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
       #{creator,jdbcType=VARCHAR})
   </insert>
-  <insert id="insertSelective" parameterType="com.xy.fedex.catalog.po.BizLinePO" >
-    insert into biz_line
+  <insert id="insertSelective" parameterType="com.xy.fedex.catalog.po.PrimaryMetricModelParamsPO" >
+    insert into primary_metric_model_params
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
         id,
       </if>
-      <if test="tenantId != null" >
-        tenant_id,
+      <if test="metricModelId != null" >
+        metric_model_id,
       </if>
-      <if test="bizLineName != null" >
-        biz_line_name,
+      <if test="paramKey != null" >
+        param_key,
       </if>
-      <if test="status != null" >
-        status,
+      <if test="paramValue != null" >
+        param_value,
       </if>
       <if test="createTime != null" >
         create_time,
@@ -60,14 +60,14 @@
       <if test="id != null" >
         #{id,jdbcType=BIGINT},
       </if>
-      <if test="tenantId != null" >
-        #{tenantId,jdbcType=BIGINT},
+      <if test="metricModelId != null" >
+        #{metricModelId,jdbcType=BIGINT},
       </if>
-      <if test="bizLineName != null" >
-        #{bizLineName,jdbcType=VARCHAR},
+      <if test="paramKey != null" >
+        #{paramKey,jdbcType=VARCHAR},
       </if>
-      <if test="status != null" >
-        #{status,jdbcType=INTEGER},
+      <if test="paramValue != null" >
+        #{paramValue,jdbcType=VARCHAR},
       </if>
       <if test="createTime != null" >
         #{createTime,jdbcType=TIMESTAMP},
@@ -80,17 +80,17 @@
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.xy.fedex.catalog.po.BizLinePO" >
-    update biz_line
+  <update id="updateByPrimaryKeySelective" parameterType="com.xy.fedex.catalog.po.PrimaryMetricModelParamsPO" >
+    update primary_metric_model_params
     <set >
-      <if test="tenantId != null" >
-        tenant_id = #{tenantId,jdbcType=BIGINT},
+      <if test="metricModelId != null" >
+        metric_model_id = #{metricModelId,jdbcType=BIGINT},
       </if>
-      <if test="bizLineName != null" >
-        biz_line_name = #{bizLineName,jdbcType=VARCHAR},
+      <if test="paramKey != null" >
+        param_key = #{paramKey,jdbcType=VARCHAR},
       </if>
-      <if test="status != null" >
-        status = #{status,jdbcType=INTEGER},
+      <if test="paramValue != null" >
+        param_value = #{paramValue,jdbcType=VARCHAR},
       </if>
       <if test="createTime != null" >
         create_time = #{createTime,jdbcType=TIMESTAMP},
@@ -104,11 +104,11 @@
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.xy.fedex.catalog.po.BizLinePO" >
-    update biz_line
-    set tenant_id = #{tenantId,jdbcType=BIGINT},
-      biz_line_name = #{bizLineName,jdbcType=VARCHAR},
-      status = #{status,jdbcType=INTEGER},
+  <update id="updateByPrimaryKey" parameterType="com.xy.fedex.catalog.po.PrimaryMetricModelParamsPO" >
+    update primary_metric_model_params
+    set metric_model_id = #{metricModelId,jdbcType=BIGINT},
+      param_key = #{paramKey,jdbcType=VARCHAR},
+      param_value = #{paramValue,jdbcType=VARCHAR},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
       creator = #{creator,jdbcType=VARCHAR}

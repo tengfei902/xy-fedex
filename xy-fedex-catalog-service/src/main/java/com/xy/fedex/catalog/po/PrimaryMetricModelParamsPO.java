@@ -3,14 +3,14 @@ package com.xy.fedex.catalog.po;
 import java.io.Serializable;
 import java.util.Date;
 
-public class BizLinePO implements Serializable {
+public class PrimaryMetricModelParamsPO implements Serializable {
     private Long id;
 
-    private Long tenantId;
+    private Long metricModelId;
 
-    private String bizLineName;
+    private String paramKey;
 
-    private Integer status;
+    private String paramValue;
 
     private Date createTime;
 
@@ -28,28 +28,28 @@ public class BizLinePO implements Serializable {
         this.id = id;
     }
 
-    public Long getTenantId() {
-        return tenantId;
+    public Long getMetricModelId() {
+        return metricModelId;
     }
 
-    public void setTenantId(Long tenantId) {
-        this.tenantId = tenantId;
+    public void setMetricModelId(Long metricModelId) {
+        this.metricModelId = metricModelId;
     }
 
-    public String getBizLineName() {
-        return bizLineName;
+    public String getParamKey() {
+        return paramKey;
     }
 
-    public void setBizLineName(String bizLineName) {
-        this.bizLineName = bizLineName == null ? null : bizLineName.trim();
+    public void setParamKey(String paramKey) {
+        this.paramKey = paramKey == null ? null : paramKey.trim();
     }
 
-    public Integer getStatus() {
-        return status;
+    public String getParamValue() {
+        return paramValue;
     }
 
-    public void setStatus(Integer status) {
-        this.status = status;
+    public void setParamValue(String paramValue) {
+        this.paramValue = paramValue == null ? null : paramValue.trim();
     }
 
     public Date getCreateTime() {
@@ -87,11 +87,11 @@ public class BizLinePO implements Serializable {
         if (getClass() != that.getClass()) {
             return false;
         }
-        BizLinePO other = (BizLinePO) that;
+        PrimaryMetricModelParamsPO other = (PrimaryMetricModelParamsPO) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
-            && (this.getTenantId() == null ? other.getTenantId() == null : this.getTenantId().equals(other.getTenantId()))
-            && (this.getBizLineName() == null ? other.getBizLineName() == null : this.getBizLineName().equals(other.getBizLineName()))
-            && (this.getStatus() == null ? other.getStatus() == null : this.getStatus().equals(other.getStatus()))
+            && (this.getMetricModelId() == null ? other.getMetricModelId() == null : this.getMetricModelId().equals(other.getMetricModelId()))
+            && (this.getParamKey() == null ? other.getParamKey() == null : this.getParamKey().equals(other.getParamKey()))
+            && (this.getParamValue() == null ? other.getParamValue() == null : this.getParamValue().equals(other.getParamValue()))
             && (this.getCreateTime() == null ? other.getCreateTime() == null : this.getCreateTime().equals(other.getCreateTime()))
             && (this.getUpdateTime() == null ? other.getUpdateTime() == null : this.getUpdateTime().equals(other.getUpdateTime()))
             && (this.getCreator() == null ? other.getCreator() == null : this.getCreator().equals(other.getCreator()));
@@ -102,9 +102,9 @@ public class BizLinePO implements Serializable {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
-        result = prime * result + ((getTenantId() == null) ? 0 : getTenantId().hashCode());
-        result = prime * result + ((getBizLineName() == null) ? 0 : getBizLineName().hashCode());
-        result = prime * result + ((getStatus() == null) ? 0 : getStatus().hashCode());
+        result = prime * result + ((getMetricModelId() == null) ? 0 : getMetricModelId().hashCode());
+        result = prime * result + ((getParamKey() == null) ? 0 : getParamKey().hashCode());
+        result = prime * result + ((getParamValue() == null) ? 0 : getParamValue().hashCode());
         result = prime * result + ((getCreateTime() == null) ? 0 : getCreateTime().hashCode());
         result = prime * result + ((getUpdateTime() == null) ? 0 : getUpdateTime().hashCode());
         result = prime * result + ((getCreator() == null) ? 0 : getCreator().hashCode());
@@ -118,9 +118,9 @@ public class BizLinePO implements Serializable {
         sb.append(" [");
         sb.append("Hash = ").append(hashCode());
         sb.append(", id=").append(id);
-        sb.append(", tenantId=").append(tenantId);
-        sb.append(", bizLineName=").append(bizLineName);
-        sb.append(", status=").append(status);
+        sb.append(", metricModelId=").append(metricModelId);
+        sb.append(", paramKey=").append(paramKey);
+        sb.append(", paramValue=").append(paramValue);
         sb.append(", createTime=").append(createTime);
         sb.append(", updateTime=").append(updateTime);
         sb.append(", creator=").append(creator);

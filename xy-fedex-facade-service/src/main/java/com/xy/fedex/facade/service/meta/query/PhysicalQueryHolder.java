@@ -3,10 +3,11 @@ package com.xy.fedex.facade.service.meta.query;
 import com.alibaba.druid.sql.ast.SQLExpr;
 import com.alibaba.druid.sql.ast.expr.SQLBinaryOpExpr;
 import com.alibaba.druid.sql.ast.expr.SQLBinaryOperator;
+import com.alibaba.druid.sql.ast.expr.SQLCharExpr;
 import com.alibaba.druid.sql.ast.statement.*;
 import com.google.common.base.Joiner;
-import com.xy.fedex.catalog.common.definition.ModelDefinition;
 import com.xy.fedex.facade.catalog.AppHolder;
+import com.xy.fedex.facade.service.meta.dto.PhysicalQueryPlan;
 import com.xy.fedex.facade.service.meta.dto.QueryMatchedModelDTO;
 import lombok.Data;
 import org.apache.commons.collections4.CollectionUtils;
@@ -109,8 +110,36 @@ public class PhysicalQueryHolder {
         return new SQLBinaryOpExpr(modelCondition, SQLBinaryOperator.BooleanAnd, metricCondition);
     }
 
-    public SQLSelect getPhysicalSelect() {
-        return null;
+    public List<PhysicalQueryPlan.PhysicalSelect> getPhysicalSelect() {
+        Map<String,SQLSelectQueryBlock> sqlMap = new HashMap<>();
+        QUERY_MAP.keySet().forEach(s -> {
+            sqlMap.putIfAbsent(s,new SQLSelectQueryBlock());
+            SQLSelectQueryBlock sqlSelectQueryBlock = sqlMap.get(s);
+
+            QuerySegment segment = QUERY_MAP.get(s);
+            Map<String,SQLSelectItem> metrics = segment.getMetrics();
+            Map<String,SQLSelectItem> dims = segment.getDims();
+            SQLExpr where = segment.getWhere();
+
+            for(String alias:metrics.keySet()) {
+                sqlSelectQueryBlock.addSelectItem(metrics.get(alias).getExpr(),alias);
+            }
+            for(String alias:dims.keySet()) {
+                sqlSelectQueryBlock.addSelectItem(dims.get(alias).getExpr(),alias);
+            }
+            sqlSelectQueryBlock.setFrom(where);
+            sqlSelectQueryBlock.setWhere(where);
+            SQLSelectGroupByClause sqlSelectGroupByClause = new SQLSelectGroupByClause();
+            for(String alias:dims.keySet()) {
+                sqlSelectGroupByClause.addItem(new SQLCharExpr(alias));
+            }
+            sqlSelectQueryBlock.setGroupBy(sqlSelectGroupByClause);
+        });
+
+        return sqlMap.values().stream().map(sqlSelectQueryBlock -> {
+            SQLSelect sqlSelect = new SQLSelect(sqlSelectQueryBlock);
+            return new PhysicalQueryPlan.PrimaryPhysicalSelect(sqlSelect);
+        }).collect(Collectors.toList());
     }
 
     private String getModelKey(Long modelId, List<String> dims, String where) {

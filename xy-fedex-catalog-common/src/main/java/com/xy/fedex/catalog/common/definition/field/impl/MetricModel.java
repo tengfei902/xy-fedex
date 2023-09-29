@@ -8,9 +8,7 @@ import lombok.Data;
  */
 @Data
 public class MetricModel extends MetaField {
-    private Long metricId;
     private String metricCode;
     private String formula;
-    private Long metricModelId;
     private AdvanceCalculate advanceCalculate;
 }

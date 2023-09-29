@@ -9,7 +9,6 @@ import java.io.Serializable;
  */
 @Data
 public class Metric implements Serializable {
-    private Long metricId;
     private String metricCode;
     private String metricName;
     private String metricComment;

@@ -3,24 +3,16 @@
 <mapper namespace="com.xy.fedex.catalog.dao.MetricDao" >
   <resultMap id="BaseResultMap" type="com.xy.fedex.catalog.po.MetricPO" >
     <id column="id" property="id" jdbcType="BIGINT" />
-    <result column="tenant" property="tenant" jdbcType="VARCHAR" />
-    <result column="biz_line_id" property="bizLineId" jdbcType="BIGINT" />
-    <result column="subject_id" property="subjectId" jdbcType="BIGINT" />
     <result column="metric_code" property="metricCode" jdbcType="VARCHAR" />
-    <result column="formula" property="formula" jdbcType="VARCHAR" />
-    <result column="metric_type" property="metricType" jdbcType="INTEGER" />
     <result column="metric_name" property="metricName" jdbcType="VARCHAR" />
     <result column="metric_comment" property="metricComment" jdbcType="VARCHAR" />
-    <result column="unit" property="unit" jdbcType="INTEGER" />
-    <result column="metric_format" property="metricFormat" jdbcType="INTEGER" />
     <result column="status" property="status" jdbcType="INTEGER" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
     <result column="creator" property="creator" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, tenant, biz_line_id, subject_id, metric_code, formula,metric_type, metric_name, metric_comment, unit, metric_format,
-    status, create_time, update_time, creator
+    id, metric_code, metric_name, metric_comment, status, create_time, update_time, creator
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select 
@@ -33,54 +25,27 @@
     where id = #{id,jdbcType=BIGINT}
   </delete>
   <insert id="insert" parameterType="com.xy.fedex.catalog.po.MetricPO" >
-    insert into metric (id, biz_line_id,
-      subject_id, metric_code,formula,metric_type,metric_name, metric_comment,
-      unit, metric_format, status, 
-      create_time, update_time, creator
-      )
-    values (#{id,jdbcType=BIGINT}, #{bizLineId,jdbcType=BIGINT},
-      #{subjectId,jdbcType=BIGINT},#{metricCode,jdbcType=VARCHAR},#{formula,jdbcType=VARCHAR},
-      #{metricType,jdbcType=INTEGER},#{metricName,jdbcType=VARCHAR},
-      #{metricComment,jdbcType=VARCHAR},#{unit,jdbcType=INTEGER}, #{metricFormat,jdbcType=INTEGER},
-      #{status,jdbcType=INTEGER},#{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP},
-      #{creator,jdbcType=VARCHAR}
-      )
+    insert into metric (id, metric_code, metric_name, 
+      metric_comment, status, create_time, 
+      update_time, creator)
+    values (#{id,jdbcType=BIGINT}, #{metricCode,jdbcType=VARCHAR}, #{metricName,jdbcType=VARCHAR}, 
+      #{metricComment,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{creator,jdbcType=VARCHAR})
   </insert>
-  <insert id="insertSelective" keyProperty="id" useGeneratedKeys="true" parameterType="com.xy.fedex.catalog.po.MetricPO" >
+  <insert id="insertSelective" parameterType="com.xy.fedex.catalog.po.MetricPO" >
     insert into metric
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
         id,
       </if>
-      <if test="tenant != null" >
-        tenant,
-      </if>
-      <if test="bizLineId != null" >
-        biz_line_id,
-      </if>
-      <if test="subjectId != null" >
-        subject_id,
-      </if>
       <if test="metricCode != null" >
         metric_code,
-      </if>
-      <if test="formula != null" >
-        formula,
-      </if>
-      <if test="metricType != null" >
-        metric_type,
       </if>
       <if test="metricName != null" >
         metric_name,
       </if>
       <if test="metricComment != null" >
         metric_comment,
-      </if>
-      <if test="unit != null" >
-        unit,
-      </if>
-      <if test="metricFormat != null" >
-        metric_format,
       </if>
       <if test="status != null" >
         status,
@@ -99,35 +64,14 @@
       <if test="id != null" >
         #{id,jdbcType=BIGINT},
       </if>
-      <if test="tenant != null" >
-        #{tenant,jdbcType=VARCHAR},
-      </if>
-      <if test="bizLineId != null" >
-        #{bizLineId,jdbcType=BIGINT},
-      </if>
-      <if test="subjectId != null" >
-        #{subjectId,jdbcType=BIGINT},
-      </if>
       <if test="metricCode != null" >
         #{metricCode,jdbcType=VARCHAR},
-      </if>
-      <if test="formula != null" >
-        #{formula,jdbcType=VARCHAR},
-      </if>
-      <if test="metricType != null" >
-        #{metricType,jdbcType=INTEGER},
       </if>
       <if test="metricName != null" >
         #{metricName,jdbcType=VARCHAR},
       </if>
       <if test="metricComment != null" >
         #{metricComment,jdbcType=VARCHAR},
-      </if>
-      <if test="unit != null" >
-        #{unit,jdbcType=INTEGER},
-      </if>
-      <if test="metricFormat != null" >
-        #{metricFormat,jdbcType=INTEGER},
       </if>
       <if test="status != null" >
         #{status,jdbcType=INTEGER},
@@ -149,29 +93,20 @@
       <if test="metricCode != null" >
         metric_code = #{metricCode,jdbcType=VARCHAR},
       </if>
-      <if test="subjectId != null" >
-        subject_id = #{subjectId,jdbcType=BIGINT},
-      </if>
-      <if test="formula != null" >
-        formula = #{formula,jdbcType=VARCHAR},
-      </if>
-      <if test="metricType != null" >
-        metric_type = #{metricType,jdbcType=INTEGER},
-      </if>
       <if test="metricName != null" >
         metric_name = #{metricName,jdbcType=VARCHAR},
       </if>
       <if test="metricComment != null" >
         metric_comment = #{metricComment,jdbcType=VARCHAR},
       </if>
-      <if test="unit != null" >
-        unit = #{unit,jdbcType=INTEGER},
-      </if>
-      <if test="metricFormat != null" >
-        metric_format = #{metricFormat,jdbcType=INTEGER},
-      </if>
       <if test="status != null" >
         status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="creator != null" >
         creator = #{creator,jdbcType=VARCHAR},
@@ -181,16 +116,9 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.xy.fedex.catalog.po.MetricPO" >
     update metric
-    set
-      biz_line_id = #{bizLineId,jdbcType=BIGINT},
-      subject_id = #{subjectId,jdbcType=BIGINT},
-      metric_code = #{metricCode,jdbcType=VARCHAR},
-      formula = #{formula,jdbcType=VARCHAR},
-      metric_type = #{metricType,jdbcType=INTEGER},
+    set metric_code = #{metricCode,jdbcType=VARCHAR},
       metric_name = #{metricName,jdbcType=VARCHAR},
       metric_comment = #{metricComment,jdbcType=VARCHAR},
-      unit = #{unit,jdbcType=INTEGER},
-      metric_format = #{metricFormat,jdbcType=INTEGER},
       status = #{status,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
@@ -198,20 +126,22 @@
     where id = #{id,jdbcType=BIGINT}
   </update>
 
-  <select id="selectByMetricCode" resultMap="BaseResultMap" >
-    select
-    <include refid="Base_Column_List" />
-    from metric
-    where biz_line_id = #{bizLineId,jdbcType=BIGINT} and metric_code = #{metricCode,jdbcType=VARCHAR}
-  </select>
+  <insert id="batchInsert">
+    insert into metric (metric_code, metric_name, metric_comment, creator)
+    values
+         <foreach collection="metrics" item="metric" separator="," open="" close="">
+            (#{metric.metricCode},#{metric.metricName},#{metric.metricComment},#{metric.creator})
+         </foreach>
+  </insert>
 
-  <select id="selectByIds" resultMap="BaseResultMap">
+  <select id="selectByMetricCodes" resultMap="BaseResultMap">
     select
     <include refid="Base_Column_List" />
     from metric
-    where id in
-    <foreach collection="ids" separator="," open="(" close=")" item="id">
-      #{id}
+    where metric_code in 
+    <foreach collection="metricCodes" item="metricCode" open="(" close=")" separator=",">
+      #{metricCode}
     </foreach>
   </select>
+
 </mapper>

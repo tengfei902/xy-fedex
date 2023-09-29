@@ -4,15 +4,12 @@ import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.xy.fedex.catalog.common.definition.field.impl.*;
 import com.xy.fedex.catalog.common.enums.MetricType;
-import com.xy.fedex.catalog.dao.DeriveMetricModelDao;
 import com.xy.fedex.catalog.dao.MetricModelDao;
-import com.xy.fedex.catalog.dao.PrimaryMetricModelDao;
 import com.xy.fedex.catalog.dto.DimModelRequest;
 import com.xy.fedex.catalog.dto.MetricModelRequest;
 import com.xy.fedex.catalog.exception.MetricModelNotFoundException;
 import com.xy.fedex.catalog.exception.MetricTypeNotSupportException;
 import com.xy.fedex.catalog.po.MetricModelPO;
-import com.xy.fedex.catalog.po.PrimaryMetricModelPO;
 import com.xy.fedex.catalog.service.meta.DimModelService;
 import com.xy.fedex.catalog.service.meta.MetricModelService;
 import org.apache.commons.collections4.CollectionUtils;
@@ -20,10 +17,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -35,17 +30,11 @@ public class MetricModelServiceImpl implements MetricModelService {
     private MetricModelDao metricModelDao;
     @Autowired
     private DimModelService dimModelService;
-    @Autowired
-    private PrimaryMetricModelDao primaryMetricModelDao;
-    @Autowired
-    private DeriveMetricModelDao deriveMetricModelDao;
 
     @Override
     public List<MetricModel> getMetricModels(MetricModelRequest request) {
-        List<PrimaryMetricModelPO> primaryMetricModels = primaryMetricModelDao.selectMetricModels(request);
-
         List<MetricModelPO> metricModels = metricModelDao.selectMetricModels(request);
-        return metricModels.stream().map(this::getMetricModel).collect(Collectors.toList());
+        return metricModels.stream().map(metricModelPO -> getMetricModel(metricModelPO)).collect(Collectors.toList());
     }
 
     private MetricModel getMetricModel(MetricModelPO metricModelPO) {

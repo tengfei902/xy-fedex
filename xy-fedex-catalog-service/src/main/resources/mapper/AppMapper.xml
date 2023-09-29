@@ -3,17 +3,17 @@
 <mapper namespace="com.xy.fedex.catalog.dao.AppDao" >
   <resultMap id="BaseResultMap" type="com.xy.fedex.catalog.po.AppPO" >
     <id column="id" property="id" jdbcType="BIGINT" />
-    <result column="biz_line_id" property="bizLineId" jdbcType="BIGINT" />
+    <result column="app_code" property="appCode" jdbcType="VARCHAR" />
     <result column="app_name" property="appName" jdbcType="VARCHAR" />
     <result column="app_comment" property="appComment" jdbcType="VARCHAR" />
     <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="version" property="version" jdbcType="VARCHAR" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
     <result column="creator" property="creator" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, biz_line_id, app_name, app_comment, status, create_time, update_time,
-    creator
+    id, app_code, app_name, app_comment, status, version, create_time, update_time, creator
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select 
@@ -26,14 +26,12 @@
     where id = #{id,jdbcType=BIGINT}
   </delete>
   <insert id="insert" parameterType="com.xy.fedex.catalog.po.AppPO" >
-    insert into app (id, biz_line_id,
-      app_name, app_comment, status,
-      create_time, update_time, creator
-      )
-    values (#{id,jdbcType=BIGINT}, #{bizLineId,jdbcType=BIGINT},
-      #{appName,jdbcType=VARCHAR}, #{appComment,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER},
-      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{creator,jdbcType=VARCHAR}
-      )
+    insert into app (id, app_code, app_name, 
+      app_comment, status, create_time, 
+      update_time, creator)
+    values (#{id,jdbcType=BIGINT}, #{appCode,jdbcType=VARCHAR}, #{appName,jdbcType=VARCHAR}, 
+      #{appComment,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{creator,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" useGeneratedKeys="true" keyProperty="id" parameterType="com.xy.fedex.catalog.po.AppPO" >
     insert into app
@@ -41,8 +39,8 @@
       <if test="id != null" >
         id,
       </if>
-      <if test="bizLineId != null" >
-        biz_line_id,
+      <if test="appCode != null" >
+        app_code,
       </if>
       <if test="appName != null" >
         app_name,
@@ -52,6 +50,9 @@
       </if>
       <if test="status != null" >
         status,
+      </if>
+      <if test="version != null" >
+        version,
       </if>
       <if test="createTime != null" >
         create_time,
@@ -67,8 +68,8 @@
       <if test="id != null" >
         #{id,jdbcType=BIGINT},
       </if>
-      <if test="bizLineId != null" >
-        #{bizLineId,jdbcType=BIGINT},
+      <if test="appCode != null" >
+        #{appCode,jdbcType=VARCHAR},
       </if>
       <if test="appName != null" >
         #{appName,jdbcType=VARCHAR},
@@ -78,6 +79,9 @@
       </if>
       <if test="status != null" >
         #{status,jdbcType=INTEGER},
+      </if>
+      <if test="version != null" >
+        #{version,jdbcType=VARCHAR},
       </if>
       <if test="createTime != null" >
         #{createTime,jdbcType=TIMESTAMP},
@@ -93,12 +97,6 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.xy.fedex.catalog.po.AppPO" >
     update app
     <set >
-      <if test="tenantId != null" >
-        tenant_id = #{tenantId,jdbcType=BIGINT},
-      </if>
-      <if test="bizLineId != null" >
-        biz_line_id = #{bizLineId,jdbcType=BIGINT},
-      </if>
       <if test="appName != null" >
         app_name = #{appName,jdbcType=VARCHAR},
       </if>
@@ -108,21 +106,18 @@
       <if test="status != null" >
         status = #{status,jdbcType=INTEGER},
       </if>
-      <if test="createTime != null" >
-        create_time = #{createTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="updateTime != null" >
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
-      </if>
       <if test="creator != null" >
         creator = #{creator,jdbcType=VARCHAR},
       </if>
+      <if test="version != null" >
+        version = #{version,jdbcType=VARCHAR},
+      </if>
     </set>
-    where id = #{id,jdbcType=BIGINT}
+    where id = #{id,jdbcType=BIGINT} and version = #{currentVersion,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.xy.fedex.catalog.po.AppPO" >
     update app
-    set biz_line_id = #{bizLineId,jdbcType=BIGINT},
+    set app_code = #{appCode,jdbcType=VARCHAR},
       app_name = #{appName,jdbcType=VARCHAR},
       app_comment = #{appComment,jdbcType=VARCHAR},
       status = #{status,jdbcType=INTEGER},
@@ -131,11 +126,14 @@
       creator = #{creator,jdbcType=VARCHAR}
     where id = #{id,jdbcType=BIGINT}
   </update>
-
-  <select id="selectByName" resultMap="BaseResultMap" >
+  <select id="selectByAppCode" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select
     <include refid="Base_Column_List" />
     from app
-    where biz_line_id = #{bizLineId,jdbcType=BIGINT} and app_name = #{appName,jdbcType=VARCHAR}
+    where app_code = #{appCode,jdbcType=VARCHAR}
   </select>
+
+  <update id="updateCurrentVersion">
+    update app set version = #{toVersion,jdbcType=VARCHAR} where app_code = #{appCode,jdbcType=VARCHAR} and version = #{fromVersion,jdbcType=VARCHAR}
+  </update>
 </mapper>

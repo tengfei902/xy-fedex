@@ -4,6 +4,7 @@
   <resultMap id="BaseResultMap" type="com.xy.fedex.catalog.po.DeriveMetricModelPO" >
     <id column="id" property="id" jdbcType="BIGINT" />
     <result column="metric_id" property="metricId" jdbcType="BIGINT" />
+    <result column="metric_code" property="metricCode" jdbcType="VARCHAR" />
     <result column="app_id" property="appId" jdbcType="BIGINT" />
     <result column="formula" property="formula" jdbcType="VARCHAR" />
     <result column="advance_calculate" property="advanceCalculate" jdbcType="VARCHAR" />
@@ -13,8 +14,8 @@
     <result column="creator" property="creator" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, metric_id, app_id, formula, advance_calculate, status, create_time, update_time, 
-    creator
+    t1.id, t1.metric_id, t2.metric_code,t1.app_id, t1.formula, t1.advance_calculate, t1.status, t1.create_time, t1.update_time,
+    t1.creator
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select 
@@ -139,4 +140,14 @@
       creator = #{creator,jdbcType=VARCHAR}
     where id = #{id,jdbcType=BIGINT}
   </update>
+
+  <select id="selectMetricModels" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from derive_metric_model t1 left join metric t2 on t1.metric_id = t2.id
+    where t1.app_id = #{appId,jdbcType=BIGINT}
+    <if test="metricId != null" >
+      t1.metric_id = #{metricId,jdbcType=BIGINT}
+    </if>
+  </select>
 </mapper>

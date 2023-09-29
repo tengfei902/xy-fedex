@@ -4,6 +4,8 @@ import com.xy.fedex.catalog.po.DimPO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 @Mapper
 public interface DimDao {
     int deleteByPrimaryKey(Long id);
@@ -18,5 +20,7 @@ public interface DimDao {
 
     int updateByPrimaryKey(DimPO record);
 
-    DimPO selectByDimCode(@Param("bizLineId") Long bizLineId,@Param("dimCode")String dimCode);
+    List<DimPO> selectByDimCodes(@Param("dimCodes") List<String> dimCodes);
+
+    int batchInsert(@Param("dims") List<DimPO> dims);
 }

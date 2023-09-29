@@ -20,4 +20,8 @@ public class Tracer {
     public static String getAccountId() {
         return RpcContext.getContext().getAttachment(TracerParamEnum.ACCOUNT_ID.getValue());
     }
+
+    public static String getTraceId() {
+        return null;
+    }
 }

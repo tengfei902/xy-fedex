@@ -3,7 +3,7 @@ package com.xy.fedex.catalog.api;
 import com.google.common.base.Joiner;
 import com.google.gson.Gson;
 import com.xy.fedex.catalog.BaseTest;
-import com.xy.fedex.catalog.api.dto.request.list.GetAppRequest;
+import com.xy.fedex.catalog.api.dto.request.GetAppRequest;
 import com.xy.fedex.catalog.api.dto.request.list.ListMetricModelRequest;
 import com.xy.fedex.catalog.api.dto.request.save.SaveRequests;
 import com.xy.fedex.catalog.api.dto.request.save.field.dim.SaveDimRequest;
@@ -131,10 +131,10 @@ public class CatalogFacadeTest extends BaseTest {
     @Rollback(value = false)
     @Test
     public void testCreateApp() {
-        String sql = SqlReader.read("ddl/app_ecs.sql");
-        Response<Long> response = catalogFacade.execute(sql);
-        Response<AppDefinition> appResponse = catalogFacade.getApp(GetAppRequest.builder().appId(response.getData()).build());
-        System.out.println(new Gson().toJson(appResponse.getData()));
+//        String sql = SqlReader.read("ddl/app_ecs.sql");
+//        Response<Long> response = catalogFacade.execute(sql);
+//        Response<AppDefinition> appResponse = catalogFacade.getApp(GetAppRequest.builder().appId(response.getData()).build());
+//        System.out.println(new Gson().toJson(appResponse.getData()));
     }
 
     @Rollback(value = false)

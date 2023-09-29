@@ -24,6 +24,7 @@ public class ModelQueryServiceImpl implements ModelQueryService {
 
     @Override
     public PhysicalQueryPlan getPhysicalQuery(QueryMatchedModelDTO metricModelMatchDTO) {
+        PhysicalQueryPlan pyPhysicalQueryPlan = new PhysicalQueryPlan();
         List<List<QueryMatchedModelDTO.MetricModel>> physicalSelectMatchedModels = getPhysicalSelectMatchedModels(metricModelMatchDTO);
 
         for(List<QueryMatchedModelDTO.MetricModel> physicalSelectMatchedModel:physicalSelectMatchedModels) {
@@ -31,9 +32,11 @@ public class ModelQueryServiceImpl implements ModelQueryService {
             for(QueryMatchedModelDTO.MetricModel metricModel:physicalSelectMatchedModel) {
                 physicalQueryHolder.addMetricModel(metricModel);
             }
-            SQLSelect physicalSelect = physicalQueryHolder.getPhysicalSelect();
+            List<PhysicalQueryPlan.PhysicalSelect> physicalSelects = physicalQueryHolder.getPhysicalSelect();
+            pyPhysicalQueryPlan.addPhysicalSelect(physicalSelects);
         }
-        return null;
+
+        return pyPhysicalQueryPlan;
     }
 
     private List<List<QueryMatchedModelDTO.MetricModel>> getPhysicalSelectMatchedModels(QueryMatchedModelDTO metricModelMatchDTO) {

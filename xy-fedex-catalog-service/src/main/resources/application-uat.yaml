@@ -5,7 +5,7 @@ dubbo:
     name: dubbo
     port: 20880
   registry:
-    address: zookeeper://172.18.0.5:2181
+    address: zookeeper://172.18.0.4:2181
   scan:
     base-packages: com.xy.fedex.catalog.api
   provider:

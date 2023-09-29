@@ -20,9 +20,7 @@ public interface MetricDao {
 
     int updateByPrimaryKey(MetricPO record);
 
-    MetricPO selectByMetricCode(@Param("bizLineId")Long bizLineId,@Param("metricCode")String metricCode);
+    List<MetricPO> selectByMetricCodes(@Param("metricCodes") List<String> metricCodes);
 
-    List<MetricPO> selectAllMetrics(@Param("bizLineId") Long bizLineId);
-
-    List<MetricPO> selectByIds(@Param("ids") List<Long> ids);
+    int batchInsert(@Param("metrics") List<MetricPO> metrics);
 }

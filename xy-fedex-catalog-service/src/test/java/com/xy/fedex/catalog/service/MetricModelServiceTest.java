@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.xy.fedex.catalog.BaseTest;
 import com.xy.fedex.catalog.common.definition.field.impl.AdvanceCalculate;
 import com.xy.fedex.catalog.common.definition.field.impl.MetricModel;
+import com.xy.fedex.catalog.common.definition.field.impl.PrimaryMetricModel;
 import com.xy.fedex.catalog.common.enums.MetricType;
 import com.xy.fedex.catalog.dao.MetricModelDao;
 import com.xy.fedex.catalog.dto.MetricModelRequest;
@@ -21,6 +22,19 @@ public class MetricModelServiceTest extends BaseTest {
     private MetricModelService metricModelService;
     @Autowired
     private MetricModelDao metricModelDao;
+
+    @Test
+    public void testSavePrimaryMetricModel() {
+//        List<MetricModel> metricModels = new ArrayList<>();
+//        PrimaryMetricModel primaryMetricModel = new PrimaryMetricModel();
+//        primaryMetricModel.setModelId();
+//        primaryMetricModel.setMetricCode();
+//        primaryMetricModel.setFormula();
+//        primaryMetricModel.setAdvanceCalculate();
+//        metricModelService.saveMetricModel(Arrays.asList(primaryMetricModel));
+//
+//        metricModelService.getMetricModels();
+    }
 
     @Test
     public void testGetMetricModels() {

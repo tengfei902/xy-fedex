@@ -1,24 +1,27 @@
-package com.xy.fedex.catalog.service.meta.impl;
+package com.xy.fedex.catalog.service.impl;
 
-import com.google.common.collect.Lists;
-import com.xy.fedex.catalog.api.dto.request.SaveAppRequest;
+import com.google.common.base.Joiner;
 import com.xy.fedex.catalog.common.definition.AppDefinition;
 import com.xy.fedex.catalog.common.definition.field.Dim;
 import com.xy.fedex.catalog.common.definition.field.Metric;
-import com.xy.fedex.catalog.common.enums.DimType;
 import com.xy.fedex.catalog.common.enums.FieldType;
+import com.xy.fedex.catalog.constants.Constants;
 import com.xy.fedex.catalog.dao.*;
+import com.xy.fedex.catalog.dto.ModelDTO;
+import com.xy.fedex.catalog.dto.request.AppRequest;
 import com.xy.fedex.catalog.exception.AppNotFoundException;
 import com.xy.fedex.catalog.po.*;
-import com.xy.fedex.catalog.service.meta.AppService;
+import com.xy.fedex.catalog.service.AppService;
+import com.xy.fedex.catalog.utils.CatalogUtils;
+import com.xy.fedex.rpc.context.UserContextHolder;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,78 +29,68 @@ public class AppServiceImpl implements AppService {
     @Autowired
     private AppDao appDao;
     @Autowired
-    private AppModelRelationDao appModelRelationDao;
-    @Autowired
     private AppMetricModelRelationDao appMetricModelRelationDao;
     @Autowired
-    private DimModelDao dimModelDao;
-    @Autowired
-    private MetricModelDao metricModelDao;
-    @Autowired
     private AppColumnDao appColumnDao;
+    @Autowired
+    private AppParamsDao appParamsDao;
 
     @Transactional
     @Override
-    public Long saveApp(SaveAppRequest saveAppRequest) {
-        Long appId = saveOrUpdateApp(saveAppRequest);
-        List<Long> relateModelIds = saveAppRequest.getRelateModelIds();
-        saveAppModelRelation(appId, relateModelIds);
-        saveAppColumns(appId, saveAppRequest.getMetrics(), saveAppRequest.getDims());
-        return appId;
+    public Long saveApp(AppRequest appRequest) {
+        AppPO currentVersionApp = upgradeAppVersion(appRequest);
+        //create relate models
+        saveAppRelateModels(currentVersionApp,appRequest.getModels());
+        //create metrics & dims
+        saveAppColumns(currentVersionApp.getId(),appRequest.getMetrics(),appRequest.getDims());
+        return currentVersionApp.getId();
     }
 
-    private Long saveOrUpdateApp(SaveAppRequest saveAppRequest) {
-        AppPO app = appDao.selectByName(saveAppRequest.getBizLineId(),saveAppRequest.getAppName());
+    private AppPO upgradeAppVersion(AppRequest appRequest) {
+        String newVersion = CatalogUtils.getCurrentVersion();
+        String appCode =CatalogUtils.getObjectFullName(appRequest.getAppCode());
+        AppPO app = appDao.selectByAppCode(appCode);
         if(Objects.isNull(app)) {
-            return createApp(saveAppRequest);
+            app = new AppPO();
+            app.setAppCode(appRequest.getAppCode());
+            app.setAppName(appRequest.getAppName());
+            app.setAppComment(appRequest.getAppComment());
+            app.setCreator(UserContextHolder.getCurrentUser().getUserName());
+            app.setVersion(newVersion);
+            appDao.insertSelective(app);
+        } else {
+            app.setAppName(appRequest.getAppName());
+            app.setAppComment(appRequest.getAppComment());
+            app.setCurrentVersion(app.getVersion());
+            app.setVersion(newVersion);
+            appDao.updateByPrimaryKeySelective(app);
         }
-        return app.getId();
+        return appDao.selectByPrimaryKey(app.getId());
     }
 
-    private Long createApp(SaveAppRequest saveAppRequest) {
-        AppPO appPO = new AppPO();
-        appPO.setAppName(saveAppRequest.getAppName());
-        appPO.setTenantId(saveAppRequest.getTenantId());
-        appPO.setCreator(saveAppRequest.getCreator());
-        appPO.setAppComment(saveAppRequest.getAppComment());
-        appPO.setBizLineId(saveAppRequest.getBizLineId());
-        appDao.insertSelective(appPO);
-        return appPO.getId();
-    }
-
-    private Long updateApp(SaveAppRequest saveAppRequest,AppPO app) {
-        if(Objects.isNull(app)) {
-            throw new AppNotFoundException("app not found:"+ saveAppRequest.getAppId());
-        }
-        AppPO updateApp = new AppPO();
-        updateApp.setId(app.getId());
-        updateApp.setAppName(saveAppRequest.getAppName());
-//        updateApp.setAppDesc(saveAppRequest.getAppDesc());
-        appDao.updateByPrimaryKeySelective(updateApp);
-        return app.getId();
-    }
-
-    private void saveAppModelRelation(Long appId, List<Long> relatedModelIds) {
-        appModelRelationDao.deleteByAppId(appId);
-        if(CollectionUtils.isEmpty(relatedModelIds)) {
+    private void saveAppRelateModels(AppPO app, List<ModelDTO> appRelateModels) {
+        if(CollectionUtils.isEmpty(appRelateModels)) {
             return;
         }
-        List<AppModelRelationPO> relations = relatedModelIds.stream().map(modelId -> {
-            AppModelRelationPO relation = new AppModelRelationPO();
-            relation.setAppId(appId);
-            relation.setModelId(modelId);
-            return relation;
-        }).collect(Collectors.toList());
-        appModelRelationDao.batchInsert(relations);
+        AppParamsPO appParamsPO = appParamsDao.selectByParamKey(app.getId(),Constants.APP_RELATE_MODELS);
+        if(Objects.isNull(appParamsPO)) {
+            appParamsPO = new AppParamsPO();
+            appParamsPO.setAppId(app.getId());
+            appParamsPO.setParamKey(Constants.APP_RELATE_MODELS);
+            appParamsPO.setParamValue(Joiner.on(",").join(appRelateModels.stream().map(ModelDTO::getModelCode).collect(Collectors.toList())));
+            appParamsDao.insertSelective(appParamsPO);
+        } else {
+            appParamsPO.setParamValue(Joiner.on(",").join(appRelateModels.stream().map(ModelDTO::getModelCode).collect(Collectors.toList())));
+            appParamsDao.updateByParamKeySelective(appParamsPO);
+        }
     }
 
-    private void saveAppColumns(Long appId, List<SaveAppRequest.Metric> metrics, List<SaveAppRequest.Dim> dims) {
+    private void saveAppColumns(Long appId, List<Metric> metrics, List<Dim> dims) {
         appColumnDao.deleteAppColumns(appId);
 
         List<AppColumnPO> metricColumns = metrics.stream().map(metric -> {
             AppColumnPO appColumnPO = new AppColumnPO();
             appColumnPO.setAppId(appId);
-            appColumnPO.setColumnId(metric.getMetricId());
             appColumnPO.setColumnCode(metric.getMetricCode());
             appColumnPO.setColumnName(metric.getMetricName());
             appColumnPO.setColumnType(FieldType.METRIC.getFieldType());
@@ -108,7 +101,6 @@ public class AppServiceImpl implements AppService {
         List<AppColumnPO> dimColumns = dims.stream().map(dim -> {
             AppColumnPO appColumnPO = new AppColumnPO();
             appColumnPO.setAppId(appId);
-            appColumnPO.setColumnId(dim.getDimId());
             appColumnPO.setColumnCode(dim.getDimCode());
             appColumnPO.setColumnName(dim.getDimName());
             appColumnPO.setColumnType(FieldType.DIM.getFieldType());
@@ -134,22 +126,23 @@ public class AppServiceImpl implements AppService {
 
     @Override
     public AppDefinition getApp(Long bizLineId, String appName) {
-        AppPO appPO = appDao.selectByName(bizLineId,appName);
-        if(Objects.isNull(appPO)) {
-            throw new AppNotFoundException(String.format("app not found, bizLineId:%s,appName:%s",bizLineId,appName));
-        }
-        return getAppDefinition(appPO);
+//        AppPO appPO = appDao.selectByName(bizLineId,appName);
+//        if(Objects.isNull(appPO)) {
+//            throw new AppNotFoundException(String.format("app not found, bizLineId:%s,appName:%s",bizLineId,appName));
+//        }
+//        return getAppDefinition(appPO);
+        return null;
     }
 
     private AppDefinition getAppDefinition(AppPO appPO) {
         AppDefinition appDefinition = new AppDefinition();
-        appDefinition.setAppId(appPO.getId());
         appDefinition.setAppName(appPO.getAppName());
         appDefinition.setAppComment(appPO.getAppComment());
 
-        List<AppModelRelationPO> appModelRelations = appModelRelationDao.selectByAppId(appPO.getId());
-        if(!CollectionUtils.isEmpty(appModelRelations)) {
-            appDefinition.setModelIds(appModelRelations.stream().map(AppModelRelationPO::getModelId).collect(Collectors.toList()));
+        List<AppParamsPO> appParams = appParamsDao.selectByAppId(appPO.getId());
+        Map<String,AppParamsPO> paramMap =  appParams.stream().collect(Collectors.toMap(AppParamsPO::getParamKey, Function.identity()));
+        if(paramMap.containsKey(Constants.APP_RELATE_MODELS) && !StringUtils.isEmpty(paramMap.get(Constants.APP_RELATE_MODELS).getParamValue())) {
+            List<Long> relateModelIds = Arrays.asList(paramMap.get(Constants.APP_RELATE_MODELS).getParamValue().split(",")).stream().map(s -> Long.valueOf(s)).collect(Collectors.toList());
         }
 
         appDefinition.setDims(new ArrayList<>());
@@ -159,7 +152,6 @@ public class AppServiceImpl implements AppService {
         for(AppColumnPO column:appColumns) {
             if(column.getColumnType() == FieldType.DIM.getFieldType()) {
                 Dim dim = new Dim();
-                dim.setDimId(column.getColumnId());
                 dim.setDimCode(column.getColumnCode());
                 dim.setDimName(column.getColumnName());
                 dim.setDimComment(column.getColumnName());
@@ -168,7 +160,6 @@ public class AppServiceImpl implements AppService {
             }
             if(column.getColumnType() == FieldType.METRIC.getFieldType()) {
                 Metric metric = new Metric();
-                metric.setMetricId(column.getColumnId());
                 metric.setMetricCode(column.getColumnCode());
                 metric.setMetricName(column.getColumnName());
                 metric.setMetricComment(column.getColumnName());
@@ -181,26 +172,26 @@ public class AppServiceImpl implements AppService {
     }
 
     private List<Dim> getDims(List<Long> relateModelIds) {
-        List<DimPO> dims = dimModelDao.selectByModelIds(relateModelIds);
-        if(CollectionUtils.isEmpty(dims)) {
-            return Lists.newArrayList();
-        }
-        return dims.stream().map(dimPO -> {
-            Dim dim = new Dim();
+//        List<DimPO> dims = dimModelDao.selectByModelIds(relateModelIds);
+//        if(CollectionUtils.isEmpty(dims)) {
+//            return Lists.newArrayList();
+//        }
+//        return dims.stream().map(dimPO -> {
+//            Dim dim = new Dim();
 //            dim.(dimPO.getId());
 //            dim.setDimCode(dimPO.getDimCode());
 //            dim.setDimName(dimPO.getDimName());
 //            dim.setDimComment(dimPO.getDimComment());
 //            dim.setDimType(DimType.parse(dimPO.getDimType()));
-            return dim;
-        }).collect(Collectors.toList());
+//            return dim;
+//        }).collect(Collectors.toList());
+        return null;
     }
 
     private List<Metric> getMetrics(Long appId) {
         List<MetricModelDetailPO> appMetrics = appMetricModelRelationDao.selectAppMetrics(appId);
         return appMetrics.stream().map(appMetricPO -> {
             Metric metric = new Metric();
-            metric.setMetricId(appMetricPO.getMetricId());
             metric.setMetricCode(appMetricPO.getMetricCode());
             metric.setMetricName(appMetricPO.getMetricName());
             metric.setMetricComment(appMetricPO.getMetricComment());

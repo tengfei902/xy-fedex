@@ -1,10 +1,14 @@
 package com.xy.fedex.catalog.po;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.io.Serializable;
 import java.util.Date;
 
+@ToString
+@EqualsAndHashCode
 @Data
 public class DimPO implements Serializable {
     private Long id;
@@ -13,11 +17,7 @@ public class DimPO implements Serializable {
 
     private String dimName;
 
-    private Integer dimType;
-
-    private String tenantId;
-
-    private Long bizLineId;
+    private String dimType;
 
     private String dimComment;
 

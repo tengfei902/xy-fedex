@@ -8,6 +8,8 @@ public class DeriveMetricModelPO implements Serializable {
 
     private Long metricId;
 
+    private String metricCode;
+
     private Long appId;
 
     private String formula;
@@ -94,6 +96,14 @@ public class DeriveMetricModelPO implements Serializable {
 
     public void setCreator(String creator) {
         this.creator = creator == null ? null : creator.trim();
+    }
+
+    public String getMetricCode() {
+        return metricCode;
+    }
+
+    public void setMetricCode(String metricCode) {
+        this.metricCode = metricCode;
     }
 
     @Override

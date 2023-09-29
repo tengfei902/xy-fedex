@@ -7,5 +7,5 @@ import lombok.Data;
  */
 @Data
 public class PrimaryMetricModel extends MetricModel {
-    private Long modelId;
+    private String modelCode;
 }

@@ -7,14 +7,12 @@
     <result column="column_code" property="columnCode" jdbcType="VARCHAR" />
     <result column="column_name" property="columnName" jdbcType="VARCHAR" />
     <result column="column_type" property="columnType" jdbcType="INTEGER" />
-    <result column="column_id" property="columnId" jdbcType="BIGINT" />
-    <result column="column_format" property="columnFormat" jdbcType="VARCHAR" />
     <result column="status" property="status" jdbcType="INTEGER" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, app_id, column_code, column_name, column_type, column_id, column_format, status, create_time,
+    id, app_id, column_code, column_name, column_type, status, create_time,
     update_time
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
@@ -29,12 +27,10 @@
   </delete>
   <insert id="insert" parameterType="com.xy.fedex.catalog.po.AppColumnPO" >
     insert into app_column (id, app_id, column_name, 
-      column_type, column_id, column_format, 
-      status, create_time, update_time
+      column_type, status, create_time, update_time
       )
     values (#{id,jdbcType=BIGINT}, #{appId,jdbcType=BIGINT}, #{columnName,jdbcType=VARCHAR}, 
-      #{columnType,jdbcType=INTEGER}, #{columnId,jdbcType=BIGINT}, #{columnFormat,jdbcType=VARCHAR}, 
-      #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
+      #{columnType,jdbcType=INTEGER},#{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.xy.fedex.catalog.po.AppColumnPO" >
@@ -54,12 +50,6 @@
       </if>
       <if test="columnType != null" >
         column_type,
-      </if>
-      <if test="columnId != null" >
-        column_id,
-      </if>
-      <if test="columnFormat != null" >
-        column_format,
       </if>
       <if test="status != null" >
         status,
@@ -87,12 +77,6 @@
       <if test="columnType != null" >
         #{columnType,jdbcType=INTEGER},
       </if>
-      <if test="columnId != null" >
-        #{columnId,jdbcType=BIGINT},
-      </if>
-      <if test="columnFormat != null" >
-        #{columnFormat,jdbcType=VARCHAR},
-      </if>
       <if test="status != null" >
         #{status,jdbcType=INTEGER},
       </if>
@@ -119,12 +103,6 @@
       <if test="columnType != null" >
         column_type = #{columnType,jdbcType=INTEGER},
       </if>
-      <if test="columnId != null" >
-        column_id = #{columnId,jdbcType=BIGINT},
-      </if>
-      <if test="columnFormat != null" >
-        column_format = #{columnFormat,jdbcType=VARCHAR},
-      </if>
       <if test="status != null" >
         status = #{status,jdbcType=INTEGER},
       </if>
@@ -142,8 +120,6 @@
     set app_id = #{appId,jdbcType=BIGINT},
       column_name = #{columnName,jdbcType=VARCHAR},
       column_type = #{columnType,jdbcType=INTEGER},
-      column_id = #{columnId,jdbcType=BIGINT},
-      column_format = #{columnFormat,jdbcType=VARCHAR},
       status = #{status,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP}
@@ -156,16 +132,14 @@
   </delete>
 
   <insert id="batchInsert" parameterType="java.util.List" >
-    insert into app_column (app_id,column_code,column_name,column_type,column_id,column_format)
+    insert into app_column (app_id,column_code,column_name,column_type)
     values
     <foreach collection ="list" item="column" index= "index" separator =",">
       (
       #{column.appId},
       #{column.columnCode},
       #{column.columnName},
-      #{column.columnType},
-      #{column.columnId},
-      #{column.columnFormat}
+      #{column.columnType}
       )
     </foreach>
   </insert>

@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 /**
  * @author tengfei
  */
-@Service
 public class ModelMatchServiceImpl implements ModelMatchService {
     private List<MetricModelReWriter> filters;
 

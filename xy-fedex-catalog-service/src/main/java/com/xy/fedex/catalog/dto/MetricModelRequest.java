@@ -33,6 +33,11 @@ public class MetricModelRequest {
         private Integer offset;
         private Integer limit;
 
+        public Builder appId(Long appId) {
+            this.appId = appId;
+            return this;
+        }
+
         public Builder modelIds(List<Long> modelIds) {
             this.modelIds = modelIds;
             return this;
@@ -51,6 +56,7 @@ public class MetricModelRequest {
 
         public MetricModelRequest build() {
             MetricModelRequest metricModelRequest = new MetricModelRequest();
+            metricModelRequest.setAppId(this.appId);
             metricModelRequest.setMetricId(this.metricId);
             metricModelRequest.setModelIds(this.modelIds);
             metricModelRequest.setLimit(this.limit);

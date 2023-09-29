@@ -1,6 +1,6 @@
 package com.xy.fedex.catalog.api;
 
-import com.xy.fedex.catalog.api.dto.request.list.GetAppRequest;
+import com.xy.fedex.catalog.api.dto.request.GetAppRequest;
 import com.xy.fedex.catalog.api.dto.request.list.ListDimModelRequest;
 import com.xy.fedex.catalog.api.dto.request.list.ListMetricModelRequest;
 import com.xy.fedex.catalog.api.dto.request.list.ListMetricRequest;

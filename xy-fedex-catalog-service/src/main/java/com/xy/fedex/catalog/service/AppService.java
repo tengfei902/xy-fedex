@@ -1,7 +1,8 @@
-package com.xy.fedex.catalog.service.meta;
+package com.xy.fedex.catalog.service;
 
 import com.xy.fedex.catalog.api.dto.request.SaveAppRequest;
 import com.xy.fedex.catalog.common.definition.AppDefinition;
+import com.xy.fedex.catalog.dto.request.AppRequest;
 
 /**
  * @author tengfei
@@ -9,10 +10,10 @@ import com.xy.fedex.catalog.common.definition.AppDefinition;
 public interface AppService {
     /**
      * 保存应用
-     * @param saveAppRequest
+     * @param appRequest
      * @return
      */
-    Long saveApp(SaveAppRequest saveAppRequest);
+    Long saveApp(AppRequest appRequest);
 
     /**
      * 获取应用

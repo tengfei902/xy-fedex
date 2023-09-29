@@ -5,9 +5,7 @@
     <id column="id" property="id" jdbcType="BIGINT" />
     <result column="dim_code" property="dimCode" jdbcType="VARCHAR" />
     <result column="dim_name" property="dimName" jdbcType="VARCHAR" />
-    <result column="dim_type" property="dimType" jdbcType="INTEGER" />
-    <result column="biz_line_id" property="bizLineId" jdbcType="BIGINT" />
-    <result column="tenant_id" property="tenantId" jdbcType="VARCHAR" />
+    <result column="dim_type" property="dimType" jdbcType="VARCHAR" />
     <result column="dim_comment" property="dimComment" jdbcType="VARCHAR" />
     <result column="status" property="status" jdbcType="INTEGER" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
@@ -15,7 +13,7 @@
     <result column="creator" property="creator" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, dim_code, dim_name, dim_type,biz_line_id,tenant_id, dim_comment, status, create_time, update_time,
+    id, dim_code, dim_name, dim_type, dim_comment, status, create_time, update_time, 
     creator
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
@@ -29,16 +27,16 @@
     where id = #{id,jdbcType=BIGINT}
   </delete>
   <insert id="insert" parameterType="com.xy.fedex.catalog.po.DimPO" >
-    insert into dim (id, dim_code,
-      dim_name, dim_type,biz_line_id, dim_comment,
-      status, create_time, update_time, 
-      creator)
-    values (#{id,jdbcType=BIGINT}, #{dimCode,jdbcType=VARCHAR},
-      #{dimName,jdbcType=VARCHAR}, #{dimType,jdbcType=INTEGER},#{bizLineId,jdbcType=BIGINT}, #{dimComment,jdbcType=VARCHAR},
-      #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
-      #{creator,jdbcType=VARCHAR})
+    insert into dim (id, dim_code, dim_name, 
+      dim_type, dim_comment, status, 
+      create_time, update_time, creator
+      )
+    values (#{id,jdbcType=BIGINT}, #{dimCode,jdbcType=VARCHAR}, #{dimName,jdbcType=VARCHAR}, 
+      #{dimType,jdbcType=INTEGER}, #{dimComment,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{creator,jdbcType=VARCHAR}
+      )
   </insert>
-  <insert id="insertSelective" useGeneratedKeys="true" keyProperty="id" parameterType="com.xy.fedex.catalog.po.DimPO" >
+  <insert id="insertSelective" parameterType="com.xy.fedex.catalog.po.DimPO" >
     insert into dim
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -52,12 +50,6 @@
       </if>
       <if test="dimType != null" >
         dim_type,
-      </if>
-      <if test="bizLineId != null" >
-        biz_line_id,
-      </if>
-      <if test="tenantId != null" >
-        tenant_id,
       </if>
       <if test="dimComment != null" >
         dim_comment,
@@ -80,19 +72,13 @@
         #{id,jdbcType=BIGINT},
       </if>
       <if test="dimCode != null" >
-        #{dimCode,jdbcType=BIGINT},
+        #{dimCode,jdbcType=VARCHAR},
       </if>
       <if test="dimName != null" >
         #{dimName,jdbcType=VARCHAR},
       </if>
       <if test="dimType != null" >
         #{dimType,jdbcType=INTEGER},
-      </if>
-      <if test="bizLineId != null" >
-        #{bizLineId,jdbcType=BIGINT},
-      </if>
-      <if test="tenantId != null" >
-        #{tenantId,jdbcType=VARCHAR},
       </if>
       <if test="dimComment != null" >
         #{dimComment,jdbcType=VARCHAR},
@@ -114,17 +100,11 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.xy.fedex.catalog.po.DimPO" >
     update dim
     <set >
-      <if test="dimCode != null" >
-        dim_code = #{dimCode,jdbcType=BIGINT},
-      </if>
       <if test="dimName != null" >
         dim_name = #{dimName,jdbcType=VARCHAR},
       </if>
       <if test="dimType != null" >
         dim_type = #{dimType,jdbcType=INTEGER},
-      </if>
-      <if test="bizLineId != null" >
-        biz_line_id = #{bizLineId,jdbcType=INTEGER},
       </if>
       <if test="dimComment != null" >
         dim_comment = #{dimComment,jdbcType=VARCHAR},
@@ -146,11 +126,9 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.xy.fedex.catalog.po.DimPO" >
     update dim
-    set
-      dim_code = #{dimCode,jdbcType=BIGINT},
+    set dim_code = #{dimCode,jdbcType=VARCHAR},
       dim_name = #{dimName,jdbcType=VARCHAR},
       dim_type = #{dimType,jdbcType=INTEGER},
-      biz_line_id = #{bizLineId,jdbcType=BIGINT},
       dim_comment = #{dimComment,jdbcType=VARCHAR},
       status = #{status,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP},
@@ -158,11 +136,21 @@
       creator = #{creator,jdbcType=VARCHAR}
     where id = #{id,jdbcType=BIGINT}
   </update>
-
-  <select id="selectByDimCode" resultMap="BaseResultMap" >
-    select
-    <include refid="Base_Column_List" />
-    from dim
-    where biz_line_id = #{bizLineId,jdbcType=BIGINT} and dim_code = #{dimCode,jdbcType=VARCHAR}
+  
+  <select id="selectByDimCodes" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List" />
+    from dim where dim_code in 
+     <foreach collection="dimCodes" item="dimCode" separator="," open="(" close=")">
+       #{dimCode}
+     </foreach>
   </select>
+  
+  <insert id="batchInsert">
+    insert into dim (dim_code, dim_name, dim_type, dim_comment, creator)
+    values
+        <foreach collection="dims" item="dim" open="" close="" separator=",">
+            (#{dim.dimCode},#{dim.dimName},#{dim.dimType},#{dim.dimComment},#{dim.creator})
+        </foreach>
+
+  </insert>
 </mapper>

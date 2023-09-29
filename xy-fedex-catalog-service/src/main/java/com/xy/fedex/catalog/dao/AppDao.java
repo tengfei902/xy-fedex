@@ -18,5 +18,7 @@ public interface AppDao {
 
     int updateByPrimaryKey(AppPO record);
 
-    AppPO selectByName(@Param("bizLineId")Long bizLineId,@Param("appName")String appName);
+    AppPO selectByAppCode(@Param("appCode") String appCode);
+
+    int updateCurrentVersion(@Param("appCode") String appCode, @Param("fromVersion") String fromVersion, @Param("toVersion") String toVersion);
 }

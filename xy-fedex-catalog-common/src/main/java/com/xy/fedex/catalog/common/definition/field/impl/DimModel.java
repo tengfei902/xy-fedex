@@ -8,9 +8,7 @@ import lombok.Data;
  */
 @Data
 public class DimModel extends MetaField {
-    private Long dimId;
     private String dimCode;
     private String formula;
-    private Long modelId;
-    private Long dimModelId;
+    private String modelCode;
 }

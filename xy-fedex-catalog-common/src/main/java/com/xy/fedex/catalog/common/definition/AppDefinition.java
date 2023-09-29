@@ -12,10 +12,10 @@ import java.util.List;
  */
 @Data
 public class AppDefinition implements Serializable {
-    private Long appId;
+    private String appCode;
     private String appName;
     private String appComment;
-    private List<Long> modelIds;
     private List<Metric> metrics;
     private List<Dim> dims;
+    private List<String> models;
 }
