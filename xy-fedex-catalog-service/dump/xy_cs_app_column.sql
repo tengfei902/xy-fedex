@@ -27,15 +27,13 @@ CREATE TABLE `app_column` (
   `app_id` bigint NOT NULL COMMENT 'biz line id',
   `column_name` varchar(64) NOT NULL COMMENT 'column name',
   `column_type` int NOT NULL COMMENT 'column type',
-  `column_id` bigint NOT NULL COMMENT 'dim id or metric id',
-  `column_format` varchar(64) NOT NULL DEFAULT '' COMMENT 'column format',
   `status` int NOT NULL DEFAULT '1' COMMENT '1:valid,-1:deleted',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `column_code` varchar(64) NOT NULL DEFAULT '' COMMENT 'column code',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `unq_l` (`app_id`,`column_name`)
-) ENGINE=InnoDB AUTO_INCREMENT=253 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  UNIQUE KEY `unq_app_column_code` (`app_id`,`column_code`)
+) ENGINE=InnoDB AUTO_INCREMENT=267 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -44,7 +42,7 @@ CREATE TABLE `app_column` (
 
 LOCK TABLES `app_column` WRITE;
 /*!40000 ALTER TABLE `app_column` DISABLE KEYS */;
-INSERT INTO `app_column` VALUES (232,33,'销售额',0,54,'decimal(38, 6)',1,'2023-06-21 16:18:07','2023-06-21 16:18:07','sale_amt'),(233,33,'销量',0,55,'int',1,'2023-06-21 16:18:07','2023-06-21 16:18:07','sale_cnt'),(234,33,'退款额',0,56,'decimal(38, 6)',1,'2023-06-21 16:18:07','2023-06-21 16:18:07','refund_amt'),(235,33,'退款量',0,57,'int',1,'2023-06-21 16:18:07','2023-06-21 16:18:07','refund_cnt'),(236,33,'退款率',0,58,'decimal(38, 6)',1,'2023-06-21 16:18:07','2023-06-21 16:18:07','refund_amt_rate'),(237,33,'退货率',0,59,'decimal(38, 6)',1,'2023-06-21 16:18:07','2023-06-21 16:18:07','refund_cnt_rate'),(238,33,'曝光pv',0,60,'bigint',1,'2023-06-21 16:18:07','2023-06-21 16:18:07','expose_pv'),(239,33,'曝光uv',0,61,'bigint',1,'2023-06-21 16:18:07','2023-06-21 16:18:07','expose_uv'),(240,33,'点击pv',0,62,'bigint',1,'2023-06-21 16:18:07','2023-06-21 16:18:07','click_pv'),(241,33,'点击uv',0,63,'bigint',1,'2023-06-21 16:18:07','2023-06-21 16:18:07','click_uv'),(242,33,'浏览pv',0,64,'bigint',1,'2023-06-21 16:18:07','2023-06-21 16:18:07','view_pv'),(243,33,'浏览uv',0,65,'bigint',1,'2023-06-21 16:18:07','2023-06-21 16:18:07','view_uv'),(244,33,'访购率',0,66,'decimal(38, 6)',1,'2023-06-21 16:18:07','2023-06-21 16:18:07','visit_buy_rate'),(245,33,'日期',1,9,'string',1,'2023-06-21 16:18:07','2023-06-21 16:18:07','dt'),(246,33,'门店id',1,70,'bigint',1,'2023-06-21 16:18:07','2023-06-21 16:18:07','shop_id'),(247,33,'门店名',1,71,'string',1,'2023-06-21 16:18:07','2023-06-21 16:18:07','shop_name'),(248,33,'门店全名',1,72,'string',1,'2023-06-21 16:18:07','2023-06-21 16:18:07','shop_full_name'),(249,33,'租户ID',1,73,'bigint',1,'2023-06-21 16:18:07','2023-06-21 16:18:07','tenant_id'),(250,33,'租户名',1,74,'string',1,'2023-06-21 16:18:07','2023-06-21 16:18:07','tenant_name'),(251,33,'品牌id',1,75,'bigint',1,'2023-06-21 16:18:07','2023-06-21 16:18:07','brand_id'),(252,33,'品牌名',1,76,'string',1,'2023-06-21 16:18:07','2023-06-21 16:18:07','brand_name');
+INSERT INTO `app_column` VALUES (232,33,'销售额',0,1,'2023-06-21 16:18:07','2023-06-21 16:18:07','sale_amt'),(233,33,'销量',0,1,'2023-06-21 16:18:07','2023-06-21 16:18:07','sale_cnt'),(234,33,'退款额',0,1,'2023-06-21 16:18:07','2023-06-21 16:18:07','refund_amt'),(235,33,'退款量',0,1,'2023-06-21 16:18:07','2023-06-21 16:18:07','refund_cnt'),(236,33,'退款率',0,1,'2023-06-21 16:18:07','2023-06-21 16:18:07','refund_amt_rate'),(237,33,'退货率',0,1,'2023-06-21 16:18:07','2023-06-21 16:18:07','refund_cnt_rate'),(238,33,'曝光pv',0,1,'2023-06-21 16:18:07','2023-06-21 16:18:07','expose_pv'),(239,33,'曝光uv',0,1,'2023-06-21 16:18:07','2023-06-21 16:18:07','expose_uv'),(240,33,'点击pv',0,1,'2023-06-21 16:18:07','2023-06-21 16:18:07','click_pv'),(241,33,'点击uv',0,1,'2023-06-21 16:18:07','2023-06-21 16:18:07','click_uv'),(242,33,'浏览pv',0,1,'2023-06-21 16:18:07','2023-06-21 16:18:07','view_pv'),(243,33,'浏览uv',0,1,'2023-06-21 16:18:07','2023-06-21 16:18:07','view_uv'),(244,33,'访购率',0,1,'2023-06-21 16:18:07','2023-06-21 16:18:07','visit_buy_rate'),(245,33,'日期',1,1,'2023-06-21 16:18:07','2023-06-21 16:18:07','dt'),(246,33,'门店id',1,1,'2023-06-21 16:18:07','2023-06-21 16:18:07','shop_id'),(247,33,'门店名',1,1,'2023-06-21 16:18:07','2023-06-21 16:18:07','shop_name'),(248,33,'门店全名',1,1,'2023-06-21 16:18:07','2023-06-21 16:18:07','shop_full_name'),(249,33,'租户ID',1,1,'2023-06-21 16:18:07','2023-06-21 16:18:07','tenant_id'),(250,33,'租户名',1,1,'2023-06-21 16:18:07','2023-06-21 16:18:07','tenant_name'),(251,33,'品牌id',1,1,'2023-06-21 16:18:07','2023-06-21 16:18:07','brand_id'),(252,33,'品牌名',1,1,'2023-06-21 16:18:07','2023-06-21 16:18:07','brand_name');
 /*!40000 ALTER TABLE `app_column` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -57,4 +55,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-07-22  0:07:18
+-- Dump completed on 2023-09-29 12:39:27
