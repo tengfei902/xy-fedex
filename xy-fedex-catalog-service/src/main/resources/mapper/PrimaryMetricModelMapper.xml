@@ -3,8 +3,8 @@
 <mapper namespace="com.xy.fedex.catalog.dao.PrimaryMetricModelDao" >
   <resultMap id="BaseResultMap" type="com.xy.fedex.catalog.po.PrimaryMetricModelPO" >
     <id column="id" property="id" jdbcType="BIGINT" />
-    <result column="model_id" property="modelId" jdbcType="BIGINT" />
-    <result column="metric_id" property="metricId" jdbcType="BIGINT" />
+    <result column="model_code" property="modelCode" jdbcType="VARCHAR" />
+    <result column="metric_code" property="metricCode" jdbcType="VARCHAR" />
     <result column="formula" property="formula" jdbcType="VARCHAR" />
     <result column="status" property="status" jdbcType="INTEGER" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
@@ -12,7 +12,7 @@
     <result column="creator" property="creator" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, model_id, metric_id, formula, status, create_time, update_time, creator
+    id ,model_code ,metric_code, formula, status, create_time, update_time, creator
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select 
@@ -24,25 +24,17 @@
     delete from primary_metric_model
     where id = #{id,jdbcType=BIGINT}
   </delete>
-  <insert id="insert" parameterType="com.xy.fedex.catalog.po.PrimaryMetricModelPO" >
-    insert into primary_metric_model (id, model_id, metric_id, 
-      formula, status, create_time, 
-      update_time, creator)
-    values (#{id,jdbcType=BIGINT}, #{modelId,jdbcType=BIGINT}, #{metricId,jdbcType=BIGINT}, 
-      #{formula,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
-      #{updateTime,jdbcType=TIMESTAMP}, #{creator,jdbcType=VARCHAR})
-  </insert>
   <insert id="insertSelective" parameterType="com.xy.fedex.catalog.po.PrimaryMetricModelPO" >
     insert into primary_metric_model
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
         id,
       </if>
-      <if test="modelId != null" >
-        model_id,
+      <if test="modelCode != null" >
+        model_code,
       </if>
-      <if test="metricId != null" >
-        metric_id,
+      <if test="metricCode != null" >
+        metric_code,
       </if>
       <if test="formula != null" >
         formula,
@@ -64,11 +56,11 @@
       <if test="id != null" >
         #{id,jdbcType=BIGINT},
       </if>
-      <if test="modelId != null" >
-        #{modelId,jdbcType=BIGINT},
+      <if test="modelCode != null" >
+        #{modelCode,jdbcType=VARCHAR},
       </if>
-      <if test="metricId != null" >
-        #{metricId,jdbcType=BIGINT},
+      <if test="metricCode != null" >
+        #{metricCode,jdbcType=VARCHAR},
       </if>
       <if test="formula != null" >
         #{formula,jdbcType=VARCHAR},
@@ -90,12 +82,6 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.xy.fedex.catalog.po.PrimaryMetricModelPO" >
     update primary_metric_model
     <set >
-      <if test="modelId != null" >
-        model_id = #{modelId,jdbcType=BIGINT},
-      </if>
-      <if test="metricId != null" >
-        metric_id = #{metricId,jdbcType=BIGINT},
-      </if>
       <if test="formula != null" >
         formula = #{formula,jdbcType=VARCHAR},
       </if>
@@ -116,8 +102,7 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.xy.fedex.catalog.po.PrimaryMetricModelPO" >
     update primary_metric_model
-    set model_id = #{modelId,jdbcType=BIGINT},
-      metric_id = #{metricId,jdbcType=BIGINT},
+    set
       formula = #{formula,jdbcType=VARCHAR},
       status = #{status,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP},
@@ -125,4 +110,23 @@
       creator = #{creator,jdbcType=VARCHAR}
     where id = #{id,jdbcType=BIGINT}
   </update>
+
+  <insert id="batchInsert">
+    insert into primary_metric_model(model_code,metric_code,formula,creator)
+    values
+    <foreach collection="primaryMetricModels" item="primaryMetricModel" open="" close="" separator=",">
+        (#{primaryMetricModel.model_code},#{primaryMetricModel.metric_code},#{primaryMetricModel.formula},#{primaryMetricModel.creator})
+    </foreach>
+  </insert>
+
+  <delete id="deleteByModel">
+    delete from primary_metric_model where model_code = #{modelCode,jdbcType=VARCHAR}
+  </delete>
+
+  <select id="selectByModelCode" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from primary_metric_model
+    where model_code = #{modelCode,jdbcType=VARCHAR}
+  </select>
 </mapper>

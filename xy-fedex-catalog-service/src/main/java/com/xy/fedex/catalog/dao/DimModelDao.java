@@ -1,13 +1,10 @@
 package com.xy.fedex.catalog.dao;
 
-import com.xy.fedex.catalog.dto.DimModelRequest;
-import com.xy.fedex.catalog.po.DimModelDetailPO;
 import com.xy.fedex.catalog.po.DimModelPO;
-import com.xy.fedex.catalog.po.DimPO;
+import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.List;
 @Mapper
 public interface DimModelDao {
     int deleteByPrimaryKey(Long id);
@@ -22,17 +19,9 @@ public interface DimModelDao {
 
     int updateByPrimaryKey(DimModelPO record);
 
-    int batchInsert(List<DimModelPO> records);
+    int batchInsert(@Param("dimModels")List<DimModelPO> dimModels);
 
-    List<DimPO> selectByModelIds(@Param("modelIds") List<Long> modelIds);
+    int deleteByModel(@Param("modelCode")String modelCode);
 
-    List<DimModelPO> selectByModelId(@Param("modelId") Long modelId);
-
-    List<DimModelDetailPO> selectDimDetailByModelId(@Param("modelId") Long modelId);
-
-    List<DimModelDetailPO> selectByAppDimId(@Param("appId")Long appId,@Param("dimId")Long dimId);
-
-    List<DimModelPO> selectDimModels(DimModelRequest dimModelRequest);
-
-    int deleteByModelId(@Param("modelId")Long modelId);
+    List<DimModelPO> selectByModelCode(@Param("modelCode") String modelCode);
 }

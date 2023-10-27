@@ -1,13 +1,18 @@
 package com.xy.fedex.catalog.service.impl;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 import com.xy.fedex.catalog.common.definition.field.Dim;
+import com.xy.fedex.catalog.common.definition.field.impl.DimModel;
 import com.xy.fedex.catalog.dao.DimDao;
+import com.xy.fedex.catalog.dao.DimModelDao;
 import com.xy.fedex.catalog.exception.CatalogServiceExceptions;
 import com.xy.fedex.catalog.exception.ErrorCode;
+import com.xy.fedex.catalog.po.DimModelPO;
 import com.xy.fedex.catalog.po.DimPO;
 import com.xy.fedex.catalog.service.DimService;
 import com.xy.fedex.catalog.utils.CatalogUtils;
+import com.xy.fedex.rpc.context.UserContextHolder;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +32,8 @@ import java.util.stream.Collectors;
 public class DimServiceImpl implements DimService {
     @Autowired
     private DimDao dimDao;
+    @Autowired
+    private DimModelDao dimModelDao;
 
     @Override
     public List<Dim> getDims(List<String> dimCodes) {
@@ -78,5 +85,39 @@ public class DimServiceImpl implements DimService {
                 dimDao.updateByPrimaryKeySelective(dim);
             }
         }
+    }
+
+    @Override
+    public void saveDimModels(List<DimModel> dimModels) {
+        List<DimModelPO> dimModelList = dimModels.stream().map(dimModel -> {
+            DimModelPO dimModelPO = new DimModelPO();
+            dimModelPO.setDimCode(dimModel.getDimCode());
+            dimModelPO.setCreator(UserContextHolder.getCurrentUser().getUserName());
+            dimModelPO.setFormula(dimModel.getFormula());
+            dimModelPO.setModelCode(dimModel.getModelCode());
+            return dimModelPO;
+        }).collect(Collectors.toList());
+        dimModelDao.batchInsert(dimModelList);
+    }
+
+    @Override
+    public void deleteDimModels(String modelCode) {
+        dimModelDao.deleteByModel(modelCode);
+    }
+
+    @Override
+    public List<DimModel> getDimModels(String modelCode) {
+        List<DimModelPO> dimModelPOS = dimModelDao.selectByModelCode(CatalogUtils.getObjectFullName(modelCode));
+        if(CollectionUtils.isEmpty(dimModelPOS)) {
+            return Lists.newArrayList();
+        }
+        List<DimModel> dimModels = dimModelPOS.stream().map(dimModelPO -> {
+            DimModel dimModel = new DimModel();
+            dimModel.setDimCode(CatalogUtils.getObject(dimModelPO.getDimCode()).getObjectName());
+            dimModel.setModelCode(CatalogUtils.getObject(dimModelPO.getModelCode()).getObjectName());
+            dimModel.setFormula(dimModelPO.getFormula());
+            return dimModel;
+        }).collect(Collectors.toList());
+        return dimModels;
     }
 }

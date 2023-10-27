@@ -54,9 +54,9 @@ public class MetricModelServiceImpl implements MetricModelService {
 
     private PrimaryMetricModel getPrimaryMetricModel(MetricModelPO metricModelPO) {
         PrimaryMetricModel primaryMetricModel = new PrimaryMetricModel();
-        primaryMetricModel.setModelId(metricModelPO.getModelIds().get(0));
-        primaryMetricModel.setMetricId(metricModelPO.getMetricId());
-        primaryMetricModel.setMetricModelId(metricModelPO.getId());
+//        primaryMetricModel.setModelId(metricModelPO.getModelIds().get(0));
+//        primaryMetricModel.setMetricId(metricModelPO.getMetricId());
+//        primaryMetricModel.setMetricModelId(metricModelPO.getId());
         List<Long> modelIds = new Gson().fromJson(metricModelPO.getModelId(),new TypeToken<List<Long>>(){}.getType());
         AdvanceCalculate advanceCalculate = getAdvanceCalculate(modelIds.get(0),metricModelPO);
         primaryMetricModel.setAdvanceCalculate(advanceCalculate);
@@ -85,8 +85,8 @@ public class MetricModelServiceImpl implements MetricModelService {
     private DeriveMetricModel getDeriveMetricModel(MetricModelPO metricModelPO) {
         DeriveMetricModel deriveMetricModel = new DeriveMetricModel();
 
-        deriveMetricModel.setMetricModelId(metricModelPO.getId());
-        deriveMetricModel.setMetricId(metricModelPO.getMetricId());
+//        deriveMetricModel.setMetricModelId(metricModelPO.getId());
+//        deriveMetricModel.setMetricId(metricModelPO.getMetricId());
         deriveMetricModel.setMetricCode(metricModelPO.getMetricCode());
         deriveMetricModel.setRelateMetricModels(new ArrayList<>());
 

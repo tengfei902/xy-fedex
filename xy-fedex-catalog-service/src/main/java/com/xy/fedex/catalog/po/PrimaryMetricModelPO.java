@@ -13,9 +13,9 @@ import java.util.Date;
 public class PrimaryMetricModelPO implements Serializable {
     private Long id;
 
-    private Long modelId;
+    private String modelCode;
 
-    private Long metricId;
+    private String metricCode;
 
     private String formula;
 

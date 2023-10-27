@@ -169,7 +169,7 @@ public class ModelService2Impl implements ModelService2 {
         if (CollectionUtils.isEmpty(metricModels)) {
             return;
         }
-        metricModelDao.deleteByModelId(new Gson().toJson(Arrays.asList(modelId)));
+//        metricModelDao.deleteByModelId(new Gson().toJson(Arrays.asList(modelId)));
         List<MetricModelPO> metricModelPOS = metricModels.stream().map(metricModelRequest -> {
             MetricModelPO metricModelPO = new MetricModelPO();
             metricModelPO.setModelIdArray(new Gson().toJson(Arrays.asList(modelId)));
@@ -190,17 +190,17 @@ public class ModelService2Impl implements ModelService2 {
         if (CollectionUtils.isEmpty(dimModelRequests)) {
             return;
         }
-        dimModelDao.deleteByModelId(modelId);
-        dimModelRequests.forEach(dimModelRequest -> fillDimId(bizLineId,dimModelRequest));
-        List<DimModelPO> dimModelPOs = dimModelRequests.stream().map(dimModelRequest -> {
-            DimModelPO dimModel = new DimModelPO();
-            dimModel.setDimId(dimModelRequest.getDimId());
-            dimModel.setModelId(modelId);
-            dimModel.setFormula(dimModelRequest.getFormula());
-            return dimModel;
-        }).collect(Collectors.toList());
+//        dimModelDao.deleteByModelId(modelId);
+//        dimModelRequests.forEach(dimModelRequest -> fillDimId(bizLineId,dimModelRequest));
+//        List<DimModelPO> dimModelPOs = dimModelRequests.stream().map(dimModelRequest -> {
+//            DimModelPO dimModel = new DimModelPO();
+//            dimModel.setDimId(dimModelRequest.getDimId());
+//            dimModel.setModelId(modelId);
+//            dimModel.setFormula(dimModelRequest.getFormula());
+//            return dimModel;
+//        }).collect(Collectors.toList());
 
-        dimModelDao.batchInsert(dimModelPOs);
+//        dimModelDao.batchInsert(dimModelPOs);
     }
 
     private void fillDimId(Long bizLineId,SaveDimModelRequest dimModelRequest) {

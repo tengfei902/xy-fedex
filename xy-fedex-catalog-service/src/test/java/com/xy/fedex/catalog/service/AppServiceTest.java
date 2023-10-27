@@ -74,13 +74,12 @@ public class AppServiceTest extends BaseTest {
         for(String modelCode:modelCodes) {
             ModelDTO modelDTO = new ModelDTO();
             modelDTO.setModelCode(modelCode);
-            modelDTO.setTableSource("select");
+//            modelDTO.setTableSource("select");
             modelDTO.setDsnCode("test_dsn_code");
             Map<String,String> modelParams = new HashMap<>();
-            modelParams.put(Constants.MODEL_FORCE_DIMS,"a,b,c");
+//            modelParams.put(Constants.MODEL_FORCE_DIMS,"a,b,c");
             modelDTO.setModelParams(modelParams);
             modelService.saveModel(modelDTO);
         }
-
     }
 }

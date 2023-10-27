@@ -1,5 +1,12 @@
-create table xy_mysql#biz_line_0.flow_shop_sku_dt
+create table flow_shop_sku_dt
     comment '商品流量数据'
+    tblproperties(
+        'model.dsn'='testdsncode',
+        'model.column_comment.expose_pv'='曝光pv',
+        'model.column_comment.expose_uv'='曝光uv',
+        'model.column_comment.click_uv'='点击uv',
+        'model.show_name'='商品流量数据'
+)
 as
 select
     count(if(user_action='expose',user_id,null)) as expose_pv,

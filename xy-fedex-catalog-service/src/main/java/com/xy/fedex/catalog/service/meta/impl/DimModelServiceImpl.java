@@ -18,14 +18,15 @@ public class DimModelServiceImpl implements DimModelService {
 
     @Override
     public List<DimModel> getDimModels(DimModelRequest dimModelRequest) {
-        List<DimModelPO> dimModels = dimModelDao.selectDimModels(dimModelRequest);
-        return dimModels.stream().map(dimModelPO -> {
-            DimModel dimModel = new DimModel();
-            dimModel.setDimModelId(dimModelPO.getId());
-            dimModel.setModelId(dimModelPO.getModelId());
-            dimModel.setDimCode(dimModelPO.getDimCode());
-            dimModel.setFormula(dimModelPO.getFormula());
-            return dimModel;
-        }).collect(Collectors.toList());
+//        List<DimModelPO> dimModels = dimModelDao.selectDimModels(dimModelRequest);
+//        return dimModels.stream().map(dimModelPO -> {
+//            DimModel dimModel = new DimModel();
+//            dimModel.setDimModelId(dimModelPO.getId());
+//            dimModel.setModelId(dimModelPO.getModelId());
+//            dimModel.setDimCode(dimModelPO.getDimCode());
+//            dimModel.setFormula(dimModelPO.getFormula());
+//            return dimModel;
+//        }).collect(Collectors.toList());
+        return null;
     }
 }

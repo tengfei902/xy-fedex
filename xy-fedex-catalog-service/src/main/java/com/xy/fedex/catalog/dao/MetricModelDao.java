@@ -29,5 +29,5 @@ public interface MetricModelDao {
 
     int batchInsert(List<MetricModelPO> metricModels);
 
-    int deleteByModelId(@Param("modelId") String modelId);
+    int deleteByModelId(@Param("modelId") Long modelId);
 }

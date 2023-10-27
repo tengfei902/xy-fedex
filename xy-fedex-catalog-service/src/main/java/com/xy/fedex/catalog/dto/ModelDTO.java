@@ -1,5 +1,6 @@
 package com.xy.fedex.catalog.dto;
 
+import com.alibaba.druid.sql.ast.statement.SQLSelect;
 import lombok.Data;
 
 import java.util.Date;
@@ -14,7 +15,7 @@ public class ModelDTO {
     private String modelName;
     private String modelComment;
     private String dsnCode;
-    private String tableSource;
+    private SQLSelect tableSource;
     private Map<String,String> modelParams;
     private Date createTime;
     private Date updateTime;

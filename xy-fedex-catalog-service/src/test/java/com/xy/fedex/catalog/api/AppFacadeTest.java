@@ -3,7 +3,7 @@ package com.xy.fedex.catalog.api;
 import com.xy.fedex.catalog.BaseTest;
 import org.junit.jupiter.api.Test;
 
-public class AppPOFacadeTest extends BaseTest {
+public class AppFacadeTest extends BaseTest {
 
     /**
      * 新建APP

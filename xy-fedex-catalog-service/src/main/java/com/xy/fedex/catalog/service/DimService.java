@@ -20,4 +20,8 @@ public interface DimService {
     void saveDims(List<Dim> dims);
 
     void saveDimModels(List<DimModel> dimModels);
+
+    void deleteDimModels(String modelCode);
+
+    List<DimModel> getDimModels(String modelCode);
 }

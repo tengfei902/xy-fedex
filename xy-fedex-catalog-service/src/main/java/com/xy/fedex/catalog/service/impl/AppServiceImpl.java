@@ -1,6 +1,7 @@
 package com.xy.fedex.catalog.service.impl;
 
 import com.google.common.base.Joiner;
+import com.xy.fedex.catalog.api.conf.VarConf;
 import com.xy.fedex.catalog.common.definition.AppDefinition;
 import com.xy.fedex.catalog.common.definition.field.Dim;
 import com.xy.fedex.catalog.common.definition.field.Metric;
@@ -72,11 +73,11 @@ public class AppServiceImpl implements AppService {
         if(CollectionUtils.isEmpty(appRelateModels)) {
             return;
         }
-        AppParamsPO appParamsPO = appParamsDao.selectByParamKey(app.getId(),Constants.APP_RELATE_MODELS);
+        AppParamsPO appParamsPO = appParamsDao.selectByParamKey(app.getId(), VarConf.APP_RELATE_MODELS.getVarName());
         if(Objects.isNull(appParamsPO)) {
             appParamsPO = new AppParamsPO();
             appParamsPO.setAppId(app.getId());
-            appParamsPO.setParamKey(Constants.APP_RELATE_MODELS);
+            appParamsPO.setParamKey(VarConf.APP_RELATE_MODELS.getVarName());
             appParamsPO.setParamValue(Joiner.on(",").join(appRelateModels.stream().map(ModelDTO::getModelCode).collect(Collectors.toList())));
             appParamsDao.insertSelective(appParamsPO);
         } else {
@@ -141,8 +142,8 @@ public class AppServiceImpl implements AppService {
 
         List<AppParamsPO> appParams = appParamsDao.selectByAppId(appPO.getId());
         Map<String,AppParamsPO> paramMap =  appParams.stream().collect(Collectors.toMap(AppParamsPO::getParamKey, Function.identity()));
-        if(paramMap.containsKey(Constants.APP_RELATE_MODELS) && !StringUtils.isEmpty(paramMap.get(Constants.APP_RELATE_MODELS).getParamValue())) {
-            List<Long> relateModelIds = Arrays.asList(paramMap.get(Constants.APP_RELATE_MODELS).getParamValue().split(",")).stream().map(s -> Long.valueOf(s)).collect(Collectors.toList());
+        if(paramMap.containsKey(VarConf.APP_RELATE_MODELS.getVarName()) && !StringUtils.isEmpty(paramMap.get(VarConf.APP_RELATE_MODELS.getVarName()).getParamValue())) {
+            List<Long> relateModelIds = Arrays.asList(paramMap.get(VarConf.APP_RELATE_MODELS.getVarName()).getParamValue().split(",")).stream().map(s -> Long.valueOf(s)).collect(Collectors.toList());
         }
 
         appDefinition.setDims(new ArrayList<>());

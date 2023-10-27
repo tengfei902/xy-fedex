@@ -6,9 +6,7 @@ import java.util.Date;
 public class DimModelPO implements Serializable {
     private Long id;
 
-    private Long modelId;
-
-    private Long dimId;
+    private String modelCode;
 
     private String dimCode;
 
@@ -32,20 +30,20 @@ public class DimModelPO implements Serializable {
         this.id = id;
     }
 
-    public Long getModelId() {
-        return modelId;
+    public String getModelCode() {
+        return modelCode;
     }
 
-    public void setModelId(Long modelId) {
-        this.modelId = modelId;
+    public void setModelCode(String modelCode) {
+        this.modelCode = modelCode == null ? null : modelCode.trim();
     }
 
-    public Long getDimId() {
-        return dimId;
+    public String getDimCode() {
+        return dimCode;
     }
 
-    public void setDimId(Long dimId) {
-        this.dimId = dimId;
+    public void setDimCode(String dimCode) {
+        this.dimCode = dimCode == null ? null : dimCode.trim();
     }
 
     public String getFormula() {
@@ -88,14 +86,6 @@ public class DimModelPO implements Serializable {
         this.creator = creator == null ? null : creator.trim();
     }
 
-    public String getDimCode() {
-        return dimCode;
-    }
-
-    public void setDimCode(String dimCode) {
-        this.dimCode = dimCode;
-    }
-
     @Override
     public boolean equals(Object that) {
         if (this == that) {
@@ -109,8 +99,8 @@ public class DimModelPO implements Serializable {
         }
         DimModelPO other = (DimModelPO) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
-            && (this.getModelId() == null ? other.getModelId() == null : this.getModelId().equals(other.getModelId()))
-            && (this.getDimId() == null ? other.getDimId() == null : this.getDimId().equals(other.getDimId()))
+            && (this.getModelCode() == null ? other.getModelCode() == null : this.getModelCode().equals(other.getModelCode()))
+            && (this.getDimCode() == null ? other.getDimCode() == null : this.getDimCode().equals(other.getDimCode()))
             && (this.getFormula() == null ? other.getFormula() == null : this.getFormula().equals(other.getFormula()))
             && (this.getStatus() == null ? other.getStatus() == null : this.getStatus().equals(other.getStatus()))
             && (this.getCreateTime() == null ? other.getCreateTime() == null : this.getCreateTime().equals(other.getCreateTime()))
@@ -123,8 +113,8 @@ public class DimModelPO implements Serializable {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
-        result = prime * result + ((getModelId() == null) ? 0 : getModelId().hashCode());
-        result = prime * result + ((getDimId() == null) ? 0 : getDimId().hashCode());
+        result = prime * result + ((getModelCode() == null) ? 0 : getModelCode().hashCode());
+        result = prime * result + ((getDimCode() == null) ? 0 : getDimCode().hashCode());
         result = prime * result + ((getFormula() == null) ? 0 : getFormula().hashCode());
         result = prime * result + ((getStatus() == null) ? 0 : getStatus().hashCode());
         result = prime * result + ((getCreateTime() == null) ? 0 : getCreateTime().hashCode());
@@ -140,8 +130,8 @@ public class DimModelPO implements Serializable {
         sb.append(" [");
         sb.append("Hash = ").append(hashCode());
         sb.append(", id=").append(id);
-        sb.append(", modelId=").append(modelId);
-        sb.append(", dimId=").append(dimId);
+        sb.append(", modelCode=").append(modelCode);
+        sb.append(", dimCode=").append(dimCode);
         sb.append(", formula=").append(formula);
         sb.append(", status=").append(status);
         sb.append(", createTime=").append(createTime);

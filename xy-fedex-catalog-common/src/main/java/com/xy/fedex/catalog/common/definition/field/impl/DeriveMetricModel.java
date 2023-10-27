@@ -9,5 +9,6 @@ import java.util.List;
  */
 @Data
 public class DeriveMetricModel extends MetricModel {
+    private String appCode;
     private List<MetricModel> relateMetricModels;
 }

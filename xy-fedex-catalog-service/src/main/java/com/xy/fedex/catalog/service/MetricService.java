@@ -27,4 +27,8 @@ public interface MetricService {
     void saveMetric(Metric metric);
 
     void saveMetricModels(List<MetricModel> metricModels);
+
+    void deleteMetricModels(String modelCode);
+
+    List<MetricModel> getMetricModels(String modelCode);
 }

@@ -3,8 +3,7 @@
 <mapper namespace="com.xy.fedex.catalog.dao.DimModelDao" >
   <resultMap id="BaseResultMap" type="com.xy.fedex.catalog.po.DimModelPO" >
     <id column="id" property="id" jdbcType="BIGINT" />
-    <result column="model_id" property="modelId" jdbcType="BIGINT" />
-    <result column="dim_id" property="dimId" jdbcType="BIGINT" />
+    <result column="model_code" property="modelCode" jdbcType="VARCHAR" />
     <result column="dim_code" property="dimCode" jdbcType="VARCHAR" />
     <result column="formula" property="formula" jdbcType="VARCHAR" />
     <result column="status" property="status" jdbcType="INTEGER" />
@@ -13,7 +12,7 @@
     <result column="creator" property="creator" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, model_id, dim_id, formula, status, create_time, update_time, creator
+    id, model_code, dim_code, formula, status, create_time, update_time, creator
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select 
@@ -26,10 +25,10 @@
     where id = #{id,jdbcType=BIGINT}
   </delete>
   <insert id="insert" parameterType="com.xy.fedex.catalog.po.DimModelPO" >
-    insert into dim_model (id, model_id, dim_id, 
+    insert into dim_model (id, model_code, dim_code, 
       formula, status, create_time, 
       update_time, creator)
-    values (#{id,jdbcType=BIGINT}, #{modelId,jdbcType=BIGINT}, #{dimId,jdbcType=BIGINT}, 
+    values (#{id,jdbcType=BIGINT}, #{modelCode,jdbcType=VARCHAR}, #{dimCode,jdbcType=VARCHAR}, 
       #{formula,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
       #{updateTime,jdbcType=TIMESTAMP}, #{creator,jdbcType=VARCHAR})
   </insert>
@@ -39,11 +38,11 @@
       <if test="id != null" >
         id,
       </if>
-      <if test="modelId != null" >
-        model_id,
+      <if test="modelCode != null" >
+        model_code,
       </if>
-      <if test="dimId != null" >
-        dim_id,
+      <if test="dimCode != null" >
+        dim_code,
       </if>
       <if test="formula != null" >
         formula,
@@ -65,11 +64,11 @@
       <if test="id != null" >
         #{id,jdbcType=BIGINT},
       </if>
-      <if test="modelId != null" >
-        #{modelId,jdbcType=BIGINT},
+      <if test="modelCode != null" >
+        #{modelCode,jdbcType=VARCHAR},
       </if>
-      <if test="dimId != null" >
-        #{dimId,jdbcType=BIGINT},
+      <if test="dimCode != null" >
+        #{dimCode,jdbcType=VARCHAR},
       </if>
       <if test="formula != null" >
         #{formula,jdbcType=VARCHAR},
@@ -91,11 +90,11 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.xy.fedex.catalog.po.DimModelPO" >
     update dim_model
     <set >
-      <if test="modelId != null" >
-        model_id = #{modelId,jdbcType=BIGINT},
+      <if test="modelCode != null" >
+        model_code = #{modelCode,jdbcType=VARCHAR},
       </if>
-      <if test="dimId != null" >
-        dim_id = #{dimId,jdbcType=BIGINT},
+      <if test="dimCode != null" >
+        dim_code = #{dimCode,jdbcType=VARCHAR},
       </if>
       <if test="formula != null" >
         formula = #{formula,jdbcType=VARCHAR},
@@ -117,8 +116,8 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.xy.fedex.catalog.po.DimModelPO" >
     update dim_model
-    set model_id = #{modelId,jdbcType=BIGINT},
-      dim_id = #{dimId,jdbcType=BIGINT},
+    set model_code = #{modelCode,jdbcType=VARCHAR},
+      dim_code = #{dimCode,jdbcType=VARCHAR},
       formula = #{formula,jdbcType=VARCHAR},
       status = #{status,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP},
@@ -127,89 +126,22 @@
     where id = #{id,jdbcType=BIGINT}
   </update>
 
-  <insert id="batchInsert" parameterType="java.util.List" >
-    insert into dim_model (
-        model_id,
-        dim_id,
-        formula,
-        creator)
+  <insert id="batchInsert">
+    insert into dim_model(dim_code,model_code,formula,creator)
     values
-    <foreach collection ="list" item="dimModel" index= "index" separator =",">
-      (
-      #{dimModel.modelId},
-      #{dimModel.dimId},
-      #{dimModel.formula},
-      #{dimModel.creator}
-      )
+    <foreach collection="dimModels" item="dimModel" open="" close="" separator=",">
+      (#{dimModel.dimCode},#{dimModel.modelCode},#{dimModel.formula},#{dimModel.creator})
     </foreach>
   </insert>
 
-  <select id="selectByModelIds" resultType="com.xy.fedex.catalog.po.DimPO">
-    select distinct
-        t1.dim_id as dimId,
-        t2.dim_code as dimCode,
-        t2.dim_name as dimName,
-        t2.dim_comment as dimComment,
-        t2.dim_type as dimType
-    from dim_model t1 left join dim t2 on t1.dim_id = t2.id
-    where t1.model_id in
-    <foreach collection="modelIds" item="modelId" open="(" close=")" separator=",">
-      #{modelId}
-    </foreach>
-    and t1.status = 1 and t2.status = 1
-  </select>
-
-  <select id="selectByModelId" resultMap="BaseResultMap" parameterType="java.lang.Long" >
-    select <include refid="Base_Column_List" />
-    from dim_model
-    where model_id = #{modelId,jdbcType=BIGINT}
-    and status = 1
-  </select>
-
-  <select id="selectDimDetailByModelId" resultType="com.xy.fedex.catalog.po.DimModelDetailPO" parameterType="java.lang.Long" >
-    select
-        t1.id as dimModelId,
-        t1.dim_id as dimId,
-        t1.model_id as modelId,
-        t1.formula as formula,
-        t2.dim_code as dimCode,
-        t2.dim_name as dimName,
-        t2.dim_comment as dimComment
-    from dim_model t1 left join dim t2 on t1.dim_id = t2.id
-    where t1.status = 1 and t2.status = 1 and t1.model_id = #{modelId,jdbcType=BIGINT}
-  </select>
-
-  <select id="selectByAppDimId" resultType="com.xy.fedex.catalog.po.DimModelDetailPO">
-    select
-      t1.id as dimModelId,
-      t1.model_id as modelId,
-      t1.dim_id as dimId,
-      t1.formula,
-      t3.dim_code as dimCode,
-      t3.dim_name as dimName,
-      t3.dim_comment as dimComment
-    from dim_model t1 left join app_model_relation t2 on t1.model_id = t2.model_id
-                      left join dim t3 on t1.dim_id = t3.id
-    where t2.status = 1 and t1.status = 1 and t3.status = 1 and t2.app_id = #{appId,jdbcType=BIGINT}
-      and t1.dim_id = #{dimId,jdbcType=BIGINT}
-  </select>
-
-  <select id="selectDimModels" resultMap="BaseResultMap" parameterType="com.xy.fedex.catalog.dto.DimModelRequest" >
-    select
-    t1.id, t1.model_id, t1.dim_id, t1.formula, t1.status, t1.create_time, t1.update_time, t1.creator,t2.dim_code
-    from dim_model t1 left join dim t2 on t1.dim_id = t2.id
-    where t1.model_id in
-    <foreach collection="modelIds" item="modelId" open="(" close=")" separator=",">
-      #{modelId}
-    </foreach>
-    and t1.status = 1
-    <if test="dimId != null" >
-      and t1.dim_id = #{dimId,jdbcType=BIGINT}
-    </if>
-  </select>
-
-  <delete id="deleteByModelId" parameterType="java.lang.Long" >
-    delete from dim_model
-    where model_id = #{modelId,jdbcType=BIGINT}
+  <delete id="deleteByModel">
+    delete from dim_model where model_code = #{modelCode}
   </delete>
+
+  <select id="selectByModelCode" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from dim_model
+    where model_code = #{modelCode,jdbcType=VARCHAR}
+  </select>
 </mapper>

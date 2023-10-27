@@ -1,19 +1,22 @@
 package com.xy.fedex.catalog.service.impl;
 
-import com.alibaba.druid.sql.ast.SQLExpr;
-import com.alibaba.druid.sql.ast.statement.SQLSelect;
-import com.alibaba.druid.sql.ast.statement.SQLSelectItem;
-import com.alibaba.druid.sql.ast.statement.SQLSelectQueryBlock;
 import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 import com.xy.fedex.catalog.common.definition.field.Metric;
+import com.xy.fedex.catalog.common.definition.field.impl.DeriveMetricModel;
+import com.xy.fedex.catalog.common.definition.field.impl.MetricModel;
+import com.xy.fedex.catalog.common.definition.field.impl.PrimaryMetricModel;
+import com.xy.fedex.catalog.dao.DeriveMetricModelDao;
 import com.xy.fedex.catalog.dao.MetricDao;
+import com.xy.fedex.catalog.dao.MetricModelDao;
+import com.xy.fedex.catalog.dao.PrimaryMetricModelDao;
 import com.xy.fedex.catalog.exception.CatalogServiceExceptions;
 import com.xy.fedex.catalog.exception.ErrorCode;
+import com.xy.fedex.catalog.po.DeriveMetricModelPO;
 import com.xy.fedex.catalog.po.MetricPO;
 import com.xy.fedex.catalog.po.PrimaryMetricModelPO;
 import com.xy.fedex.catalog.service.MetricService;
 import com.xy.fedex.catalog.utils.CatalogUtils;
-import com.xy.fedex.dsl.utility.SQLExprUtils;
 import com.xy.fedex.rpc.context.UserContextHolder;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -25,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author tengfei
@@ -33,6 +37,10 @@ import java.util.stream.Collectors;
 public class MetricServiceImpl implements MetricService {
     @Autowired
     private MetricDao metricDao;
+    @Autowired
+    private PrimaryMetricModelDao primaryMetricModelDao;
+    @Autowired
+    private DeriveMetricModelDao deriveMetricModelDao;
 
     @Override
     public List<Metric> getMetrics(List<String> metricCodes) {
@@ -92,8 +100,58 @@ public class MetricServiceImpl implements MetricService {
         saveMetrics(Arrays.asList(metric));
     }
 
+    @Transactional
     @Override
-    public void saveMetricModels(String tableSource) {
+    public void saveMetricModels(List<MetricModel> metricModels) {
+        getMetrics(metricModels.stream().map(MetricModel::getMetricCode).collect(Collectors.toList()));
 
+        List<PrimaryMetricModelPO> primaryMetricModels = metricModels.stream().filter(metricModel -> metricModel instanceof PrimaryMetricModel).map(metricModel -> {
+            PrimaryMetricModel primaryMetricModel = (PrimaryMetricModel) metricModel;
+            PrimaryMetricModelPO primaryMetricModelPO = new PrimaryMetricModelPO();
+            primaryMetricModelPO.setMetricCode(CatalogUtils.getObjectFullName(primaryMetricModel.getMetricCode()));
+            primaryMetricModelPO.setModelCode(CatalogUtils.getObjectFullName(primaryMetricModel.getModelCode()));
+            primaryMetricModelPO.setFormula(primaryMetricModel.getFormula());
+            return primaryMetricModelPO;
+        }).collect(Collectors.toList());
+
+        for(PrimaryMetricModelPO primaryMetricModelPO:primaryMetricModels) {
+            primaryMetricModelDao.insertSelective(primaryMetricModelPO);
+        }
+
+        List<DeriveMetricModelPO> deriveMetricModels = metricModels.stream().filter(metricModel -> metricModel instanceof DeriveMetricModel).map(metricModel -> {
+            DeriveMetricModel deriveMetricModel = (DeriveMetricModel) metricModel;
+            DeriveMetricModelPO deriveMetricModelPO = new DeriveMetricModelPO();
+            deriveMetricModelPO.setAppCode(CatalogUtils.getObjectFullName(deriveMetricModel.getAppCode()));
+            deriveMetricModelPO.setMetricCode(CatalogUtils.getObjectFullName(deriveMetricModelPO.getMetricCode()));
+            deriveMetricModelPO.setFormula(deriveMetricModelPO.getFormula());
+            deriveMetricModelPO.setCreator(UserContextHolder.getCurrentUser().getUserName());
+            return deriveMetricModelPO;
+        }).collect(Collectors.toList());
+
+        for(DeriveMetricModelPO deriveMetricModelPO:deriveMetricModels) {
+            deriveMetricModelDao.insertSelective(deriveMetricModelPO);
+        }
+    }
+
+    @Override
+    public void deleteMetricModels(String modelCode) {
+        primaryMetricModelDao.deleteByModel(modelCode);
+    }
+
+    @Override
+    public List<MetricModel> getMetricModels(String modelCode) {
+        List<PrimaryMetricModelPO> primaryMetricModelPOS = primaryMetricModelDao.selectByModelCode(CatalogUtils.getObjectFullName(modelCode));
+        if(CollectionUtils.isEmpty(primaryMetricModelPOS)) {
+            return Lists.newArrayList();
+        }
+        List<MetricModel> metricModels = primaryMetricModelPOS.stream().map(primaryMetricModelPO -> {
+            PrimaryMetricModel primaryMetricModel = new PrimaryMetricModel();
+            primaryMetricModel.setModelCode(CatalogUtils.getObject(primaryMetricModelPO.getModelCode()).getObjectName());
+            primaryMetricModel.setMetricCode(CatalogUtils.getObject(primaryMetricModelPO.getMetricCode()).getObjectName());
+            primaryMetricModel.setFormula(primaryMetricModelPO.getFormula());
+//            primaryMetricModel.setAdvanceCalculate();
+            return primaryMetricModel;
+        }).collect(Collectors.toList());
+        return metricModels;
     }
 }

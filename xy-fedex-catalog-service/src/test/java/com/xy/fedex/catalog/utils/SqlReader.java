@@ -1,7 +1,23 @@
 package com.xy.fedex.catalog.utils;
 
+import com.alibaba.druid.DbType;
+import com.alibaba.druid.sql.SQLUtils;
+import com.alibaba.druid.sql.ast.SQLStatement;
+import com.alibaba.druid.sql.ast.expr.SQLCharExpr;
+import com.alibaba.druid.sql.ast.statement.SQLAssignItem;
 import com.alibaba.druid.sql.ast.statement.SQLSelect;
+import com.alibaba.druid.sql.dialect.hive.stmt.HiveCreateTableStatement;
+import com.facebook.presto.sql.parser.ParsingOptions;
+import com.facebook.presto.sql.parser.SqlParser;
+import com.facebook.presto.sql.tree.Statement;
+import com.google.common.base.Joiner;
+import com.xy.fedex.def.Response;
 import com.xy.fedex.dsl.utility.SQLExprUtils;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import org.apache.spark.sql.catalyst.parser.CatalystSqlParser;
+import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 
@@ -41,5 +57,26 @@ public class SqlReader {
         while (m.find()) {
             System.out.println(m.group());
         }
+    }
+
+    @Test
+    public void testReadDDL() {
+        List<Long> modelIds = new ArrayList<>();
+        List<String> models = Arrays.asList("model_flow_shop_sku_dt.sql");
+        for(String model:models) {
+            String sql = SqlReader.read("ddl/"+model);
+//            CatalystSqlParser parser = new CatalystSqlParser();
+//            LogicalPlan parsedPlan = parser.parsePlan(sql);
+
+//            SqlParser parser = new SqlParser();
+//            Statement statement = parser.createStatement(sql, ParsingOptions.builder().build());
+            System.out.println("----");
+            SQLStatement sqlStatement = SQLUtils.parseSingleStatement(sql, DbType.hive);
+            HiveCreateTableStatement hiveCreateTableStatement = (HiveCreateTableStatement) sqlStatement;
+            SQLSelect select = hiveCreateTableStatement.getSelect();
+            String modelComment = ((SQLCharExpr)hiveCreateTableStatement.getComment()).getText();
+            List<SQLAssignItem> tblProperties = hiveCreateTableStatement.getTblProperties();
+        }
+        System.out.println(Joiner.on(",").join(modelIds));
     }
 }

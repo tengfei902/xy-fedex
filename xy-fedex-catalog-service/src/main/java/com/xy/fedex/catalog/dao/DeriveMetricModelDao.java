@@ -1,11 +1,8 @@
 package com.xy.fedex.catalog.dao;
 
-import com.xy.fedex.catalog.dto.MetricModelRequest;
 import com.xy.fedex.catalog.po.DeriveMetricModelPO;
 import org.apache.ibatis.annotations.Mapper;
-
-import java.util.List;
-
+import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface DeriveMetricModelDao {
     int deleteByPrimaryKey(Long id);
@@ -20,5 +17,5 @@ public interface DeriveMetricModelDao {
 
     int updateByPrimaryKey(DeriveMetricModelPO record);
 
-    List<DeriveMetricModelPO> selectMetricModels(MetricModelRequest request);
+    int deleteByModel(@Param("modelCode")String modelCode);
 }

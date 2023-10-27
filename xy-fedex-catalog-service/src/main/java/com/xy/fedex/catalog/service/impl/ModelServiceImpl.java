@@ -1,10 +1,14 @@
 package com.xy.fedex.catalog.service.impl;
 
+import com.alibaba.druid.DbType;
+import com.alibaba.druid.sql.SQLUtils;
 import com.alibaba.druid.sql.ast.SQLExpr;
 import com.alibaba.druid.sql.ast.statement.SQLSelect;
 import com.alibaba.druid.sql.ast.statement.SQLSelectGroupByClause;
 import com.alibaba.druid.sql.ast.statement.SQLSelectItem;
 import com.alibaba.druid.sql.ast.statement.SQLSelectQueryBlock;
+import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
+import com.alibaba.druid.sql.dialect.hive.stmt.HiveCreateTableStatement;
 import com.google.common.base.Joiner;
 import com.xy.fedex.catalog.common.definition.field.Dim;
 import com.xy.fedex.catalog.common.definition.field.Metric;
@@ -27,6 +31,7 @@ import com.xy.fedex.dsl.utility.SQLExprUtils;
 import com.xy.fedex.rpc.context.UserContextHolder;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -95,10 +100,14 @@ public class ModelServiceImpl implements ModelService {
             model.setModelCode(CatalogUtils.getObject(modelPO.getModelCode()).getObjectName());
             model.setModelName(modelPO.getModelName());
             model.setModelComment(modelPO.getModelComment());
-            model.setDsnCode(model.getDsnCode());
+            model.setDsnCode(modelPO.getDsnCode());
             model.setCreator(modelPO.getCreator());
             model.setCreateTime(modelPO.getCreateTime());
             model.setUpdateTime(modelPO.getUpdateTime());
+            if(!StringUtils.isEmpty(modelPO.getTableSource())) {
+                SQLSelectStatement sqlSelectStatement = (SQLSelectStatement) SQLUtils.parseSingleStatement(modelPO.getTableSource(),DbType.hive);
+                model.setTableSource(sqlSelectStatement.getSelect());
+            }
             List<ModelParamsPO> params = modelParamsMap.get(modelPO.getId());
             if(!CollectionUtils.isEmpty(params)) {
                 Map<String,String> paramMap = new HashMap<>();
@@ -116,17 +125,17 @@ public class ModelServiceImpl implements ModelService {
     public void saveModel(ModelDTO modelDTO) {
         ModelPO model = createModel(modelDTO);
         saveModelParams(model,modelDTO.getModelParams());
-        String tableSource = modelDTO.getTableSource();
-        SQLSelect sqlSelect = SQLExprUtils.parse(tableSource);
+        SQLSelect tableSource = modelDTO.getTableSource();
 
-        SQLSelectQueryBlock sqlSelectQueryBlock = sqlSelect.getQueryBlock();
+        SQLSelectQueryBlock sqlSelectQueryBlock = tableSource.getQueryBlock();
         List<SQLSelectItem> selectItems = sqlSelectQueryBlock.getSelectList();
         SQLSelectGroupByClause sqlSelectGroupByClause = sqlSelectQueryBlock.getGroupBy();
         List<SQLExpr> groupByItems = sqlSelectGroupByClause.getItems();
 
         List<SQLSelectItem> metrics = selectItems.stream().filter(selectItem -> !groupByItems.contains(selectItem.getExpr())).collect(Collectors.toList());
         List<SQLSelectItem> dims = selectItems.stream().filter(selectItem -> groupByItems.contains(selectItem.getExpr())).collect(Collectors.toList());
-
+        //model
+        metricService.deleteMetricModels(model.getModelCode());
         metricService.saveMetricModels(metrics.stream().map(selectItem -> {
             PrimaryMetricModel metricModel = new PrimaryMetricModel();
             metricModel.setMetricCode(selectItem.getAlias());
@@ -136,6 +145,8 @@ public class ModelServiceImpl implements ModelService {
             return metricModel;
         }).collect(Collectors.toList()));
 
+        //dim
+        dimService.deleteDimModels(model.getModelCode());
         dimService.saveDimModels(dims.stream().map(selectItem -> {
             DimModel dim = new DimModel();
             dim.setDimCode(selectItem.getAlias());
@@ -151,8 +162,9 @@ public class ModelServiceImpl implements ModelService {
         newModel.setModelCode(CatalogUtils.getObjectFullName(modelDTO.getModelCode()));
         newModel.setModelName(modelDTO.getModelName());
         newModel.setModelComment(modelDTO.getModelComment());
-        newModel.setTableSource(modelDTO.getTableSource());
+        newModel.setTableSource(modelDTO.getTableSource().toString());
         newModel.setDsnCode(modelDTO.getDsnCode());
+        newModel.setCreator(modelDTO.getCreator());
         if(Objects.isNull(modelPO)) {
             modelDao.insertSelective(newModel);
         } else {
